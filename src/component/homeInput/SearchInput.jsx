@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { checkBnBAddress } from "../../apis/checkApis";
 import "./SearchInput.scss";
 import { CgMenu } from "react-icons/cg";
@@ -6,8 +6,8 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
 import HomeSelect from "./HomeSelect";
 import InputHistory from "./History";
+import { useEffect } from "react";
 
-import Modal from "../modal";
 const selectItems = ["Btc", "BNB", "BSC", "Ethereum"];
 function SearchInput({ t, getData }) {
   const [iptValue, setValue] = useState("");
@@ -31,6 +31,21 @@ function SearchInput({ t, getData }) {
     setValue("");
     setVisible(false);
   };
+  const selectRef = useRef(null);
+  const handleClickOutside = (event) => {
+    if (selectRef.current && !selectRef.current.contains(event.target)) {
+      console.log('close', selectRef.current.contains(event.target));
+      setShowHistory(false);
+    }
+  };
+  useEffect(() => {
+    if (showHistory) {
+      document.addEventListener("click", handleClickOutside);
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }
+  }, [showHistory])
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !!e.target.value) {
@@ -53,9 +68,8 @@ function SearchInput({ t, getData }) {
   };
   return (
     <div
-      className={`${
-        isFocused ? "border-borderGold" : ""
-      } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
+      className={`${isFocused ? "border-borderGold" : ""
+        } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
       id="main-input"
     >
       <div className="py-6 pl-4 pr-2 w-40">
@@ -69,6 +83,7 @@ function SearchInput({ t, getData }) {
       <div className="line w-[1px] h-[70%] bg-border"></div>
       <div className="flex items-center w-full h-full px-4 relative">
         <input
+          ref={selectRef}
           value={iptValue}
           className="flex-1 h-full bg-transparent text-white text-base"
           onChange={handleChange}
@@ -81,12 +96,22 @@ function SearchInput({ t, getData }) {
             setIsFocused(false);
           }}
           onClick={() => {
-            setShowHistory(true);
+            if (historyList.length) {
+              setShowHistory(true);
+            }
           }}
         />
-        <Modal show={showHistory} onClose={() => {setShowHistory(false)}}>
-          <div>123123</div>
-        </Modal>
+        <AnimatePresence initial={false} >
+          {
+            showHistory && (
+              <motion.div key="history" initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}>
+                <InputHistory list={historyList} />
+              </motion.div>
+            )
+          }
+        </AnimatePresence>
         <AnimatePresence initial={false}>
           {visible && (
             <motion.div
