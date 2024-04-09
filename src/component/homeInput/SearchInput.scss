@@ -1,0 +1,10 @@
+#main-input {
+  position: relative;
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, .08), hsla(0, 0%, 100%, .04));
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  transition: .3s;
+  &:hover {
+      box-shadow: 0 8px 30px 2px #bd7c4090
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "welcome": "Welcome to Check",
+  "hello": "Hello",
+  "placeholder": "Please input an address",
+  "main-header": "Crypto Tracking and Investigation Platform",
+  "input-placer": "Please input an address, ENS name, or tx hash, and press Enter to Analyze",
+  "support-currency": "available currency"
+}
