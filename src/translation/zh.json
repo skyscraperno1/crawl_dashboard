@@ -4,5 +4,8 @@
   "placeholder": "请输入一个地址",
   "main-header": "加密货币跟踪和调查平台",
   "input-placer": "请输入一个地址、ENS名称或者tx哈希, 按下回车分析",
-  "support-currency": "支持货币"
+  "support-currency": "支持货币",
+  "back": "返回",
+  "home": "主页",
+  "detail": "详情"
 }

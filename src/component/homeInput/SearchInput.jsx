@@ -71,7 +71,8 @@ function SearchInput({ t, getData }) {
           getData(res.data);
         }
       }).finally(() => {
-        
+        setHistory(false)
+        getData(iptValue) // 待删除
       });
       const hasItem = historyList.some((it) => it.value === iptValue);
       if (hasItem) return;
