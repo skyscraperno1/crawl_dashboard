@@ -10,9 +10,11 @@ const resources = {
     translation: en
   },
 };
+
+const lang = sessionStorage.getItem('i18n') || 'zh'
 i18n.use(initReactI18next).init({
   resources,
-  lng: "zh",
+  lng: lang,
   fallbackLng: "zh",
   interpolation: {
     escapeValue: false,

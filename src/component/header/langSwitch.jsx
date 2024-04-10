@@ -5,8 +5,10 @@ function Switcher() {
   const changeLanguage = () => {
     if (currentLang === 'zh') {
       i18n.changeLanguage('en');
+      sessionStorage.setItem('i18n', 'en')
     } else if (currentLang === 'en'){
       i18n.changeLanguage('zh');
+      sessionStorage.setItem('i18n', 'zh')
     }
   };
   return (
