@@ -21,7 +21,9 @@ export default {
         hoverBd: '#34c3ff',
         text: "#e9ebf0",
         borderGold: 'rgb(189, 124, 64)',
-        themeColor: '#bd7c40'
+        themeColor: '#bd7c40',
+        bg: '#202124',
+        boardBg: '#303135'
       },
       backgroundImage: {
         logoSm: "url('./assets/logo-wordless.png')",

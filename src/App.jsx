@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./translation/i8n";
 import Header from "./component/header/header";
@@ -15,11 +15,19 @@ function App() {
   }
   const [currentPage, setCurrentPage] = useState(window.location.pathname);
 
+  const showBd = useMemo(() => {
+    if (currentPage === '/') {
+      return false;
+    } else {
+      return true;
+    }
+  }, [currentPage])
+
   function renderPage() {
     if (currentPage.includes("/detail")) {
       return (
         <>
-          <Detail t={t} goBack={go.bind(null, "/")} />
+          <Detail t={t} />
         </>
       );
     } else if (currentPage === "/") {
@@ -31,12 +39,12 @@ function App() {
         </>
       );
     } else {
-      return <div className="h-full w-full mx-auto pt-20 text-center text-text bg-black">Empty</div>;
+      return <div className="h-full w-full mx-auto pt-20 text-center text-text bg-bg">Empty</div>;
     }
   }
   return (
     <div className="App h-full font-text">
-      <Header t={t} />
+      <Header t={t} showBd={showBd}/>
       {renderPage()}
     </div>
   );
