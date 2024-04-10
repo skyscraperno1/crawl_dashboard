@@ -34,7 +34,6 @@ function SearchInput({ t, getData }) {
   const selectRef = useRef(null);
   const handleClickOutside = (event) => {
     if (selectRef.current && !selectRef.current.contains(event.target)) {
-      console.log('close', selectRef.current.contains(event.target));
       setShowHistory(false);
     }
   };
@@ -45,31 +44,50 @@ function SearchInput({ t, getData }) {
         document.removeEventListener("click", handleClickOutside);
       };
     }
-  }, [showHistory])
+  }, [showHistory]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !!e.target.value) {
-      const val = e.target.value;
+  const handleDel = (val) => {
+    const newList = historyList.filter((it) => it.value !== val);
+    setHistory(newList);
+    localStorage.setItem("search_option", JSON.stringify(newList));
+  };
+
+  const handleChoose = (val) => {
+    setValue(val)
+    setVisible(true)
+  }
+
+  const handleKeyUp = (e) => {
+    if (!iptValue) return;
+    if (showHistory) {
+      setShowHistory(false);
+    }
+    if (e.key === "Enter") {
+      checkBnBAddress(iptValue).then((res) => {
+        if (res.code === 200) {
+          getData(res.data);
+        }
+      }).finally(() => {
+        
+      });
+      const hasItem = historyList.some((it) => it.value === iptValue);
+      if (hasItem) return;
       const newHistory = [
         ...historyList,
         {
-          value: val,
+          value: iptValue,
           chain: type,
         },
       ];
       setHistory(newHistory);
       localStorage.setItem("search_option", JSON.stringify(newHistory));
-      checkBnBAddress(val).then((res) => {
-        if (res.code === 200) {
-          getData(res.data);
-        }
-      });
     }
   };
   return (
     <div
-      className={`${isFocused ? "border-borderGold" : ""
-        } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
+      className={`${
+        isFocused ? "border-borderGold" : ""
+      } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
       id="main-input"
     >
       <div className="py-6 pl-4 pr-2 w-40">
@@ -87,7 +105,7 @@ function SearchInput({ t, getData }) {
           value={iptValue}
           className="flex-1 h-full bg-transparent text-white text-base"
           onChange={handleChange}
-          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
           placeholder={t("input-placer")}
           onFocus={() => {
             setIsFocused(true);
@@ -101,16 +119,17 @@ function SearchInput({ t, getData }) {
             }
           }}
         />
-        <AnimatePresence initial={false} >
-          {
-            showHistory && (
-              <motion.div key="history" initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}>
-                <InputHistory list={historyList} />
-              </motion.div>
-            )
-          }
+        <AnimatePresence initial={false}>
+          {showHistory && (
+            <motion.div
+              key="history"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <InputHistory list={historyList} handleDel={handleDel} handleChoose={handleChoose}/>
+            </motion.div>
+          )}
         </AnimatePresence>
         <AnimatePresence initial={false}>
           {visible && (
