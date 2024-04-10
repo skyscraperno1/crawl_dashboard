@@ -50,6 +50,9 @@ function SearchInput({ t, getData }) {
     const newList = historyList.filter((it) => it.value !== val);
     setHistory(newList);
     localStorage.setItem("search_option", JSON.stringify(newList));
+    if (!newList.length) {
+      setShowHistory(false)
+    }
   };
 
   const handleChoose = (val) => {
