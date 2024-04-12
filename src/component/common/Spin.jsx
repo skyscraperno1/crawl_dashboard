@@ -1,6 +1,6 @@
 function Spin({ color = "themeColor" }) {
   return (
-    <div className="spin-wrapper w-full h-full flex items-center justify-center absolute z-[999]" style={{backgroundColor: 'rgb(57 57 57 / 80%)'}}>
+    <div className="spin-wrapper w-full h-full flex items-center justify-center absolute z-[999]" style={{backgroundColor: 'rgba(34, 35, 37, 0.8)'}}>
       <div
         className={`text-${color} inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em]  motion-reduce:animate-[spin_1.5s_linear_infinite]`}
         role="status"
