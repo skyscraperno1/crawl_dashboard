@@ -105,8 +105,8 @@ function DetailCanvas() {
     checkAddress(address)
       .then((res) => {
         if (res.code === 200) {
-        const _data = handleData(res.data.nodes, res.data.edges, address);
-          setData(_data);
+        const _data = handleData(res.data.nodes.slice(0, 40), res.data.edges.slice(0, 40), address);
+        setData(_data);
         }
       })
       .finally(() => {

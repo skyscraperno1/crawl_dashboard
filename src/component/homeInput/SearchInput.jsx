@@ -58,6 +58,7 @@ function SearchInput({ t, getData }) {
   const handleChoose = (val) => {
     setValue(val)
     setVisible(true)
+    selectRef.current.focus()
   }
 
   const handleKeyUp = (e) => {

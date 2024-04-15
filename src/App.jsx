@@ -5,7 +5,7 @@ import Header from "./component/header/header";
 import Content from "./component/content/content";
 import BgCanvas from "./component/BgCanvas";
 import Detail from "./component/Detail";
-
+import Table from './component//table/tableIndex'
 
 function App() {
   const { t } = useTranslation();
@@ -38,6 +38,8 @@ function App() {
           <BgCanvas index={1} />
         </>
       );
+    } else if (currentPage === '/table') {
+      return <Table />
     } else {
       return <div className="h-full w-full mx-auto pt-20 text-center text-text bg-bg">Empty</div>;
     }

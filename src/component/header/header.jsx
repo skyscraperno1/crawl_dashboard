@@ -4,6 +4,7 @@ import Switcher from "./langSwitch";
 const list = [
   { path: "/", text: "home" },
   { path: "/detail", text: "detail" },
+  { path: "/table", text: "table" },
 ];
 
 function Header({ t, showBd }) {

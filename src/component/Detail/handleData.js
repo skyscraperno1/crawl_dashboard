@@ -72,6 +72,7 @@ export function handleData(nodes, edges, address) {
       label: `[${it.year}-${it.month}-${it.day}]`,
       font: {
         color: "#fff",
+        strokeWidth: 0,
       },
       smooth: { roundness: duplicateEdges[key] * 0.1 },
     };
