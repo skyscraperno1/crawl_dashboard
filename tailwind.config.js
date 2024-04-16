@@ -26,7 +26,7 @@ export default {
         boardBg: '#303135'
       },
       spacing: {
-        calc: 'calc(100% - 40px)'        
+        calc: 'calc(100% - 48px)'        
       },
       backgroundImage: {
         logoSm: "url('./assets/logo-wordless.png')",

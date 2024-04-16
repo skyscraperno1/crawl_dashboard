@@ -64,7 +64,7 @@ function Pagination({
   };
   return (
     <div>
-      <div className="rounded-b-lg border-t border-gray-200 px-4 py-2">
+      <div className="rounded-b-lg px-4 py-2">
         <ol className="flex justify-end gap-1 text-xs font-medium">
           <li>
             <div

@@ -1,0 +1,20 @@
+.ant-table-wrapper {
+  height: 100%;
+  overflow: hidden;
+  .ant-spin-nested-loading {
+    height: 100%;
+    .ant-spin-container {
+      height: 100%;
+      .ant-table {
+        height: 100%;
+        .ant-table-container {
+          height: 100%;
+          
+        }
+      }
+    }
+  }
+}
+.ant-spin-dot-item {
+  background-color: #bd7c40!important;
+}
