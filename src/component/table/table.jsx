@@ -10,21 +10,29 @@ function MyTable({ address, t }) {
     { key: "tokenAddress", title: t('address'), dataIndex: "tokenAddress" },
     { key: "value", title: t('value'), dataIndex: "value" },
   ];
-  const [currentPage, setPage] = useState(1);
+  
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [reqData, setReqData] = useState({})
   const onPageChange = (pageNum) => {
-    setPage(pageNum);
+    setReqData({
+      ...reqData,
+      pageNum
+    })
   };
-
-  const initData = debounce(() => {
-    setLoading(true);
-    getTableData({
-      pageNum: currentPage,
+  useEffect(() => {
+    setReqData({
+      pageNum: 1,
       pageSize: 20,
       tokenAddress: address,
     })
+  }, [address])
+
+  const initData = debounce(() => {
+    setLoading(true);
+    if (!Object.keys(reqData).length) return;
+    getTableData(reqData)
       .then((res) => {
         if (res.code === 200) {
           setTotalPages(Math.ceil(res.data.count / 20));
@@ -41,9 +49,11 @@ function MyTable({ address, t }) {
         setLoading(false);
       });
   })
+
   useEffect(() => {
-    initData()
-  }, [currentPage, address]);
+    initData();
+  }, [reqData]);
+
   return (
     <div className="table-container text-text bg-[#262727] w-full h-calc">
       <div className="h-full overflow-hidden flex flex-col px-4 pb-2">
@@ -56,7 +66,7 @@ function MyTable({ address, t }) {
           locale={{ emptyText: <Empty t={t}></Empty>}}
         />
         <Pagination
-          currentPage={currentPage}
+          currentPage={reqData.pageNum}
           totalPages={totalPages}
           onPageChange={onPageChange}
         />
