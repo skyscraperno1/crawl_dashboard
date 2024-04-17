@@ -8,5 +8,8 @@
   "back": "返回",
   "home": "主页",
   "detail": "详情",
-  "table": "表格"
+  "table": "表格",
+  "empty": "暂无信息",
+  "address": "地址",
+  "value": "交易量"
 }

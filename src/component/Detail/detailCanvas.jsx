@@ -3,6 +3,8 @@ import { Network, DataSet } from "vis-network/standalone/esm/vis-network";
 import { debounce } from "../../utils";
 import { checkAddress } from "../../apis/checkApis";
 import Spin from "../common/Spin";
+import Empty from "../common/Empty";
+import ToolBox from "./toolBox";
 function getAddress(pathname) {
   const idx = pathname.lastIndexOf("/");
   const hash = pathname.substring(idx + 1);
@@ -13,13 +15,14 @@ function getAddress(pathname) {
   }
 }
 import { handleData } from "./handleData";
-function DetailCanvas() {
+function DetailCanvas({t}) {
   const address = getAddress(window.location.pathname);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     nodes: [],
     edges: [],
   });
+  const [empty, setEmpty] = useState(false)
   const networkRef = useRef(null);
 
   useEffect(() => {
@@ -98,6 +101,8 @@ function DetailCanvas() {
       return () => {
         network.destroy();
       };
+    } else {
+      setEmpty(true)
     }
   }, [data]);
   const fetchData = debounce(() => {
@@ -118,12 +123,18 @@ function DetailCanvas() {
       fetchData();
     } else {
       setLoading(false);
+      setEmpty(true)
     }
   }, [address]);
   return (
     <div className="w-full h-full overflow-hidden relative">
+      <ToolBox />
       {loading && <Spin />}
-      <div ref={networkRef} className="h-full w-full" id="canvas-node"></div>
+      {
+        empty ? 
+        <Empty t={t}/>
+        : <div ref={networkRef} className="h-full w-full" id="canvas-node"></div>
+      }
     </div>
   );
 }

@@ -5,23 +5,27 @@ import Header from "./component/header/header";
 import Content from "./component/content/content";
 import BgCanvas from "./component/BgCanvas";
 import Detail from "./component/Detail";
-import Table from './component//table/tableIndex'
-
+import MyTable from "./component//table/tableIndex";
+import { ConfigProvider } from "antd";
+const componentConfig = {
+  algorithm: true,
+  colorPrimary: "#bd7c40",
+};
 function App() {
   const { t } = useTranslation();
   const go = (pathname) => {
-    setCurrentPage(pathname)
+    setCurrentPage(pathname);
     window.location.pathname = pathname;
-  }
+  };
   const [currentPage, setCurrentPage] = useState(window.location.pathname);
 
   const showBd = useMemo(() => {
-    if (currentPage === '/') {
+    if (currentPage === "/") {
       return false;
     } else {
       return true;
     }
-  }, [currentPage])
+  }, [currentPage]);
 
   function renderPage() {
     if (currentPage.includes("/detail")) {
@@ -33,21 +37,40 @@ function App() {
     } else if (currentPage === "/") {
       return (
         <>
-          <Content t={t} getData={(val) => {go('/detail/' + val)}} />
+          <Content
+            t={t}
+            getData={(val) => {
+              go("/detail/" + val);
+            }}
+          />
           <BgCanvas index={0} />
           <BgCanvas index={1} />
         </>
       );
-    } else if (currentPage === '/table') {
-      return <Table />
+    } else if (currentPage === "/table") {
+      return <MyTable t={t} />;
     } else {
-      return <div className="h-full w-full mx-auto pt-20 text-center text-text bg-bg">Empty</div>;
+      return (
+        <div className="h-full w-full mx-auto pt-20 text-center text-text bg-bg">
+          Empty
+        </div>
+      );
     }
   }
   return (
     <div className="App h-full font-text">
-      <Header t={t} showBd={showBd}/>
-      {renderPage()}
+      <ConfigProvider
+        theme={{
+          components: {
+            Table: componentConfig,
+            Input: componentConfig,
+            InputNumber: componentConfig,
+          },
+        }}
+      >
+        <Header t={t} showBd={showBd} />
+        {renderPage()}
+      </ConfigProvider>
     </div>
   );
 }

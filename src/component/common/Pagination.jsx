@@ -1,9 +1,11 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import { Input } from "antd";
+import { useState } from 'react'
 function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-  maxDisplayPages = 8,
+  maxDisplayPages = 8
 }) {
   const maxDisplay = Math.max(5, Number(maxDisplayPages));
   const pageNumbers = Array.from(
@@ -15,11 +17,7 @@ function Pagination({
       return pageNumbers;
     } else {
       if (currentPage <= Math.floor(maxDisplay / 2)) {
-        return [
-          ...pageNumbers.slice(0, maxDisplay - 2),
-          "...",
-          totalPages,
-        ];
+        return [...pageNumbers.slice(0, maxDisplay - 2), "...", totalPages];
       } else if (currentPage >= totalPages - Math.floor(maxDisplay / 2)) {
         return [1, "...", ...pageNumbers.slice(-maxDisplay + 2)];
       } else {
@@ -57,6 +55,19 @@ function Pagination({
       onPageChange(pageNumber);
     }
   };
+  const [value, setValue] = useState(currentPage)
+  const handleBlur = (e) => {
+    let _value = e.target.value.replace(/[^0-9]/g, "")
+    if (_value > totalPages) {
+      _value = totalPages
+    } else if (_value < 1) {
+      _value = 1
+    }
+    if (_value) {
+      setValue(_value)
+      onPageChange(Number(_value))
+    } 
+  }
 
   const disabled = {
     cursor: "not-allowed",
@@ -64,8 +75,11 @@ function Pagination({
   };
   return (
     <div>
-      <div className="rounded-b-lg px-4 py-2">
-        <ol className="flex justify-end gap-1 text-xs font-medium">
+      <div className="rounded-b-lg my-2 px-4 h-8 flex justify-end items-center">
+        <ol
+          className="justify-end gap-1 text-xs font-medium h-8"
+          style={{ display: totalPages ? "flex" : "none" }}
+        >
           <li>
             <div
               style={currentPage === 1 ? disabled : {}}
@@ -103,7 +117,6 @@ function Pagination({
               </button>
             </li>
           ))}
-
           <li>
             <div
               onClick={() => {
@@ -128,6 +141,18 @@ function Pagination({
             </div>
           </li>
         </ol>
+        {totalPages > 10 && (
+          <div className="h-full flex items-center text-text mx-2 text-sm">
+            跳至
+            <Input
+              value={value}
+              onChange={(e) => {setValue(e.target.value)}}
+              className="mx-4 w-16"
+              onBlur={handleBlur}
+            />
+            页
+          </div>
+        )}
       </div>
     </div>
   );
@@ -136,7 +161,7 @@ function Pagination({
 Pagination.propTypes = {
   numberProp: PropTypes.number,
   totalPages: PropTypes.number,
-  currentPage: PropTypes.number
-}
+  currentPage: PropTypes.number,
+};
 
 export default Pagination;

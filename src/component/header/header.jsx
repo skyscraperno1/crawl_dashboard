@@ -21,7 +21,7 @@ function Header({ t, showBd }) {
     <header className={`${showBd ? 'border-b border-[#303030]' : ''} h-[80px] w-full fixed top-0 left-0 right-0 z-20 backdrop-blur-sm px-8 text-text`}>
       <div className="p-4 flex items-center">
         <div
-          className="cursor-pointer w-40 h-12 mx-8 bg-logo bg-no-repeat bg-cover"
+          className="cursor-pointer w-40 h-12 bg-logoSm xl:bg-logo bg-no-repeat xl:bg-cover bg-contain"
           onClick={() => {
             window.location.href = "/";
           }}
@@ -47,8 +47,8 @@ function Header({ t, showBd }) {
             })}
           </div>
         </div>
-        <div className="w-56">
-        <Switcher />
+        <div className="w-40">
+          <Switcher />
         </div>
       </div>
     </header>
