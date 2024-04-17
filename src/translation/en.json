@@ -11,5 +11,6 @@
   "table": "table",
   "empty": "No Data",
   "address": "Address",
-  "value": "Value"
+  "value": "Value",
+  "more": "More"
 }
