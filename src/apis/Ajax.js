@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const Axios = axios.create({
-  // baseURL: 'http://192.168.110.38:9020',
+  // baseURL: '/api',
+  baseURL: '/prod-api/',
   timeout: 10000
 })
 
