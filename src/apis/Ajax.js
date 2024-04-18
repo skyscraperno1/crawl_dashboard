@@ -3,7 +3,7 @@ import axios from 'axios'
 const Axios = axios.create({
   // baseURL: '/api',
   // baseURL: 'http://' + window.location.hostname + ':9011',
-  baseURL: 'http://http://192.168.110.50:9011',
+  baseURL: 'http://localhost:9011',
   timeout: 10000
 })
 
