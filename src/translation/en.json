@@ -12,5 +12,9 @@
   "empty": "No Data",
   "address": "Address",
   "value": "Value",
-  "more": "More"
+  "more": "More",
+  "date": "Date",
+  "from_address": "From Address",
+  "raw_amount": "Amount",
+  "inter_tracker": "InterChain Tracker"
 }

@@ -6,6 +6,7 @@ import DetailCanvas from "./detailCanvas";
 function Detail({t}) {
   const [showSide, setShowSide] = useState();
   const toggleShow = () => {
+    if (!showSide) return;
     setShowSide(!showSide);
   };
   return (

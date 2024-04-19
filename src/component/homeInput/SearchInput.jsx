@@ -8,8 +8,7 @@ import HomeSelect from "./HomeSelect";
 import InputHistory from "./History";
 import { useEffect } from "react";
 
-const selectItems = ["Btc", "BNB", "BSC", "Ethereum"];
-function SearchInput({ t, getData }) {
+function SearchInput({ t, getData, selectItems }) {
   const [iptValue, setValue] = useState("");
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState(selectItems[0]);
@@ -67,13 +66,13 @@ function SearchInput({ t, getData }) {
       setShowHistory(false);
     }
     if (e.key === "Enter") {
+      console.log(type);
       checkBnBAddress(iptValue).then((res) => {
         if (res.code === 200) {
           getData(res.data);
         }
       }).finally(() => {
-        setHistory(false)
-        getData(iptValue) // 待删除
+        getData(iptValue) 
       });
       const hasItem = historyList.some((it) => it.value === iptValue);
       if (hasItem) return;
@@ -95,7 +94,7 @@ function SearchInput({ t, getData }) {
       } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
       id="main-input"
     >
-      <div className="py-6 pl-4 pr-2 w-40">
+      <div className="py-6 pl-4 pr-2 w-44">
         <HomeSelect
           options={selectItems.map((it) => ({ label: it, value: it }))}
           defaultValue={selectItems[0]}

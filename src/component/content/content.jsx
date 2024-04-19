@@ -3,7 +3,7 @@ import { fadeIn } from "./fadeIn";
 import { TypeAnimation } from "react-type-animation";
 import SearchInput from "../homeInput/SearchInput";
 import "./content.scss";
-const selectItems = ["Btc", "BNB", "BSC", "Ethereum"];
+const selectItems = ["Bep20", "BNB"];
 function Content({ t, getData }) {
   const sequence = selectItems.flatMap((item) => [item, 2000]);
 
@@ -30,7 +30,7 @@ function Content({ t, getData }) {
           />
         </div>
 
-        <SearchInput t={t} getData={getData}></SearchInput>
+        <SearchInput t={t} getData={getData} selectItems={selectItems}></SearchInput>
       </motion.div>
     </section>
   );

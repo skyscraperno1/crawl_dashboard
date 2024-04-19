@@ -17,6 +17,7 @@ const InputHistory = ({ list = [], handleDel = () => {}, handleChoose = () => {}
           key={it.value}
           onClick={chooseClick.bind(null, it.value)}
         >
+          <div className={`bg-${it.chain} bg-contain bg-no-repeat w-6 h-6 mr-2`}></div>
           <div className="flex-1 truncate">{it.value}</div>
           <AiFillCloseCircle className="text-slate-400" onClick={(e) => {handleClick(e, it.value)}}/>
         </div>

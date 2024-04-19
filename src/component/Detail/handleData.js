@@ -64,6 +64,12 @@ export function handleData(edges, address) {
       smooth: { roundness: duplicateEdges[key] * 0.1 },
     };
   });
+  const len = Math.max(leftCount, rightCount);
+  _nodes.forEach((node) => {
+    if (node.id === address) {
+      node.y = (len / 2) * 140;
+    }
+  });
   return {
     nodes: _nodes,
     edges: _edges,

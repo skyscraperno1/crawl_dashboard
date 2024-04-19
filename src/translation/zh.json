@@ -12,5 +12,9 @@
   "empty": "暂无信息",
   "address": "地址",
   "value": "交易量",
-  "more": "更多"
+  "more": "更多",
+  "date": "日期",
+  "from_address": "来源地址",
+  "raw_amount": "总量",
+  "inter_tracker": "链间追踪"
 }

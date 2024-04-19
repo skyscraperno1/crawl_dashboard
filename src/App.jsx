@@ -65,7 +65,8 @@ function App() {
             Table: componentConfig,
             Input: componentConfig,
             InputNumber: componentConfig,
-            Button: componentConfig
+            Button: componentConfig,
+            Drawer: componentConfig
           },
         }}
       >
