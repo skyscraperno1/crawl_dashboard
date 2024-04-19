@@ -54,8 +54,9 @@ function SearchInput({ t, getData, selectItems }) {
     }
   };
 
-  const handleChoose = (val) => {
+  const handleChoose = (val, type) => {
     setValue(val)
+    setType(type)
     setVisible(true)
     selectRef.current.focus()
   }
@@ -97,9 +98,9 @@ function SearchInput({ t, getData, selectItems }) {
       <div className="py-6 pl-4 pr-2 w-44">
         <HomeSelect
           options={selectItems.map((it) => ({ label: it, value: it }))}
-          defaultValue={selectItems[0]}
           onChange={selectChange}
           disabled={false}
+          selValue={type}
         />
       </div>
       <div className="line w-[1px] h-[70%] bg-border"></div>

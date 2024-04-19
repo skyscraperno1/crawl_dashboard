@@ -276,6 +276,7 @@ function DetailCanvas({ t }) {
       >
         {
           <Table
+            className="drawer-table"
             dataSource={drawerData}
             columns={columns}
             pagination={false}

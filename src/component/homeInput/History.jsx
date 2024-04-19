@@ -6,8 +6,8 @@ const InputHistory = ({ list = [], handleDel = () => {}, handleChoose = () => {}
     handleDel(val)
   }, [handleDel])
 
-  const chooseClick = useCallback((val) => {
-    handleChoose(val)
+  const chooseClick = useCallback((val, type) => {
+    handleChoose(val, type)
   }, [handleChoose])
   return (
     <div className="absolute left-2 top-[100%] translate-y-1 rounded-md hide-scrollbar w-[95%] bg-[#191819] py-2">
@@ -15,7 +15,7 @@ const InputHistory = ({ list = [], handleDel = () => {}, handleChoose = () => {}
         <div
           className="flex items-center justify-between truncate hover:bg-[#ffffff20] h-10 w-full cursor-pointer py-2 text-base leading-4 px-4"
           key={it.value}
-          onClick={chooseClick.bind(null, it.value)}
+          onClick={chooseClick.bind(null, it.value, it.chain)}
         >
           <div className={`bg-${it.chain} bg-contain bg-no-repeat w-6 h-6 mr-2`}></div>
           <div className="flex-1 truncate">{it.value}</div>

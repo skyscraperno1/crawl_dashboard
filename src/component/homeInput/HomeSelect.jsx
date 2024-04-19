@@ -2,21 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { FiChevronDown } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import "./HomeSelect.scss";
-const HomeSelect = ({ options, onChange, defaultValue, disabled }) => {
+const HomeSelect = ({ options, onChange, disabled, selValue }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(
-    defaultValue ? defaultValue : ""
-  );
+
   const selectRef = useRef(null);
 
   const handleClick = () => {
     if (disabled) return;
     setIsOpen(!isOpen);
   };
-  const handleSelectOption = (value) => {
-    setSelectedOption(value);
+  const handleSelectOption = (value, type) => {
     setIsOpen(false);
-    onChange(value);
+    onChange(value, type);
   };
 
   useEffect(() => {
@@ -38,7 +35,7 @@ const HomeSelect = ({ options, onChange, defaultValue, disabled }) => {
       className="select overflow-hidden overflow-y-hidden w-full px-2 flex items-center text-slate-300 text-base"
     >
       <div
-        className={`bg-${selectedOption} bg-contain bg-no-repeat w-6 h-6 mr-2`}
+        className={`bg-${selValue} bg-contain bg-no-repeat w-6 h-6 mr-2`}
       ></div>
       <div
         className={`${
@@ -46,7 +43,7 @@ const HomeSelect = ({ options, onChange, defaultValue, disabled }) => {
         } flex-1 truncate`}
         onClick={handleClick}
       >
-        {selectedOption}
+        {selValue}
       </div>
       <FiChevronDown />
       <AnimatePresence initial={false}>
@@ -58,7 +55,7 @@ const HomeSelect = ({ options, onChange, defaultValue, disabled }) => {
               <div
                 key={index}
                 className={`justify-between hover:bg-[#ffffff20] h-8 leading-8 w-full cursor-pointer ${
-                  selectedOption === option.value ? "bg-themeColor" : ""
+                  selValue === option.value ? "bg-themeColor" : ""
                 }`}
                 onClick={() => handleSelectOption(option.value)}
               >
