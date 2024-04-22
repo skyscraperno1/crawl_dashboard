@@ -22,9 +22,17 @@ function getAddress(pathname) {
     return hash;
   }
 }
+function getType(pathname) {
+  const splitArr = pathname.split("/");
+  if (splitArr.length === 2) {
+    return "";
+  } else {
+    return splitArr[2];
+  }
+}
 let initialData = [];
 let network = null;
-function DetailCanvas({ t }) {
+function DetailCanvas({ t, getData }) {
   const [copied, setCopied] = useState(false);
   const columns = [
     { key: "block_time", title: t("date"), dataIndex: "block_time" },
@@ -76,6 +84,7 @@ function DetailCanvas({ t }) {
   ];
 
   const address = getAddress(window.location.pathname);
+  const type = getType(window.location.pathname);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     nodes: [],
@@ -136,25 +145,24 @@ function DetailCanvas({ t }) {
     network = new Network(networkRef.current, _data, options);
     network.on("click", function (params) {
       const [node] = params.nodes;
-      if (node) {
-        // console.log(node, nodes.get(node), "click");
-      }
       const [edgeId] = params.edges;
       if (edgeId && !node) {
         setDrawerOpen(false);
         const edge = network.body.data.edges.get(edgeId);
         const fromNode = edge.from;
         const toNode = edge.to;
-        console.log(fromNode, toNode);
-        checkEdgeAdd({
-          toAddress: toNode,
-          fromAddress: fromNode,
-          symbol: "",
-        }).then((res) => {
+        checkEdgeAdd(
+          {
+            toAddress: toNode,
+            fromAddress: fromNode,
+            symbol: "",
+          },
+          type
+        ).then((res) => {
           if (res.code === 200) {
-            console.log(res.data);
+            const _data = type === "Bep20" ? res.data : [res.data];
             setDrawerData(
-              res.data.map((it) => {
+              _data.map((it) => {
                 return {
                   ...it,
                   key: it.id,
@@ -205,7 +213,7 @@ function DetailCanvas({ t }) {
   }, [data]);
   const fetchData = debounce(() => {
     setLoading(true);
-    checkAddress(address)
+    checkAddress(address, type)
       .then((res) => {
         if (res.code === 200) {
           initialData = res.data.edges;
@@ -249,6 +257,7 @@ function DetailCanvas({ t }) {
         t={t}
         showMore={initialData.length && initialData.length > chunkSize}
         loadMore={loadMore}
+        getData={getData}
       />
       {loading && <Spin />}
       {empty && !loading && <Empty t={t} />}

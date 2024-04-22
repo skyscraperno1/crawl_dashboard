@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { checkBnBAddress } from "../../apis/checkApis";
 import "./SearchInput.scss";
 import { CgMenu } from "react-icons/cg";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -8,7 +7,7 @@ import HomeSelect from "./HomeSelect";
 import InputHistory from "./History";
 import { useEffect } from "react";
 
-function SearchInput({ t, getData, selectItems }) {
+function SearchInput({ t, getData, selectItems, menuClick = null}) {
   const [iptValue, setValue] = useState("");
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState(selectItems[0]);
@@ -20,6 +19,7 @@ function SearchInput({ t, getData, selectItems }) {
 
   const selectChange = (val) => {
     setType(val);
+    setValue('')
   };
   const handleChange = (e) => {
     const text = e.target.value;
@@ -52,6 +52,7 @@ function SearchInput({ t, getData, selectItems }) {
     if (!newList.length) {
       setShowHistory(false)
     }
+    setValue('')
   };
 
   const handleChoose = (val, type) => {
@@ -67,15 +68,8 @@ function SearchInput({ t, getData, selectItems }) {
       setShowHistory(false);
     }
     if (e.key === "Enter") {
-      console.log(type);
-      checkBnBAddress(iptValue).then((res) => {
-        if (res.code === 200) {
-          getData(res.data);
-        }
-      }).finally(() => {
-        getData(iptValue) 
-      });
-      const hasItem = historyList.some((it) => it.value === iptValue);
+      getData(iptValue, type)
+      const hasItem = historyList.some((it) => (it.value === iptValue && it.chain === type));
       if (hasItem) return;
       const newHistory = [
         ...historyList,
@@ -92,10 +86,10 @@ function SearchInput({ t, getData, selectItems }) {
     <div
       className={`${
         isFocused ? "border-borderGold" : ""
-      } flex relative  h-22 w-[80%] backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
+      } flex relative  h-full max-h-20 backdrop-blur-sm items-center border-2 border-border rounded-full hover:border-borderGold shadow-hoverShadow font-text`}
       id="main-input"
     >
-      <div className="py-6 pl-4 pr-2 w-44">
+      <div className="pl-4 pr-2 w-44">
         <HomeSelect
           options={selectItems.map((it) => ({ label: it, value: it }))}
           onChange={selectChange}
@@ -150,7 +144,7 @@ function SearchInput({ t, getData, selectItems }) {
               />
             </motion.div>
           )}
-          <CgMenu className="text-slate-300 text-2xl" />
+          <CgMenu className={`${menuClick ? 'cursor-pointer' : 'cursor-normal'} text-slate-300 text-2xl`} onClick={menuClick}/>
         </AnimatePresence>
       </div>
     </div>

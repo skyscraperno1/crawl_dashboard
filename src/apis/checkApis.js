@@ -1,31 +1,12 @@
 import Ajax from "./Ajax";
 
-export function checkAddress(address) {
+export function checkAddress(address, type) {
+  const url =
+    type === "Bep20"
+      ? "/v1/api/bep20/findBep20ByAddress"
+      : "/v1/api/bnb/queryBnbByAddress";
   return Ajax({
-    url: "/v1/api/bep20/findBep20ByAddress",
-    method: "POST",
-    params: {
-      address,
-    },
-  });
-}
-
-/**
- *
- * @param {toAddress: string, fromAddress: string, symbol: string} params
- * @returns
- */
-export function checkEdgeAdd(params) {
-  return Ajax({
-    url: "/v1/api/bep20/findAddressByEdge",
-    method: "POST",
-    params,
-  });
-}
-
-export function checkBnBAddress(address) {
-  return Ajax({
-    url: "/v1/api/bnb/queryBnbByAddress",
+    url,
     method: "POST",
     params: {
       address,
@@ -38,9 +19,13 @@ export function checkBnBAddress(address) {
  * @param {toAddress: string, fromAddress: string} params
  * @returns
  */
-export function checkBnBEdge(params) {
+export function checkEdgeAdd(params, type) {
+  const url =
+    type === "Bep20"
+      ? "/v1/api/bep20/findAddressByEdge"
+      : "/v1/api/bnb/queryEdge";
   return Ajax({
-    url: "/v1/api/bnb/queryEdge",
+    url,
     method: "POST",
     params,
   });

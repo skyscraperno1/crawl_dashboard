@@ -29,8 +29,13 @@ function Content({ t, getData }) {
             repeat={Infinity}
           />
         </div>
-
-        <SearchInput t={t} getData={getData} selectItems={selectItems}></SearchInput>
+        <div className="h-24 w-full px-12">
+          <SearchInput
+            t={t}
+            getData={getData}
+            selectItems={selectItems}
+          ></SearchInput>
+        </div>
       </motion.div>
     </section>
   );

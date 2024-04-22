@@ -31,7 +31,12 @@ function App() {
     if (currentPage.includes("/detail")) {
       return (
         <>
-          <Detail t={t} />
+          <Detail
+            t={t}
+            getData={(val, type) => {
+              go("/detail/" + type + "/" + val.toLowerCase());
+            }}
+          />
         </>
       );
     } else if (currentPage === "/") {
@@ -39,8 +44,8 @@ function App() {
         <>
           <Content
             t={t}
-            getData={(val) => {
-              go("/detail/" + val);
+            getData={(val, type) => {
+              go("/detail/" + type + "/" + val.toLowerCase());
             }}
           />
           <BgCanvas index={0} />
@@ -66,7 +71,7 @@ function App() {
             Input: componentConfig,
             InputNumber: componentConfig,
             Button: componentConfig,
-            Drawer: componentConfig
+            Drawer: componentConfig,
           },
         }}
       >
