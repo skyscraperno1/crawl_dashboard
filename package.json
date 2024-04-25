@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antv/g6": "^4.8.24",
     "antd": "^5.16.2",
     "axios": "^1.6.8",
     "framer-motion": "^11.0.25",

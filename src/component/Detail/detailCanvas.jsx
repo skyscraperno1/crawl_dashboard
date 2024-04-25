@@ -92,7 +92,7 @@ function DetailCanvas({ t, getData }) {
   });
   const [empty, setEmpty] = useState(false);
   const networkRef = useRef(null);
-  const [chunkSize, setChunk] = useState(20);
+  const [chunkSize, setChunk] = useState(0);
   const initNet = () => {
     const nodes = new DataSet(data.nodes);
     const edges = new DataSet(data.edges);
@@ -141,7 +141,6 @@ function DetailCanvas({ t, getData }) {
         improvedLayout: false,
       },
     };
-    console.log(_data);
     network = new Network(networkRef.current, _data, options);
     network.on("click", function (params) {
       const [node] = params.nodes;
@@ -172,52 +171,30 @@ function DetailCanvas({ t, getData }) {
             setDrawerOpen(true);
           }
         });
+      } 
+      if (node) {
+        fetchData(node)
       }
     });
-    // network.on("hoverNode", (params) => {
-    //   const { node } = params;
-    //   const hoveredNode = nodes.get(node);
-    //   hoveredNode.label +=
-    //     '<br><button id="myButton" onclick="alert(\'Button Clicked!\')">Click Me</button>';
-    //   nodes.update(hoveredNode);
-    // });
-    // network.on("blurNode", (params) => {
-    //   const { node } = params;
-    //   console.log(node);
-    //   const blurredNode = nodes.get(node);
-    //   blurredNode.label = blurredNode.id;
-    //   nodes.update(blurredNode);
-    // });
     setEmpty(false);
   };
   useEffect(() => {
-    if (data.nodes.length) {
-      if (network === null) {
-        initNet();
-      } else {
-        const nodes = new DataSet(data.nodes);
-        const edges = new DataSet(data.edges);
-        const _data = {
-          nodes,
-          edges,
-        };
-        console.log(123, data, _data);
-        // network.setData(_data)
-      }
-      // return () => {
-      //   network.destroy();
-      // };
+    if (chunkSize) {
+      initNet();
+    } else if (network) {
+      console.log('else');
     } else {
-      setEmpty(true);
+      console.log('last', chunkSize, network);
     }
-  }, [data]);
-  const fetchData = debounce(() => {
+  }, [chunkSize]);
+  const fetchData = debounce((_address) => {
     setLoading(true);
-    checkAddress(address, type)
+    checkAddress(_address, type)
       .then((res) => {
         if (res.code === 200) {
           initialData = res.data.edges;
-          const _data = handleData(initialData.slice(0, chunkSize), address);
+          const _data = handleData(initialData.slice(chunkSize, chunkSize + 20), address);
+          setChunk(chunkSize + 20);
           setData(_data);
         }
       })
@@ -227,7 +204,7 @@ function DetailCanvas({ t, getData }) {
   });
   useEffect(() => {
     if (address) {
-      fetchData();
+      fetchData(address);
     } else {
       setLoading(false);
       setEmpty(true);
@@ -236,19 +213,6 @@ function DetailCanvas({ t, getData }) {
   const [showDrawer, setDrawerOpen] = useState(false);
   const [drawerData, setDrawerData] = useState([]);
   const loadMore = () => {
-    // setData((oldData) => ({
-    //   nodes: [...oldData.nodes, ...newData.nodes],
-    //   edges: [...oldData.edges, ...newData.edges]
-    // }))
-    const newData = pushData(
-      data,
-      initialData.slice(chunkSize, chunkSize + 20),
-      address
-    );
-    setData({
-      nodes: newData.nodes,
-      edges: newData.edges,
-    });
     setChunk(chunkSize + 20);
   };
   return (

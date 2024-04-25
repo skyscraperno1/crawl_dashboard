@@ -3,6 +3,7 @@ import { useState } from "react";
 import { BiLeftIndent, BiRightIndent } from "react-icons/bi";
 import SideBar from "./sideBar";
 import DetailCanvas from "./detailCanvas";
+import G6Canvas from "./g6Canvas";
 function Detail({ t, getData }) {
   const [showSide, setShowSide] = useState();
   const toggleShow = () => {
@@ -45,7 +46,8 @@ function Detail({ t, getData }) {
         )}
         {/* left Main */}
         <div className="flex-1 bg-boardBg rounded-md ml-10">
-          <DetailCanvas t={t} getData={getData} />
+          {/* <DetailCanvas t={t} getData={getData} /> */}
+          <G6Canvas />
         </div>
       </div>
     </div>
