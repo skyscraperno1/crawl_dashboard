@@ -1,3 +1,5 @@
+import { copyText } from "../../utils";
+
 const defaultNode = {
   type: "rect",
   style: {
@@ -6,12 +8,15 @@ const defaultNode = {
     radius: 10,
     width: 200,
     height: 50,
+    shadowColor: "rgba(189,124,64,.8)",
   },
   labelCfg: {
     style: {
       fill: "#a2a2a2",
       fontSize: 12,
       fontFamily: "Inter",
+      textAlign: "left",
+      x: -87,
     },
   },
 };
@@ -44,24 +49,47 @@ export const defaultCfg = (container) => {
   };
 };
 
-export const behaviors = (graph) => {
+export const behaviors = (graph, clickCallback) => {
   graph.on("node:mouseenter", (e) => {
     const { item } = e;
     graph.updateItem(item, {
       type: "hoverNode",
     });
   });
-
+  graph.on("edge:click", (e) => {
+    const { item } = e;
+    const { source, target } = item.getModel();
+    clickCallback(source, target);
+  });
   graph.on("node:mouseleave", (e) => {
     const { item } = e;
     graph.updateItem(item, {
       type: "rect",
     });
   });
-
-  graph.on("node:click", (e) => {
+  graph.on("edge:mouseenter", (e) => {
     const { item } = e;
-    console.log(item, item.getModel());
+    graph.setItemState(item, "hover", true);
+    const sourceNode = item.getSource();
+    const targetNode = item.getTarget();
+    graph.updateItem(sourceNode, {
+      style: { shadowBlur: 20 },
+    });
+    graph.updateItem(targetNode, {
+      style: { shadowBlur: 20 },
+    });
+  });
+  graph.on("edge:mouseleave", (e) => {
+    const { item } = e;
+    graph.setItemState(item, "hover", false);
+    const sourceNode = item.getSource();
+    const targetNode = item.getTarget();
+    graph.updateItem(sourceNode, {
+      style: { shadowBlur: 0 },
+    });
+    graph.updateItem(targetNode, {
+      style: { shadowBlur: 0 },
+    });
   });
 };
 
@@ -87,16 +115,27 @@ export const registerX = (G6, address) => {
         if (cfg.label) {
           group.addShape("text", {
             attrs: {
-              x: 0,
+              x: -87,
               y: -10,
-              textAlign: "center",
+              textAlign: "left",
               textBaseline: "middle",
               text: cfg.label,
               fill: "#a2a2a2",
               fontFamily: "Inter",
+              cursor: "pointer",
             },
+            name: "text-shape",
           });
         }
+        // 绑定点击复制事件
+        group
+          .find((element) => element.get("name") === "text-shape")
+          .on("click", (e) => {
+            const text = e.target.attr("text").replace(/\n/g, "");
+            copyText(text);
+          });
+
+        // Analyze Button
         const buttonGroup = group.addGroup();
         const button = buttonGroup.addShape("rect", {
           attrs: {
@@ -135,7 +174,7 @@ export const registerX = (G6, address) => {
         return rect;
       },
     },
-    "single-node"
+    "rect"
   );
 
   G6.registerEdge("smooth", {
@@ -166,16 +205,27 @@ export const registerX = (G6, address) => {
       const shape = group.addShape("path", {
         attrs: {
           stroke: "#bd7c40",
+          lineWidth: 3,
           path,
-          endArrow,
-          startArrow,
+          endArrow: endArrow && {
+            path: G6.Arrow.triangle(10, 10, 10),
+            d: 10,
+            fill: "#bd7c40",
+          },
+          startArrow: startArrow && {
+            path: G6.Arrow.triangle(10, 10, 10),
+            d: 10,
+            fill: "#bd7c40",
+          },
+          shadowColor: "#666",
+          cursor: "pointer",
         },
       });
       group.addShape("text", {
         attrs: {
           text: cfg.amount,
           x: (ex + sx) / 2,
-          y: ey,
+          y: ey - 2,
           textAlign: "center",
           textBaseline: "bottom",
           fill: "#fff",
@@ -186,7 +236,7 @@ export const registerX = (G6, address) => {
         attrs: {
           text: cfg.time,
           x: (ex + sx) / 2,
-          y: ey,
+          y: ey + 4,
           textAlign: "center",
           textBaseline: "top",
           fill: "#fff",
@@ -194,6 +244,21 @@ export const registerX = (G6, address) => {
         },
       });
       return shape;
+    },
+
+    // 设置edge hover的样式
+    setState(name, value, item) {
+      const group = item.getContainer();
+      const [shape] = group.get("children");
+      if (name === "hover") {
+        if (value) {
+          shape.attr("shadowBlur", "10");
+          shape.attr("lineWidth", "5");
+        } else {
+          shape.attr("shadowBlur", "0");
+          shape.attr("lineWidth", "3");
+        }
+      }
     },
   });
 };

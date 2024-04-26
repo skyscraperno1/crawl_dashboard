@@ -11,7 +11,7 @@ export function debounce(func, delay = 0) {
   };
 }
 
-export function copyText(text, callback) {
+export function copyText(text, callback = () => {}) {
   navigator.clipboard
     .writeText(text)
     .catch(() => {
