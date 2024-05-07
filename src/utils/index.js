@@ -28,3 +28,13 @@ export function copyText(text, callback = () => {}) {
       callback();
     });
 }
+
+export function deduplicate(array, key = 'id') {
+  const map = new Map();
+  array.forEach(item => {
+    if (!map.has(item[key])) {
+      map.set(item[key], item);
+    }
+  });
+  return Array.from(map.values());
+}

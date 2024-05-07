@@ -7,8 +7,10 @@ import { debounce } from '../../utils/index'
 import Empty from "../common/Empty";
 function MyTable({ address, t }) {
   const columns = [
+    { key: "createTime", title: t('create_time'), dataIndex: "createTime" },
     { key: "tokenAddress", title: t('address'), dataIndex: "tokenAddress" },
     { key: "value", title: t('value'), dataIndex: "value" },
+    { key: "token20Name", title: t('token20Name'), dataIndex: "token20Name" },
   ];
   
   const [loading, setLoading] = useState(false);

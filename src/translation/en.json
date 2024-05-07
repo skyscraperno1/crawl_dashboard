@@ -11,10 +11,12 @@
   "table": "Table",
   "empty": "No Data",
   "address": "Address",
-  "value": "Value",
+  "value": "Count",
   "more": "More",
   "date": "Date",
   "from_address": "From Address",
+  "to_address": "To Address",
   "raw_amount": "Amount",
-  "inter_tracker": "InterChain Tracker"
+  "create_time": "Create Time",
+  "token20Name": "Token Name"
 }
