@@ -2,8 +2,7 @@ import axios from 'axios'
 
 const Axios = axios.create({
   // baseURL: '/api',
-  baseURL: 'http://' + window.location.hostname + ':9011',
-  timeout: 10000
+  baseURL: 'http://' + window.location.hostname + ':9012',
 })
 
 Axios.interceptors.request.use(config => {
