@@ -5,13 +5,13 @@ import { checkAddress, checkEdgeAdd } from "../../apis/checkApis";
 import { debounce } from "../../utils";
 import Spin from "../common/Spin";
 import ToolBox from "./toolBox";
-import { getAddress, getType, handleData } from "./canvanUtils";
+import { getAddress, getType, handleData, deduplicate, handleL2Node } from "./canvanUtils";
 import { Drawer, Table, Tooltip } from "antd";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
 import Empty from "../common/Empty";
 import { motion } from "framer-motion";
-import { copyText, deduplicate } from "../../utils";
+import { copyText } from "../../utils";
 const GraphComponent = ({ t, getData }) => {
   const [copied, setCopied] = useState(false);
   const renderCopy = (text) => {
@@ -128,7 +128,22 @@ const GraphComponent = ({ t, getData }) => {
       setTableLoading(false)
     });
   };
- 
+  
+  const handleAnalyze = (_address) => {
+    console.log('待开发', _address)
+    // setLoading(true);
+    // checkAddress(_address, type).then((res) => {
+    //   if (res.code === 200) {
+    //     const result = handleL2Node(res.data.edges, _address, data.nodes)
+    //     setData({
+    //       nodes: [...data.nodes, ...result.nodes],
+    //       edges: [...data.edges, ...result.edges]
+    //     })
+    //   }
+    // }).finally(() => {
+    //   setLoading(false)
+    // })
+  }
 
   const graph = useRef(null);
 
@@ -145,7 +160,7 @@ const GraphComponent = ({ t, getData }) => {
       graph.current.render();
     } else {
       graph.current = new G6.Graph(defaultCfg(containerRef.current));
-      registerX(G6, address);
+      registerX(G6, address, handleAnalyze);
       graph.current.data(data);
       behaviors(graph.current, clickEdge);
       graph.current.render();
@@ -165,7 +180,8 @@ const GraphComponent = ({ t, getData }) => {
     const _data = handleData(
       initData.current.slice(chunkSize, chunkSize + 20),
       address,
-      containerRef.current.clientWidth / 2
+      containerRef.current.clientWidth / 2,
+      true
     );
     const newNodes = deduplicate([...data.nodes, ..._data.nodes])
     setData({

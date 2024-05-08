@@ -93,7 +93,7 @@ export const behaviors = (graph, clickCallback) => {
   });
 };
 
-export const registerX = (G6, address) => {
+export const registerX = (G6, address, callback) => {
   G6.registerNode(
     "hoverNode",
     {
@@ -169,7 +169,7 @@ export const registerX = (G6, address) => {
           button.attr("fill", "#bd7c40");
         });
         buttonGroup.on("click", () => {
-          console.log("click");
+          callback(cfg.id)
         });
         return rect;
       },
@@ -231,6 +231,7 @@ export const registerX = (G6, address) => {
           fill: "#fff",
           fontSize: 12,
         },
+        name: 'amount-text'
       });
       group.addShape("text", {
         attrs: {
@@ -242,6 +243,7 @@ export const registerX = (G6, address) => {
           fill: "#fff",
           fontSize: 12,
         },
+        name: 'time-text'
       });
       return shape;
     },
@@ -250,13 +252,27 @@ export const registerX = (G6, address) => {
     setState(name, value, item) {
       const group = item.getContainer();
       const [shape] = group.get("children");
+      const text1 = group.find(element => element.get('name') === 'amount-text');
+      const text2 = group.find(element => element.get('name') === 'time-text');
       if (name === "hover") {
         if (value) {
           shape.attr("shadowBlur", "10");
           shape.attr("lineWidth", "5");
+          text1 && text1.attr({
+            fontSize: 16, // 放大字体大小
+          });
+          text2 && text2.attr({
+            fontSize: 16, // 放大字体大小
+          });
         } else {
           shape.attr("shadowBlur", "0");
           shape.attr("lineWidth", "3");
+          text1 && text1.attr({
+            fontSize: 12, // 恢复字体大小
+          });
+          text2 && text2.attr({
+            fontSize: 12, // 恢复字体大小
+          });
         }
       }
     },
