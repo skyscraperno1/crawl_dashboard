@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const Axios = axios.create({
-  // baseURL: '/api',
-  baseURL: 'http://' + window.location.hostname + ':9012',
+  baseURL: '/api',
+  // baseURL: 'http://' + window.location.hostname + ':9012',
 })
 
 Axios.interceptors.request.use(config => {
