@@ -4,6 +4,8 @@
   .ant-table-thead >tr>th {
     background-color: #bd7c40;
     color: #e9ebf0;
+    font-family: 'Inter', 'sans-serif';
+    border: none;
   }
   .ant-table-thead > tr > .ant-table-cell-scrollbar {
     box-shadow: 0 1px 0 1px #bd7c40;
@@ -40,6 +42,7 @@
       background-color: #303135;
       .ant-table-row .ant-table-cell {
         border-color: #707070;
+        font-family: 'Inter', 'sans-serif';
       }
       .ant-table-cell-row-hover {
         background-color: #1d1d1d;

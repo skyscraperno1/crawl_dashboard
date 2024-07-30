@@ -31,8 +31,6 @@ export default {
       backgroundImage: {
         logoSm: "url('./assets/logo-wordless.png')",
         logo: "url('./assets/logo.png')",
-        Bep20: "url('./assets/bep20.svg')",
-        BNB: "url('./assets/bnb.svg')"
       },
     },
   },

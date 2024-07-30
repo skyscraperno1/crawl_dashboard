@@ -6,6 +6,7 @@ import Content from "./component/content/content";
 import BgCanvas from "./component/BgCanvas";
 import Detail from "./component/Detail";
 import MyTable from "./component//table/tableIndex";
+import DashBoard from "./component/dashboard/DashBoard";
 import { ConfigProvider } from "antd";
 const componentConfig = {
   algorithm: true,
@@ -54,16 +55,23 @@ function App() {
       );
     } else if (currentPage === "/table") {
       return <MyTable t={t} />;
+    } else if (currentPage === "/dashboard") {
+      return (
+        <>
+          <DashBoard t={t} />
+          <BgCanvas index={0} />
+        </>
+      )
     } else {
       return (
-        <div className="h-full w-full mx-auto pt-20 text-center text-text bg-bg">
+        <div className="h-full w-full mx-auto pt-20 text-center bg-bg">
           Empty
         </div>
       );
     }
   }
   return (
-    <div className="App h-full font-text">
+    <div className="App h-full font-text text-text">
       <ConfigProvider
         theme={{
           components: {

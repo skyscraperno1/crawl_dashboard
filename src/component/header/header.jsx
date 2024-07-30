@@ -3,6 +3,7 @@ import Switcher from "./langSwitch";
 
 const list = [
   { path: "/", text: "home" },
+  { path: "/dashboard", text: "dashboard" },
   { path: "/detail", text: "detail" },
   { path: "/table", text: "table" },
 ];
@@ -18,7 +19,7 @@ function Header({ t, showBd }) {
   };
 
   return (
-    <header className={`${showBd ? 'border-b border-[#303030]' : ''} h-[80px] w-full fixed top-0 left-0 right-0 z-20 backdrop-blur-sm px-8 text-text`}>
+    <header className={`${showBd ? 'border-b border-[#303030]' : ''} h-[80px] w-full fixed top-0 left-0 right-0 z-20 backdrop-blur-sm px-8`}>
       <div className="p-4 flex items-center">
         <div
           className="cursor-pointer w-40 h-12 bg-logoSm xl:bg-logo bg-no-repeat xl:bg-cover bg-contain"
