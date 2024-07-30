@@ -28,3 +28,23 @@ export function copyText(text, callback = () => {}) {
       callback();
     });
 }
+
+export const getType = (value, type) => {
+  const typeString = Object.prototype.toString.call(value);
+  const typeMap = {
+    '[object Boolean]': 'boolean',
+    '[object Number]': 'number',
+    '[object String]': 'string',
+    '[object Undefined]': 'undefined',
+    '[object Null]': 'null',
+    '[object Object]': 'object',
+    '[object Array]': 'array',
+    '[object Date]': 'date',
+    '[object RegExp]': 'regexp',
+    '[object Function]': 'function',
+  };
+  if (!!type) {
+    return typeMap[typeString] === type;
+  }
+  return typeMap[typeString] || 'unknown';
+}
