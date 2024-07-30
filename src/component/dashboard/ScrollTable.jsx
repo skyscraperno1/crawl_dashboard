@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { getType } from "../../utils";
 import Empty from "../common/Empty";
@@ -9,6 +9,13 @@ const scrollAnimation = keyframes`
   }
 `;
 
+const scrollBarAnimation = keyframes`
+  from {
+    width: 0%;
+  } to {
+    width: 100%;
+  }
+`;
 const TableWrapper = styled.div`
   width: 100%;
   overflow: hidden;
@@ -73,9 +80,6 @@ const TableBody = styled.div`
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   min-height: 107px;
-  &:hover {
-    animation-play-state: paused;
-  }
 `;
 
 const TableRow = styled.div`
@@ -92,9 +96,30 @@ const TableCell = styled.div`
   flex: 1;
   font-size: 14px;
   border-bottom: 1px solid #707070;
+  cursor: pointer;
 `;
 
-const ScrollTable = ({ columns, dataSource, speed = "normal", t, loading }) => {
+const ProgressBar = styled.div`
+  position: absolute;
+  left: 0;
+  top: 53px;
+  z-index: 100;
+  width: 100%;
+  height: 4px;
+  background-color: red;
+  animation-name: ${scrollBarAnimation};
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+`;
+
+const ScrollTable = ({
+  columns,
+  dataSource,
+  speed = "normal",
+  t,
+  loading,
+  showProcess = true,
+}) => {
   const rowHeight = 54;
   const headerHeight = 53;
 
@@ -126,7 +151,7 @@ const ScrollTable = ({ columns, dataSource, speed = "normal", t, loading }) => {
       typeof speed === "number" ? speed : baseSpeed[speed] || 20;
     const estimatedRowHeight = 54;
     const totalHeight = estimatedRowHeight * dataSource.length;
-    const animationTime = `${(totalHeight / speedFactor).toFixed(2)}s`;
+    const animationTime = (totalHeight / speedFactor).toFixed(2);
     return animationTime;
   }, [speed, dataSource.length]);
   const renderTableHeader = () => {
@@ -141,7 +166,13 @@ const ScrollTable = ({ columns, dataSource, speed = "normal", t, loading }) => {
 
   const renderTableBody = () => {
     return duplicatedData.map((row) => (
-      <TableRow key={row.key} className="scroll-table-row">
+      <TableRow
+        key={row.key}
+        className="scroll-table-row"
+        onClick={() => {
+          console.log("click");
+        }}
+      >
         {columns.map((col, colIndex) => (
           <TableCell key={`${row.key}-${colIndex}`}>{row[col.key]}</TableCell>
         ))}
@@ -149,21 +180,37 @@ const ScrollTable = ({ columns, dataSource, speed = "normal", t, loading }) => {
     ));
   };
 
+  const handleAnimation = (isPause) => {
+    const bar = document.getElementById("progress-bar");
+    const tbody = document.getElementById("scroll-table-body-inner");
+    bar.style.animationPlayState = isPause ? "paused" : "running";
+    tbody.style.animationPlayState = isPause ? "paused" : "running";
+  };
+  
   return (
     <TableWrapper
       style={{ height: `${getHeight}px` }}
-      className="rounded-lg scroll-table-wrapper"
+      className="rounded-lg"
+      id="scroll-table-wrapper"
     >
       {loading && <Spin />}
       {renderTableHeader()}
+      {showProcess && (
+        <ProgressBar
+          id="progress-bar"
+          style={{ animationDuration: `${getAnimationTime}s`}}
+        />
+      )}
       <div
         style={{ height: `${getHeight - headerHeight}px` }}
         className="scroll-table-body relative"
       >
         {getType(dataSource, "array") && dataSource.length ? (
           <TableBody
-            style={{ animationDuration: getAnimationTime }}
-            className="scroll-table-body-inner"
+            style={{ animationDuration: `${getAnimationTime}s` }}
+            id="scroll-table-body-inner"
+            onMouseEnter={() => handleAnimation(true)}
+            onMouseLeave={() => handleAnimation(false)}
           >
             {renderTableBody()}
           </TableBody>

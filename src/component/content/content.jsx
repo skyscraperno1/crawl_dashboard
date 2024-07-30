@@ -13,7 +13,7 @@ function Content({ t, getData }) {
         variants={fadeIn("down", 0.2)}
         initial="hidden"
         whileInView={"show"}
-        viewport={{ once: false, amount: 0.7 }}
+        viewport={{ once: true, amount: 0.7 }}
         className="container mx-auto p-4 flex h-full z-10 flex-col items-center"
       >
         <h2 className="text-6xl mb-10 mx-40 header-bg font-textBd font-semibold h-28 text-center">
