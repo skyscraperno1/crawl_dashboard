@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import styled, { keyframes } from "styled-components";
 import { getType } from "../../utils";
 import Empty from "../common/Empty";
+import Spin from "../common/Spin";
 const scrollAnimation = keyframes`
   to {
     transform: translateY(-50%);
@@ -93,7 +94,7 @@ const TableCell = styled.div`
   border-bottom: 1px solid #707070;
 `;
 
-const ScrollTable = ({ columns, dataSource, speed = "normal", t }) => {
+const ScrollTable = ({ columns, dataSource, speed = "normal", t, loading }) => {
   const rowHeight = 54;
   const headerHeight = 53;
 
@@ -153,19 +154,23 @@ const ScrollTable = ({ columns, dataSource, speed = "normal", t }) => {
       style={{ height: `${getHeight}px` }}
       className="rounded-lg scroll-table-wrapper"
     >
+      {loading && <Spin />}
       {renderTableHeader()}
-      {getType(dataSource, "array") && dataSource.length ? (
-        <TableBody
-          style={{ animationDuration: getAnimationTime }}
-          className="scroll-table-body"
-        >
-          {renderTableBody()}
-        </TableBody>
-      ) : (
-        <div style={{ height: `${getHeight - headerHeight}px` }}>
+      <div
+        style={{ height: `${getHeight - headerHeight}px` }}
+        className="scroll-table-body relative"
+      >
+        {getType(dataSource, "array") && dataSource.length ? (
+          <TableBody
+            style={{ animationDuration: getAnimationTime }}
+            className="scroll-table-body-inner"
+          >
+            {renderTableBody()}
+          </TableBody>
+        ) : (
           <Empty t={t} size="small"></Empty>
-        </div>
-      )}
+        )}
+      </div>
     </TableWrapper>
   );
 };
