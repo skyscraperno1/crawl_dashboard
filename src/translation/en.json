@@ -19,5 +19,6 @@
   "to_address": "To Address",
   "raw_amount": "Amount",
   "create_time": "Create Time",
-  "token20Name": "Token Name"
+  "token20Name": "Token Name",
+  "pie-title": "Followed Case"
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { getType } from "../../utils";
 import Empty from "../common/Empty";
@@ -18,6 +18,7 @@ const scrollBarAnimation = keyframes`
 `;
 const TableWrapper = styled.div`
   width: 100%;
+  height: 100%;
   overflow: hidden;
   border: 1px solid #333;
   background-color: #222;
@@ -39,6 +40,7 @@ const TableWrapper = styled.div`
     opacity: 0.4;
     z-index: 1;
     pointer-events: none;
+    ${props => props.$hideBefore === '0' && `display: none;`}
   }
 `;
 
@@ -106,7 +108,7 @@ const ProgressBar = styled.div`
   z-index: 100;
   width: 100%;
   height: 4px;
-  background-color: red;
+  background-color: #dd6b66;
   animation-name: ${scrollBarAnimation};
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -115,45 +117,41 @@ const ProgressBar = styled.div`
 const ScrollTable = ({
   columns,
   dataSource,
-  speed = "normal",
+  speed = "fast",
   t,
   loading,
   showProcess = true,
 }) => {
-  const rowHeight = 54;
   const headerHeight = 53;
+  const rowHeight = 54;
 
-  let duplicatedData = [];
-  // 计算表格高度，保证滚动下面不会有空白
-  const getHeight = useMemo(() => {
-    if (dataSource.length <= 2) {
-      duplicatedData = dataSource;
-      return rowHeight * 4 + headerHeight;
-    } else {
-      duplicatedData = [
-        ...dataSource,
-        ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
-      ];
-      return Math.min(dataSource.length * rowHeight + headerHeight, 500);
-    }
-  }, [dataSource.length]);
-  // 计算动画时长，设置滚动的速度
-  const getAnimationTime = useMemo(() => {
+  const [duplicatedData, setNewData] = useState(dataSource)
+  const [animationTime, setAnimation] = useState(0)
+  useLayoutEffect(() => {
+    const bodyHeight = document.getElementById('scroll-table-body').clientHeight;
+    const len = dataSource.length;
+    const maxRow = parseInt(bodyHeight / rowHeight)
+    // 计算速率的
     const baseSpeed = {
       normal: 20,
       fast: 40,
       slow: 10,
     };
-    if (dataSource.length <= 2) {
-      return 0;
-    }
-    const speedFactor =
+    // 超过就可以加滚动了
+    if (len >= maxRow) {
+      setNewData([
+        ...dataSource,
+        ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
+      ])
+
+      const speedFactor =
       typeof speed === "number" ? speed : baseSpeed[speed] || 20;
-    const estimatedRowHeight = 54;
-    const totalHeight = estimatedRowHeight * dataSource.length;
-    const animationTime = (totalHeight / speedFactor).toFixed(2);
-    return animationTime;
-  }, [speed, dataSource.length]);
+      const totalHeight = rowHeight * dataSource.length;
+      setAnimation((totalHeight / speedFactor).toFixed(2))
+    }
+  }, [speed, dataSource.length])
+
+  
   const renderTableHeader = () => {
     return (
       <TableHead className="scroll-table-header">
@@ -181,33 +179,40 @@ const ScrollTable = ({
   };
 
   const handleAnimation = (isPause) => {
-    const bar = document.getElementById("progress-bar");
+    // 没有动画则不需要停止或者开始
+    if (!animationTime) {
+      return;
+    }
     const tbody = document.getElementById("scroll-table-body-inner");
-    bar.style.animationPlayState = isPause ? "paused" : "running";
+    const bar = document.getElementById("progress-bar");
     tbody.style.animationPlayState = isPause ? "paused" : "running";
+    if (bar) {
+      bar.style.animationPlayState = isPause ? "paused" : "running";
+    }
   };
-  
+
   return (
     <TableWrapper
-      style={{ height: `${getHeight}px` }}
-      className="rounded-lg"
+      $hideBefore={animationTime.toString()}
+      className={`rounded-lg ${(loading || !animationTime) ? "no-before" : ""}`}
       id="scroll-table-wrapper"
     >
       {loading && <Spin />}
       {renderTableHeader()}
-      {showProcess && (
+      {(showProcess && !!animationTime) && (
         <ProgressBar
           id="progress-bar"
-          style={{ animationDuration: `${getAnimationTime}s`}}
+          style={{ animationDuration: `${animationTime}s` }}
         />
       )}
       <div
-        style={{ height: `${getHeight - headerHeight}px` }}
-        className="scroll-table-body relative"
+        style={{ height: `calc(100% - ${headerHeight}px)` }}
+        className="relative"
+        id="scroll-table-body"
       >
-        {getType(dataSource, "array") && dataSource.length ? (
+        {(getType(dataSource, "array") && dataSource.length) ? (
           <TableBody
-            style={{ animationDuration: `${getAnimationTime}s` }}
+            style={{ animationDuration: `${animationTime}s` }}
             id="scroll-table-body-inner"
             onMouseEnter={() => handleAnimation(true)}
             onMouseLeave={() => handleAnimation(false)}

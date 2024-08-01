@@ -18,7 +18,6 @@ export default {
     extend: {
       colors: {
         border: 'rgb(60, 63, 67)',
-        hoverBd: '#34c3ff',
         text: "#e9ebf0",
         borderGold: 'rgb(189, 124, 64)',
         themeColor: '#bd7c40',
