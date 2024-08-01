@@ -3,7 +3,8 @@ import Charts from "./Charts";
 import styled from "styled-components";
 import { getOverAllData, getProjectPage } from "../../apis/dashBoardApis";
 import { useEffect, useState } from "react";
-import { makeLineChart, makePieChart, makePieChart1 } from "./MakeOptions";
+import { makeLineChart, makePieChart } from "./MakeOptions";
+import CountUp from "react-countup";
 const Section = styled.div`
   border-radius: 0.5rem;
   overflow: hidden;
@@ -34,15 +35,24 @@ const DashBoard = ({ t }) => {
     { title: t('date'), key: "date" },
   ];
   const [pieChartOptions, setPieChart] = useState(null);
-  const [pieChartOptions1, setPieChart1] = useState(null);
   const [lineChartOptions, setLineChart] = useState(null);
   const [tableData, setTableData] = useState([]);
+  const [info, setInfo] = useState([
+    {name: "下降数量", key: "downCount", val: 0},
+    {name: "相等数量", key: "eqCount", val: 0},
+    {name: "增长数量", key: "upCount", val: 0},
+  ])
   useEffect(() => {
     getOverAllData().then((res) => {
       if (res.code === 200) {
-        setPieChart(makePieChart(res.data.A));
-        setPieChart1(makePieChart1(res.data.B));
+        setPieChart(makePieChart(res.data.A, res.data.B));
         setLineChart(makeLineChart(res.data.C));
+        const [_info] = res.data.D;
+        setInfo([
+          {name: "下降数量", key: "downCount", val: _info.downCount},
+          {name: "相等数量", key: "eqCount", val: _info.eqCount},
+          {name: "增长数量", key: "upCount", val: _info.upCount},
+        ]);
       }
     });
     getProjectPage({
@@ -75,7 +85,16 @@ const DashBoard = ({ t }) => {
         style={{ height: "calc(100% - 1rem)" }}
       >
         <Section $isCard={true} className="col-span-2">
-          {pieChartOptions1 && <Charts options={pieChartOptions1} />}
+          <ul>
+            {info.map(it => {
+              return (
+                <li key={it.key} className="flex h-4 py-1 text-text">
+                  <div>{it.name}</div>
+                  <CountUp start={0} end={it.val} duration={0.3} />
+                </li>
+              )
+            })}
+          </ul>
         </Section>
         
         <Section $isCard={false} $titleSize="46" className="col-span-4">

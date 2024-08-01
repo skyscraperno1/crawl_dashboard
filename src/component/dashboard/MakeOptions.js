@@ -58,7 +58,7 @@ export const makeLineChart = (sourceArr) => {
   };
 };
 
-export const makePieChart = (sourceArr) => {
+export const makePieChart = (sourceArr, sourceArr1) => {
   let total = 0;
   let pinTotal = 0;
   const title = "关注/总数";
@@ -73,7 +73,12 @@ export const makePieChart = (sourceArr) => {
       value: it.count,
     };
   });
-
+  const chartData1 = sourceArr1.map((it) => {
+    return {
+      name: it.source,
+      value: it.count,
+    };
+  }); 
   const pin = `${pinTotal}/${total}`;
   return {
     backgroundColor: bgColor,
@@ -103,60 +108,24 @@ export const makePieChart = (sourceArr) => {
     series: [
       {
         type: "pie",
-        radius: ["45%", "60%"],
+        radius: ["55%", "60%"],
         center: ["50%", "50%"],
         data: chartData,
       },
+      {
+        type: "pie",
+        radius: ["45%", "50%"],
+        center: ["50%", "50%"],
+        data: chartData1
+      }
     ],
   };
 };
-
-export const makePieChart1 = (sourceArr) => {
-  let total = 0;
-  const chartData = sourceArr.map((it) => {
-    total += it.count;
-    return {
-      name: it.source,
-      value: it.count,
-    };
-  }); 
-  return {
-    backgroundColor: bgColor,
-    color: colors,
-    title: {
-      text: "{a|" + total + "}\n{b|" + '总数' + "}",
-      x: "center",
-      y: "center",
-      textStyle: {
-        rich: {
-          a: {
-            fontSize: 38,
-            color: "#ffffff",
-          },
-          b: {
-            fontSize: 30,
-            color: "#ffffff",
-            padding: [10, 0, 0, 0],
-          },
-        },
-      },
-    },
-    series: [
-      {
-        type: "pie",
-        radius: ["45%", "60%"],
-        center: ["50%", "50%"],
-        data: chartData,
-      },
-    ],
-  };
-}
 
 export const MakeChartFactory = (type) => {
   const chartFactories = {
     line: makeLineChart,
     pie: makePieChart,
-    pie1: makePieChart1,
   };
 
   const chartFactory = chartFactories[type];
