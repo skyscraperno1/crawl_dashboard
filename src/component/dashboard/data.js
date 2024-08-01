@@ -35,24 +35,24 @@ export const data = [
     age: 32,
     address: "Sidney No. 1 Lake Park",
   },
-  {
-    key: "7",
-    name: "Joe Black7",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: '8',
-    name: 'Joe Black8',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-  },
-  {
-    key: '9',
-    name: 'Joe Black9',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-  },
+  // {
+  //   key: "7",
+  //   name: "Joe Black7",
+  //   age: 32,
+  //   address: "Sidney No. 1 Lake Park",
+  // },
+  // {
+  //   key: '8',
+  //   name: 'Joe Black8',
+  //   age: 32,
+  //   address: 'Sidney No. 1 Lake Park',
+  // },
+  // {
+  //   key: '9',
+  //   name: 'Joe Black9',
+  //   age: 32,
+  //   address: 'Sidney No. 1 Lake Park',
+  // },
   // {
   //   key: '10',
   //   name: 'Joe Black10',

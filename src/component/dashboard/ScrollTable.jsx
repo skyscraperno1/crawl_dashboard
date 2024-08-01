@@ -46,7 +46,7 @@ const TableWrapper = styled.div`
 
 const TableHead = styled.div`
   display: flex;
-  background-color: #bd7c40;
+  background-color: #252e37;
   color: #e9ebf0;
   position: sticky;
   top: 0;
@@ -125,7 +125,7 @@ const ScrollTable = ({
   const headerHeight = 53;
   const rowHeight = 54;
 
-  const [duplicatedData, setNewData] = useState(dataSource)
+  const [duplicatedData, setNewData] = useState([])
   const [animationTime, setAnimation] = useState(0)
   useLayoutEffect(() => {
     const bodyHeight = document.getElementById('scroll-table-body').clientHeight;
@@ -148,6 +148,8 @@ const ScrollTable = ({
       typeof speed === "number" ? speed : baseSpeed[speed] || 20;
       const totalHeight = rowHeight * dataSource.length;
       setAnimation((totalHeight / speedFactor).toFixed(2))
+    } else {
+      setNewData(dataSource)
     }
   }, [speed, dataSource.length])
 

@@ -1,6 +1,6 @@
 const colors = [
-  "#ff7473",
-  "#fec22b",
+  "#7deff8",
+  "#4071d6",
   "#47b8e0",
   "#a5d296",
   "#c4ccd3",
@@ -11,7 +11,7 @@ const colors = [
   "#91ca8c",
   "#f49f42",
 ];
-const bgColor = "#303135"
+const bgColor = "#303135";
 export const makeLineChart = (sourceArr) => {
   const chartData = sourceArr.reduce(
     (acc, item) => {
@@ -22,20 +22,32 @@ export const makeLineChart = (sourceArr) => {
     { xAxisData: [], seriesData: [] }
   );
   return {
-    title: {
-      text: "Line Chart",
-      left: "center",
-    },
     tooltip: {
       trigger: "axis",
     },
     xAxis: {
       type: "category",
       data: chartData.xAxisData,
+      axisLabel: {
+        color: "#fff",
+      },
     },
     yAxis: {
-      type: "value",
-    },
+      type: 'value',
+      axisLine: {
+          lineStyle: {
+              color: '#333' // 设置 Y 轴轴线的颜色
+          }
+      },
+      splitLine: {
+          lineStyle: {
+              color: ['#ccc'] // 设置 Y 轴分隔线的颜色
+          }
+      },
+      axisLabel: {
+          color: '#666' // 设置 Y 轴文字颜色
+      }
+  },
     series: [
       {
         name: "Value",
@@ -94,43 +106,57 @@ export const makePieChart = (sourceArr) => {
         radius: ["45%", "60%"],
         center: ["50%", "50%"],
         data: chartData,
-        // labelLine: {
-        //   normal: {
-        //     length: 10,
-        //     length2: 10,
-        //     lineStyle: {
-        //       color: "#e6e6e6",
-        //     },
-        //   },
-        // },
-        // label: {
-        //   normal: {
-        //     rich: {
-        //       icon: {
-        //         fontSize: 16,
-        //       },
-        //       name: {
-        //         fontSize: 14,
-        //         padding: [0, 10, 0, 4],
-        //         color: "#666666",
-        //       },
-        //       value: {
-        //         fontSize: 18,
-        //         fontWeight: "bold",
-        //         color: "#333333",
-        //       },
-        //     },
-        //   },
-        // },
       },
     ],
   };
 };
 
+export const makePieChart1 = (sourceArr) => {
+  let total = 0;
+  const chartData = sourceArr.map((it) => {
+    total += it.count;
+    return {
+      name: it.source,
+      value: it.count,
+    };
+  }); 
+  return {
+    backgroundColor: bgColor,
+    color: colors,
+    title: {
+      text: "{a|" + total + "}\n{b|" + '总数' + "}",
+      x: "center",
+      y: "center",
+      textStyle: {
+        rich: {
+          a: {
+            fontSize: 38,
+            color: "#ffffff",
+          },
+          b: {
+            fontSize: 30,
+            color: "#ffffff",
+            padding: [10, 0, 0, 0],
+          },
+        },
+      },
+    },
+    series: [
+      {
+        type: "pie",
+        radius: ["45%", "60%"],
+        center: ["50%", "50%"],
+        data: chartData,
+      },
+    ],
+  };
+}
+
 export const MakeChartFactory = (type) => {
   const chartFactories = {
     line: makeLineChart,
     pie: makePieChart,
+    pie1: makePieChart1,
   };
 
   const chartFactory = chartFactories[type];

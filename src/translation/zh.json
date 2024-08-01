@@ -20,5 +20,8 @@
   "raw_amount": "总量",
   "create_time": "创建时间",
   "token20Name": "合约名称",
-  "pie-title": "关注项目"
+  "pie-title": "关注列表",
+  "line-chart": "折线图",
+  "pair": "配对",
+  "liquidity": "流动池"
 }

@@ -1,15 +1,9 @@
 import ScrollTable from "./ScrollTable";
 import Charts from "./Charts";
 import styled from "styled-components";
-import { getOverAllData } from "../../apis/dashBoardApis";
-import { data } from './data'
+import { getOverAllData, getProjectPage } from "../../apis/dashBoardApis";
 import { useEffect, useState } from "react";
-import { makeLineChart, makePieChart } from "./MakeOptions";
-const columns = [
-  { title: "姓名", key: "name" },
-  { title: "Age", key: "age" },
-  { title: "Address", key: "address" },
-];
+import { makeLineChart, makePieChart, makePieChart1 } from "./MakeOptions";
 const Section = styled.div`
   border-radius: 0.5rem;
   overflow: hidden;
@@ -21,67 +15,88 @@ const Section = styled.div`
   padding: ${(props) => (props.$isCard ? "0.5rem" : "0")};
   position: relative;
   & > h1 {
-    font-size: ${(props) => (props.$titleSize - 16) + 'px'};
-    height: ${(props) => props.$titleSize + 'px'};
-    line-height: ${(props) => props.$titleSize + 'px'};
+    font-size: ${(props) => props.$titleSize - 16 + "px"};
+    height: ${(props) => props.$titleSize + "px"};
+    line-height: ${(props) => props.$titleSize + "px"};
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    user-select: none;
+    font-family: "微软雅黑, Arial, sans-serif";
   }
   & > .inner-section {
-    height: calc(100% - ${(props) => props.$titleSize + 'px'});
+    height: calc(100% - ${(props) => props.$titleSize + "px"});
   }
 `;
 const DashBoard = ({ t }) => {
-  const [pieLoading, setPieLoading] = useState(false);
+  const columns = [
+    { title: t('pair'), key: "name" },
+    { title: t('liquidity'), key: "liquidity" },
+    { title: t('date'), key: "date" },
+  ];
   const [pieChartOptions, setPieChart] = useState(null);
+  const [pieChartOptions1, setPieChart1] = useState(null);
   const [lineChartOptions, setLineChart] = useState(null);
+  const [tableData, setTableData] = useState([]);
   useEffect(() => {
-    setPieLoading(true);
-    // 模拟Ajax获取数据
-    setTimeout(() => {
-      setPieChart(
-        makePieChart([
-          { is_hold: "1", count: 1 },
-          { is_hold: "0", count: 476 },
-        ])
-      );
-      setLineChart(
-        makeLineChart([
-          { today: "2023-04-01", count: 1 },
-          { today: "2023-04-02", count: 2 },
-          { today: "2023-04-03", count: 3 },
-        ])
-      );
-    }, 1000);
-    // getOverAllData().then((res) => {
-    //   if (res.code === 200) {
-    //     setPieChart(makePieChart(res.data.A))
-    //     setLineChart(makeLineChart(res.data.C))
-    //   }
-    // }).finally(() => {
-    //   setPieLoading(false)
-    // })
+    getOverAllData().then((res) => {
+      if (res.code === 200) {
+        setPieChart(makePieChart(res.data.A));
+        setPieChart1(makePieChart1(res.data.B));
+        setLineChart(makeLineChart(res.data.C));
+      }
+    });
+    getProjectPage({
+      pageNum: 0,
+      pageSize: 0,
+      isHold: "1",
+      name: "",
+      net: "",
+      pair: "",
+      source: "",
+      token: ""
+    }).then((res) => {
+      if (res.code === 200) {
+        const newData = res.data.rows.map(it => {
+          return {
+            name: it.rcoinName + '/' + it.fcoinName,
+            liquidity: it.liquidity,
+            date: it.today,
+            key: it.id
+          }
+        })
+        setTableData(newData)
+      }
+    })
   }, []);
   return (
     <div className="pt-20 h-full w-full">
       <section
-        className="grid grid-cols-6 grid-rows-2 gap-4 w-full p-4"
+        className="grid grid-cols-6 grid-rows-2 gap-6 w-[80%] p-4 mx-auto"
         style={{ height: "calc(100% - 1rem)" }}
       >
+        <Section $isCard={true} className="col-span-2">
+          {pieChartOptions1 && <Charts options={pieChartOptions1} />}
+        </Section>
+        
+        <Section $isCard={false} $titleSize="46" className="col-span-4">
+          {/* LineChart */}
+          <h1>{t("line-chart")}</h1>
+          <Section className="inner-section">
+            {lineChartOptions && <Charts options={lineChartOptions} />}
+          </Section>
+        </Section>
         {/* PieChart */}
-        <Section $isCard={false} $titleSize="50" className="col-span-2">
-          <h1>
-            {t("pie-title")}
-          </h1>
+        <Section $isCard={false} $titleSize="10" className="col-span-2">
+          <h1></h1>
           <Section $isCard={true} className="inner-section">
             {pieChartOptions && <Charts options={pieChartOptions} />}
           </Section>
         </Section>
-        <Section $isCard={false} className="col-span-4">
-          {/* LineChart */}
-          {lineChartOptions && <Charts options={lineChartOptions} />}
-        </Section>
-        <Section $isCard={true} className="col-span-2"></Section>
-        <Section $isCard={false} className="col-span-4">
-          <ScrollTable columns={columns} dataSource={data} t={t}/>
+        <Section $isCard={false} $titleSize="46" className="col-span-4">
+          <h1>{t("pie-title")}</h1>
+          <Section $isCard={false} className="inner-section">
+            <ScrollTable columns={columns} dataSource={tableData} t={t} />
+          </Section>
         </Section>
       </section>
     </div>

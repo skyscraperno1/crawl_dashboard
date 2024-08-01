@@ -20,5 +20,8 @@
   "raw_amount": "Amount",
   "create_time": "Create Time",
   "token20Name": "Token Name",
-  "pie-title": "Followed Case"
+  "pie-title": "Followed Case",
+  "line-chart": "Line Chart",
+  "pair": "Pair",
+  "liquidity": "Liquidity"
 }
