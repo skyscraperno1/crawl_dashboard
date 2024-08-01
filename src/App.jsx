@@ -7,6 +7,7 @@ import BgCanvas from "./component/BgCanvas";
 import Detail from "./component/Detail";
 import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
+import OverAllCase from './component/OverAllCase/OverAllCase'
 import { ConfigProvider } from "antd";
 const componentConfig = {
   algorithm: true,
@@ -59,6 +60,13 @@ function App() {
       return (
         <>
           <DashBoard t={t} />
+          <BgCanvas index={0} />
+        </>
+      )
+    } else if (currentPage === "/overallCase") {
+      return (
+        <>
+          <OverAllCase />
           <BgCanvas index={0} />
         </>
       )

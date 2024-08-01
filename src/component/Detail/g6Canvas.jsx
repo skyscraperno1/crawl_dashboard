@@ -5,7 +5,7 @@ import { checkAddress, checkEdgeAdd } from "../../apis/checkApis";
 import { debounce } from "../../utils";
 import Spin from "../common/Spin";
 import ToolBox from "./toolBox";
-import { getAddress, getType, handleData, deduplicate, handleL2Node } from "./canvanUtils";
+import { getAddress, getType, handleData, deduplicate, handleL2Node } from "./canvasUtils";
 import { Drawer, Table, Tooltip } from "antd";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";

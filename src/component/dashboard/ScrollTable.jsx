@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { getType } from "../../utils";
+import { calValueType } from "../../utils";
 import Empty from "../common/Empty";
 import Spin from "../common/Spin";
 const scrollAnimation = keyframes`
@@ -212,7 +212,7 @@ const ScrollTable = ({
         className="relative"
         id="scroll-table-body"
       >
-        {(getType(dataSource, "array") && dataSource.length) ? (
+        {(calValueType(dataSource, "array") && dataSource.length) ? (
           <TableBody
             style={{ animationDuration: `${animationTime}s` }}
             id="scroll-table-body-inner"

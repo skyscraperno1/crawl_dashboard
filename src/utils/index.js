@@ -29,7 +29,7 @@ export function copyText(text, callback = () => {}) {
     });
 }
 
-export const getType = (value, type) => {
+export const calValueType = (value, type) => {
   const typeString = Object.prototype.toString.call(value);
   const typeMap = {
     '[object Boolean]': 'boolean',
