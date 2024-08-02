@@ -1,7 +1,7 @@
 import Pagination from "../common/Pagination";
 import { useState, useEffect } from "react";
 import { Table } from "antd";
-import "./table.scss";
+// import "./table.scss";
 import { getTableData } from "../../apis/tableApius";
 import { debounce } from '../../utils/index'
 import Empty from "../common/Empty";

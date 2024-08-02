@@ -23,5 +23,20 @@
   "pie-title": "关注列表",
   "line-chart": "折线图",
   "pair": "配对",
-  "liquidity": "流动池"
+  "liquidity": "流动池",
+  "liquidityChange": "流动池变化",
+  "token": "合约",
+  "allCase": "所有案件",
+  "net": "网络",
+  "isHold": "关注",
+  "web": "主网",
+  "telegram": "电报",
+  "twitter": "推特",
+  "qq": "QQ",
+  "discord": "Discord",
+  "intro": "简介",
+  "wxMsgCount": "微信消息量",
+  "qqMsgCount": "QQ消息量",
+  "tgMsgCount": "Tg消息量",
+  "name": "名称"
 }

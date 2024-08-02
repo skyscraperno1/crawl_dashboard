@@ -111,6 +111,7 @@ export const makePieChart = (sourceArr, sourceArr1) => {
         radius: ["55%", "60%"],
         center: ["50%", "50%"],
         data: chartData,
+        startAngle: 225,  
       },
       {
         type: "pie",

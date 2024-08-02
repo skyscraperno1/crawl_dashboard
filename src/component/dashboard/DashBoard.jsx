@@ -5,6 +5,7 @@ import { getOverAllData, getProjectPage } from "../../apis/dashBoardApis";
 import { useEffect, useState } from "react";
 import { makeLineChart, makePieChart } from "./MakeOptions";
 import CountUp from "react-countup";
+import FlipLink from "../common/FlipLink";
 const Section = styled.div`
   border-radius: 0.5rem;
   overflow: hidden;
@@ -84,14 +85,17 @@ const DashBoard = ({ t }) => {
         className="grid grid-cols-6 grid-rows-2 gap-6 w-[80%] p-4 mx-auto"
         style={{ height: "calc(100% - 1rem)" }}
       >
-        <Section $isCard={true} className="col-span-2">
-          <ul>
-            {info.map(it => {
+        <Section $isCard={true} className="col-span-2 flex flex-col">
+          <ul className="mx-auto flex items-center justify-center w-full flex-1">
+            {info.map((it, idx) => {
               return (
-                <li key={it.key} className="flex h-4 py-1 text-text">
-                  <div>{it.name}</div>
-                  <CountUp start={0} end={it.val} duration={0.3} />
-                </li>
+                <>
+                  {idx !== 0 && <p className="h-[1px] w-12 bg-indigo-200 sm:h-12 sm:w-[1px]"></p>}
+                  <li key={it.key} className="flex w-72 flex-col items-center py-8 sm:py-0 text-text">
+                    <CountUp start={0} end={it.val} duration={0.8} className="mb-2 text-center text-7xl font-semibold sm:text-6xl"/>
+                    <FlipLink>{it.name}</FlipLink>
+                  </li>
+                </>
               )
             })}
           </ul>

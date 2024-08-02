@@ -7,12 +7,8 @@ import BgCanvas from "./component/BgCanvas";
 import Detail from "./component/Detail";
 import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
-import OverAllCase from './component/OverAllCase/OverAllCase'
-import { ConfigProvider } from "antd";
-const componentConfig = {
-  algorithm: true,
-  colorPrimary: "#bd7c40",
-};
+import OverAllCase from "./component/OverAllCase/OverAllCase";
+import { ConfigProvider, theme, Button } from "antd";
 function App() {
   const { t } = useTranslation();
   const go = (pathname) => {
@@ -62,14 +58,14 @@ function App() {
           <DashBoard t={t} />
           <BgCanvas index={0} />
         </>
-      )
+      );
     } else if (currentPage === "/overallCase") {
       return (
         <>
-          <OverAllCase />
-          <BgCanvas index={0} />
+          <OverAllCase t={t} />
+          {/* <BgCanvas index={0} /> */}
         </>
-      )
+      );
     } else {
       return (
         <div className="h-full w-full mx-auto pt-20 text-center bg-bg">
@@ -80,17 +76,7 @@ function App() {
   }
   return (
     <div className="App h-full font-text text-text">
-      <ConfigProvider
-        theme={{
-          components: {
-            Table: componentConfig,
-            Input: componentConfig,
-            InputNumber: componentConfig,
-            Button: componentConfig,
-            Drawer: componentConfig,
-          },
-        }}
-      >
+      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm, token: { colorPrimary: "#bd7c40"} }}>
         <Header t={t} showBd={showBd} />
         {renderPage()}
       </ConfigProvider>

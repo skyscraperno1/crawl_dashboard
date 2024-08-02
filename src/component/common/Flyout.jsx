@@ -14,9 +14,6 @@ const FlyoutLink = ({ children, FlyoutContent, menuList }) => {
       <div className="relative">
         {children}
         <span
-          style={{
-            transform: showFlyout ? "scaleX(1)" : "scaleX(0)",
-          }}
           className="absolute -bottom-2 -left-2 -right-2 h-1 origin-left scale-x-0 rounded-full bg-indigo-300 transition-transform duration-300 ease-out"
         />
       </div>
@@ -28,7 +25,7 @@ const FlyoutLink = ({ children, FlyoutContent, menuList }) => {
             exit={{ opacity: 0, y: 15 }}
             style={{ translateX: "-50%" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute left-1/2 top-12 bg-transparent"
+            className="absolute left-1/2 top-10 bg-transparent"
           >
             <FlyoutContent menuList={menuList}/>
           </motion.div>

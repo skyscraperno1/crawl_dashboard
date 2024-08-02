@@ -23,5 +23,20 @@
   "pie-title": "Followed Case",
   "line-chart": "Line Chart",
   "pair": "Pair",
-  "liquidity": "Liquidity"
+  "liquidity": "Liquidity",
+  "liquidityChange": "Liquidity Change",
+  "token": "Token",
+  "allCase": "All Case",
+  "net": "Net",
+  "isHold": "Followed",
+  "web": "Web",
+  "telegram": "Telegram",
+  "twitter": "Twitter",
+  "qq": "QQ",
+  "discord": "Discord",
+  "intro": "Intro",
+  "wxMsgCount": "WChat Count",
+  "qqMsgCount": "QQ Count",
+  "tgMsgCount": "TG Count",
+  "name": "Name"
 }
