@@ -44,17 +44,15 @@ const DashBoard = ({ t }) => {
     {name: "增长数量", key: "upCount", val: 0},
   ])
   useEffect(() => {
-    getOverAllData().then((res) => {
-      if (res.code === 200) {
-        setPieChart(makePieChart(res.data.A, res.data.B));
-        setLineChart(makeLineChart(res.data.C));
-        const [_info] = res.data.D;
-        setInfo([
-          {name: "下降数量", key: "downCount", val: _info.downCount},
-          {name: "相等数量", key: "eqCount", val: _info.eqCount},
-          {name: "增长数量", key: "upCount", val: _info.upCount},
-        ]);
-      }
+    getOverAllData().then((data) => {
+      setPieChart(makePieChart(data.A, data.B));
+      setLineChart(makeLineChart(data.C));
+      const [_info] = data.D;
+      setInfo([
+        {name: "下降数量", key: "downCount", val: _info.downCount},
+        {name: "相等数量", key: "eqCount", val: _info.eqCount},
+        {name: "增长数量", key: "upCount", val: _info.upCount},
+      ]);
     });
     getProjectPage({
       pageNum: 0,
@@ -65,9 +63,8 @@ const DashBoard = ({ t }) => {
       pair: "",
       source: "",
       token: ""
-    }).then((res) => {
-      if (res.code === 200) {
-        const newData = res.data.rows.map(it => {
+    }).then((data) => {
+        const newData = data.rows.map(it => {
           return {
             name: it.rcoinName + '/' + it.fcoinName,
             liquidity: it.liquidity,
@@ -76,7 +73,6 @@ const DashBoard = ({ t }) => {
           }
         })
         setTableData(newData)
-      }
     })
   }, []);
   return (

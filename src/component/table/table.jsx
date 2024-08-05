@@ -20,7 +20,7 @@ function MyTable({ address, t }) {
     {createTime: '2024-07-16 08:57', tokenAddress: '0x0cae2c281209309c8d0d5084bc8812f3835968ca', value: '依赖关系', token20Name: '""Dependency resolution error"（依赖解析错误）...'},
     {createTime: '2024-07-17 20:15', tokenAddress: '0xe283d0e3b8c102badf5e8166b73e02d96d92f688', value: '网络通信', token20Name: ' "Connection timed out"（连接超时）...'},
   ]);
-  const [totalPages, setTotalPages] = useState(0);  
+  const [totalNum, setTotalNum] = useState(0);  
   const [reqData, setReqData] = useState({})
   const onPageChange = (pageNum) => {
     setReqData({
@@ -40,17 +40,15 @@ function MyTable({ address, t }) {
     setLoading(true);
     if (!Object.keys(reqData).length) return;
     getTableData(reqData)
-      .then((res) => {
-        if (res.code === 200) {
-          setTotalPages(Math.ceil(res.data.count / 20));
-          const _data = res.data.data.map((it) => {
-            return {
-              key: it.id,
-              ...it,
-            };
-          });
-          setData(_data);
-        }
+      .then((data) => {
+        setTotalNum(data.count)
+        const _data = data.data.map((it) => {
+          return {
+            key: it.id,
+            ...it,
+          };
+        });
+        setData(_data);
       })
       .finally(() => {
         setLoading(false);
@@ -74,7 +72,7 @@ function MyTable({ address, t }) {
         />
         <Pagination
           currentPage={reqData.pageNum}
-          totalPages={totalPages}
+          total={totalNum}
           onPageChange={onPageChange}
         />
       </div>

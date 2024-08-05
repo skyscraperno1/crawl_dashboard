@@ -38,5 +38,8 @@
   "wxMsgCount": "微信消息量",
   "qqMsgCount": "QQ消息量",
   "tgMsgCount": "Tg消息量",
+  "xhsCount": "小红书消息量",
+  "dyCount": "抖音消息量",
+  "wbCount": "微博消息量",
   "name": "名称"
 }

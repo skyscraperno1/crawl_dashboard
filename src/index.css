@@ -44,3 +44,9 @@ code {
   border-radius: 50%;
   background-color: rgba(87, 87, 87, 0.24);
 }
+
+/* 修改message的样式 */
+.ant-message > .ant-message-notice-wrapper .ant-message-notice-content {
+  background-color: #333;
+  color: #e9ebf0;
+}

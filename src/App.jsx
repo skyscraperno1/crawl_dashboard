@@ -8,7 +8,7 @@ import Detail from "./component/Detail";
 import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
-import { ConfigProvider, theme, Button } from "antd";
+import { ConfigProvider, theme } from "antd";
 function App() {
   const { t } = useTranslation();
   const go = (pathname) => {
@@ -76,7 +76,12 @@ function App() {
   }
   return (
     <div className="App h-full font-text text-text">
-      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm, token: { colorPrimary: "#bd7c40"} }}>
+      <ConfigProvider
+        theme={{
+          algorithm: theme.darkAlgorithm,
+          token: { colorPrimary: "#bd7c40" },
+        }}
+      >
         <Header t={t} showBd={showBd} />
         {renderPage()}
       </ConfigProvider>
