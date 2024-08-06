@@ -1,12 +1,39 @@
 import styled from "styled-components";
 import { Input, Table, Pagination, Tooltip } from "antd";
-import { useState, useEffect } from "react";
-import { getProjectPage, followProject } from "../../apis/dashBoardApis";
+import { useState, useEffect, useMemo } from "react";
+import {
+  getProjectPage,
+  followProject,
+  getTokenInfo,
+  getCoinInfo,
+} from "../../apis/dashBoardApis";
 import { motion } from "framer-motion";
 import { copyText } from "../../utils";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle, FaHeart, FaRegHeart } from "react-icons/fa";
-import { FiFilter } from "react-icons/fi";
+import FilterBox from "./FilterBox";
+import BSC from '/src/assets/nets/bsc.png'
+import Solana from '../../assets/nets/solana.png'
+import Ethereum from '../../assets/nets/eth.png'
+import Polygon from '../../assets/nets/polygon.png'
+import Arbitrum from '../../assets/nets/arbitrum.png'
+import AVE from '../../assets/sources/ave.png'
+import QQ from '../../assets/sources/qq.png'
+import TG from '../../assets/sources/telegram.png'
+import WX from '../../assets/sources/wechat.png'
+const nets = {
+  BSC,
+  Solana,
+  Ethereum,
+  Polygon,
+  Arbitrum
+}
+const sources = {
+  TG,
+  QQ,
+  WX,
+  AVE
+}
 const Heading = styled.h1`
   height: 100px;
   line-height: 100px;
@@ -27,15 +54,61 @@ const RestTable = styled.div`
     color: #fff !important;
   }
 `;
-const OverallCase = ({ t }) => {
-  const inlineStyle = {
-    width: "485px",
-  };
 
-  const [showFilter, setShowFilter] = useState(false)
-  const handleClick = () => {
-    
-  }
+const dataKeys = [
+  "name",
+  "liquidity",
+  "liquidityChange",
+  "token",
+  "pair",
+  "today",
+  "source",
+  "web",
+  "telegram",
+  "twitter",
+  "qq",
+  "discord",
+  "intro",
+  "wxMsgCount",
+  "qqMsgCount",
+  "tgMsgCount",
+  "xhsCount",
+  "dyCount",
+  "wbCount",
+  "isHold",
+];
+
+const hiddenKeys = [
+  "telegram",
+  "twitter",
+  "pair",
+  "web",
+  "qq",
+  "discord",
+  "intro",
+];
+const disabledKeys = [
+  "name",
+  "liquidity",
+  "liquidityChange",
+  "token",
+  "isHold",
+  "pair ",
+  "source",
+];
+const tokens = ["wxMsgCount", "qqMsgCount", "tgMsgCount"];
+const coins = ["xhsCount", "dyCount", "wbCount"];
+const renderKeys = [
+  "name",
+  "liquidityChange",
+  "token",
+  "isHold",
+  "source",
+  ...tokens,
+  ...coins,
+];
+const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
+const OverallCase = ({ t }) => {
   const [copied, setCopied] = useState(false);
   const clickFollow = (isFollow, id) => {
     followProject(
@@ -48,32 +121,39 @@ const OverallCase = ({ t }) => {
       getTable();
     });
   };
-  const columns = [
-    { key: "name", title: (
-      <div className="flex items-center w-full">
-        <FiFilter className="text-xs mr-1 hover:text-themeColor cursor-pointer" onClick={handleClick}/>
-        <div>{t("name")}</div>
-      </div>
-    ), dataIndex: "name", width: 90 },
-    { key: "liquidity", title: t("liquidity"), dataIndex: "createTime" },
-    {
-      key: "liquidityChange",
-      title: t("liquidityChange"),
-      dataIndex: "liquidityChange",
-      render: (text) => {
-        const [num] = text.split("%");
-        const className =
-          num > 0 ? "text-red-500" : num < 0 ? "text-green-500" : "";
-        return <div className={className}>{text}</div>;
-      },
-    },
-    {
-      key: "token",
-      title: t("token"),
-      dataIndex: "token",
-      ellipsis: true,
-      width: 200,
-      render: (text) => (
+
+  const [checkList, setCheckList] = useState(defaultChecked);
+
+  const options = dataKeys.map((it) => ({
+    label: t(it),
+    value: it,
+    disabled: disabledKeys.includes(it),
+  }));
+  const _columns = dataKeys.map((it) => ({
+    key: it,
+    title: t(it),
+    dataIndex: it,
+    render: renderKeys.includes(it)
+      ? (text, content) => renderCell(it, text, content)
+      : undefined,
+    hidden: !hiddenKeys.includes(it),
+    ellipsis: true,
+  }));
+  const renderCell = (key, text, content) => {
+    if (key === "name") {
+      return (
+        <div className="flex items-center">
+          {content.net && <img className="w-4 h-4 mr-1 align-middle rounded-full" src={nets[content.net]} alt="" title={content.net}/>}
+          <span>{text}</span>
+        </div>
+      );
+    } else if (key === "liquidityChange") {
+      const [num] = text.split("%");
+      const className =
+        num > 0 ? "text-red-500" : num < 0 ? "text-green-500" : "";
+      return <div className={className}>{text}</div>;
+    } else if (key === "token") {
+      return (
         <Tooltip
           placement="topLeft"
           afterOpenChange={(open) => {
@@ -110,44 +190,75 @@ const OverallCase = ({ t }) => {
         >
           <span className="cursor-pointer hover:text-themeColor">{text}</span>
         </Tooltip>
-      ),
-    },
-    { key: "pair", title: t("pair"), dataIndex: "pair", ellipsis: true },
-    { key: "today", title: t("date"), dataIndex: "today" },
-    { key: "net", title: t("net"), dataIndex: "net" },
-    { key: "web", title: t("web"), dataIndex: "web" },
-    { key: "telegram", title: t("telegram"), dataIndex: "telegram" },
-    { key: "twitter", title: t("twitter"), dataIndex: "twitter" },
-    { key: "qq", title: t("qq"), dataIndex: "qq" },
-    { key: "discord", title: t("discord"), dataIndex: "discord" },
-    { key: "intro", title: t("intro"), dataIndex: "intro", ellipsis: true },
-    { key: "wxMsgCount", title: t("wxMsgCount"), dataIndex: "wxMsgCount" },
-    { key: "qqMsgCount", title: t("qqMsgCount"), dataIndex: "qqMsgCount" },
-    { key: "tgMsgCount", title: t("tgMsgCount"), dataIndex: "tgMsgCount" },
-    { key: "xhsCount", title: t("xhsCount"), dataIndex: "xhsCount" },
-    { key: "dyCount", title: t("dyCount"), dataIndex: "dyCount" },
-    { key: "wbCount", title: t("wbCount"), dataIndex: "wbCount" },
-    {
-      key: "isHold",
-      title: t("isHold"),
-      dataIndex: "isHold",
-      render: (text, { id }) => (
+      );
+    } else if (key === 'source') {
+      return (
+        <img src={sources[content.source]} alt="" title={text} className="w-8 h-8 rounded-full"/>
+      )
+    } else if (key === "isHold") {
+      return (
         <div>
           {text === "1" ? (
             <FaHeart
               className="cursor-pointer text-themeColor"
-              onClick={clickFollow.bind(null, false, id)}
+              onClick={clickFollow.bind(null, false, content.id)}
             />
           ) : (
             <FaRegHeart
               className="cursor-pointer"
-              onClick={clickFollow.bind(null, true, id)}
+              onClick={clickFollow.bind(null, true, content.id)}
             />
           )}
         </div>
-      ),
-    },
-  ];
+      );
+    } else if (tokens.includes(key)) {
+      key = key.replace("MsgCount", "");
+      return (
+        <div
+          className="cursor-pointer hover:text-themeColor"
+          onClick={() => {
+            handleTokens(key, content.token);
+          }}
+        >
+          {text}
+        </div>
+      );
+    } else if (coins.includes(key)) {
+      key = key.replace("Count", "");
+      return (
+        <div
+          className="cursor-pointer hover:text-themeColor"
+          onClick={() => {
+            handleCoins(key, content.id);
+          }}
+        >
+          {text}
+        </div>
+      );
+    }
+  };
+
+  const handleCoins = (key, coinId) => {
+    getCoinInfo({
+      key,
+      coinId,
+    });
+  };
+
+  const handleTokens = (key, token) => {
+    getTokenInfo({
+      key,
+      token,
+    });
+  };
+
+  const columns = useMemo(() => {
+    return _columns.map((item) => ({
+      ...item,
+      hidden: !checkList.includes(item.key),
+    }));
+  }, [checkList]);
+
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -170,7 +281,7 @@ const OverallCase = ({ t }) => {
     getProjectPage(reqData)
       .then((data) => {
         setTotal(data.total);
-        const newData = data.rows.map((it) => {
+        const newData = data.rows?.map((it) => {
           return {
             ...it,
             name:
@@ -205,8 +316,15 @@ const OverallCase = ({ t }) => {
         {t("allCase")}
       </Heading>
       <Main className="lg:px-24 px-8 bg-boardBg py-8">
-        <section>
-          <Input placeholder={t("input-placer")} style={inlineStyle} />
+        <section className="flex px-4">
+          <FilterBox
+            defaultCheckedList={defaultChecked}
+            options={options}
+            onChange={(list) => {
+              setCheckList(list);
+            }}
+          />
+          <Input placeholder={t("input-placer")} style={{ width: "485px" }} />
         </section>
         <RestTable>
           <Table

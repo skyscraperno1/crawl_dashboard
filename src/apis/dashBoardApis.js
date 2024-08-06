@@ -44,3 +44,35 @@ export function followProject(params, showMessage) {
     params
   }, showMessage);
 }
+
+/**
+ *
+ * @param {
+* key: "wx" | "tg" | "qq",
+* token: string,
+* } data
+* @returns Promise<any>
+*/
+export function getTokenInfo(params) {
+  return Ajax({
+    url: "/v1/api/msg/findMsgByToken",
+    method: "POST",
+    params
+  });
+}
+
+/**
+ *
+ * @param {
+* key: "xhs" | "dy" | "wb",
+* coinId: number,
+* } data
+* @returns Promise<any>
+*/
+export function getCoinInfo(params) {
+  return Ajax({
+    url: "v1/api/search/findDataByCoinId",
+    method: "POST",
+    params
+  });
+}
