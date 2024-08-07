@@ -43,5 +43,6 @@
   "xhsCount": "小红书消息量",
   "dyCount": "抖音消息量",
   "wbCount": "微博消息量",
-  "name": "名称"
+  "name": "名称",
+  "copy-success": "复制成功"
 }

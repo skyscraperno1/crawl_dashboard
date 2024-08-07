@@ -7,7 +7,7 @@ import {
   getTokenInfo,
   getCoinInfo,
 } from "../../apis/dashBoardApis";
-import { motion } from "framer-motion";
+import { message } from 'antd';
 import { copyText } from "../../utils";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle, FaHeart, FaRegHeart } from "react-icons/fa";
@@ -109,7 +109,7 @@ const renderKeys = [
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
 const OverallCase = ({ t }) => {
-  const [copied, setCopied] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
   const clickFollow = (isFollow, id) => {
     followProject(
       {
@@ -156,34 +156,22 @@ const OverallCase = ({ t }) => {
       return (
         <Tooltip
           placement="topLeft"
-          afterOpenChange={(open) => {
-            if (!open) {
-              setCopied(false);
-            }
-          }}
           title={
             <div className="relative">
               <span className="inline">{text}</span>
               <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1"> 
-              <motion.div
-                  initial={{ y: 0 }}
-                  animate={{ y: copied ? -16 : 0 }}
-                  transition={{
-                    duration: copied ? 0.2 : 0,
-                    type: "spring",
-                    damping: 10,
-                    stiffness: 100,
-                  }}
-                  className="w-[14px] h-[30px] flex flex-col justify-between"
-                >
                   <FiCopy
                     className="cursor-pointer"
-                    onClick={copyText.bind(null, text, () => {
-                      setCopied(true);
-                    })}
+                    onClick={() => {
+                      copyText(text, () => {
+                        messageApi.open({
+                          type: 'success',
+                          content: t('copy-success'),
+                        });
+                      });
+                    }}
                   />
                   <FaCheckCircle className="text-[#24c197]" />
-                </motion.div>
               </div>
             </div>
           }
@@ -312,6 +300,7 @@ const OverallCase = ({ t }) => {
   };
   return (
     <section className="bg-neutral-950 pt-[80px] w-full h-full">
+      {contextHolder}
       <Heading className="h-20 text-3xl font-bold lg:px-24 px-8">
         {t("allCase")}
       </Heading>

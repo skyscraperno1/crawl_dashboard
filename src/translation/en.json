@@ -43,5 +43,6 @@
   "xhsCount": "XHS Count",
   "dyCount": "TikTok Count",
   "wbCount": "WB Count",
-  "name": "Name"
+  "name": "Name",
+  "copy-success": "Copy successful"
 }
