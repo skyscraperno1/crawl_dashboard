@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Input, Table, Pagination, Tooltip } from "antd";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   getProjectPage,
   followProject,
@@ -134,12 +134,12 @@ const OverallCase = ({ t }) => {
     title: t(it),
     dataIndex: it,
     render: renderKeys.includes(it)
-      ? (text, content) => renderCell(it, text, content)
-      : undefined,
+    ? (text, content) => renderCell(it, text, content)
+    : undefined,
     hidden: !hiddenKeys.includes(it),
     ellipsis: true,
   }));
-  const renderCell = (key, text, content) => {
+  const renderCell = useCallback((key, text, content) => {
     if (key === "name") {
       return (
         <div className="flex items-center">
@@ -164,8 +164,8 @@ const OverallCase = ({ t }) => {
           title={
             <div className="relative">
               <span className="inline">{text}</span>
-              <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1">
-                <motion.div
+              <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1"> 
+              <motion.div
                   initial={{ y: 0 }}
                   animate={{ y: copied ? -16 : 0 }}
                   transition={{
@@ -236,7 +236,7 @@ const OverallCase = ({ t }) => {
         </div>
       );
     }
-  };
+  }, []);
 
   const handleCoins = (key, coinId) => {
     getCoinInfo({
@@ -257,7 +257,7 @@ const OverallCase = ({ t }) => {
       ...item,
       hidden: !checkList.includes(item.key),
     }));
-  }, [checkList]);
+  }, [checkList, t]);
 
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
