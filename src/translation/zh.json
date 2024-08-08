@@ -44,5 +44,12 @@
   "dyCount": "抖音消息量",
   "wbCount": "微博消息量",
   "name": "名称",
-  "copy-success": "复制成功"
+  "copy-success": "复制成功",
+  "last-date": "上次更新时间：",
+  "followed": "已关注",
+  "un-followed": "未关注",
+  "removed-follow": "已移除",
+  "search": "搜索",
+  "reset": "重置",
+  "overall-placeholder": "请输入项目名称"
 }

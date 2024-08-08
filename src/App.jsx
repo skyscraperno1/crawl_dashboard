@@ -9,8 +9,18 @@ import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
 import { ConfigProvider, theme } from "antd";
+import zhCN from "antd/lib/locale/zh_CN";
+import enUS from 'antd/lib/locale/en_US'; 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const currentLang = useMemo(() => {
+    if (i18n.language === 'zh') {
+      return zhCN;
+    } else {
+      return enUS;
+    }
+  }, [t])
   const go = (pathname) => {
     setCurrentPage(pathname);
     window.location.pathname = pathname;
@@ -77,6 +87,7 @@ function App() {
   return (
     <div className="App h-full font-text text-text">
       <ConfigProvider
+        locale={currentLang}
         theme={{
           algorithm: theme.darkAlgorithm,
           token: { colorPrimary: "#bd7c40" },

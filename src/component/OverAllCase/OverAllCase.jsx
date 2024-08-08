@@ -7,33 +7,36 @@ import {
   getTokenInfo,
   getCoinInfo,
 } from "../../apis/dashBoardApis";
-import { message } from 'antd';
+import { message } from "antd";
 import { copyText } from "../../utils";
 import { FiCopy } from "react-icons/fi";
-import { FaCheckCircle, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaCheckCircle, FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import FilterBox from "./FilterBox";
-import BSC from '/src/assets/nets/bsc.png'
-import Solana from '../../assets/nets/solana.png'
-import Ethereum from '../../assets/nets/eth.png'
-import Polygon from '../../assets/nets/polygon.png'
-import Arbitrum from '../../assets/nets/arbitrum.png'
-import AVE from '../../assets/sources/ave.png'
-import QQ from '../../assets/sources/qq.png'
-import TG from '../../assets/sources/telegram.png'
-import WX from '../../assets/sources/wechat.png'
+import BSC from "/src/assets/nets/bsc.png";
+import Solana from "../../assets/nets/solana.png";
+import Ethereum from "../../assets/nets/eth.png";
+import Polygon from "../../assets/nets/polygon.png";
+import Arbitrum from "../../assets/nets/arbitrum.png";
+import AVE from "../../assets/sources/ave.png";
+import QQ from "../../assets/sources/qq.png";
+import TG from "../../assets/sources/telegram.png";
+import WX from "../../assets/sources/wechat.png";
+import TableFilterInput from "../common/TableFilterInput";
+import { debounce } from "../../utils";
+import { IoMdAddCircleOutline, IoMdRemoveCircle } from "react-icons/io";
 const nets = {
   BSC,
   Solana,
   Ethereum,
   Polygon,
-  Arbitrum
-}
+  Arbitrum,
+};
 const sources = {
   TG,
   QQ,
   WX,
-  AVE
-}
+  AVE,
+};
 const Heading = styled.h1`
   height: 100px;
   line-height: 100px;
@@ -110,11 +113,11 @@ const renderKeys = [
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
 const OverallCase = ({ t }) => {
   const [messageApi, contextHolder] = message.useMessage();
-  const clickFollow = (isFollow, id) => {
+  const clickFollow = (isHold, id) => {
     followProject(
       {
         id,
-        isHold: isFollow ? "1" : "0",
+        isHold,
       },
       true
     ).then(() => {
@@ -134,44 +137,119 @@ const OverallCase = ({ t }) => {
     title: t(it),
     dataIndex: it,
     render: renderKeys.includes(it)
-    ? (text, content) => renderCell(it, text, content)
-    : undefined,
+      ? (text, content) => renderCell(it, text, content)
+      : undefined,
     hidden: !hiddenKeys.includes(it),
     ellipsis: true,
   }));
+
+  const renderFilter = useCallback((key) => {
+    if (key === "isHold") {
+      return {
+        filters: [
+          { text: t("followed"), value: "1" },
+          { text: t("un-followed"), value: "0" },
+          { text: t("removed-follow"), value: "2" },
+        ],
+        filterMultiple: false,
+      };
+    } else if (key === "name") {
+      return {
+        filters: Object.keys(nets).map((key) => ({
+          text: (
+            <img
+              className="h-4 w-4 align-sub inline-block rounded-full"
+              src={nets[key]}
+              alt={key}
+              title={key}
+              key={key}
+            />
+          ),
+          value: key,
+        })),
+        filterMultiple: false,
+      };
+    } else if (key === "source") {
+      return {
+        filters: Object.keys(sources).map((key) => ({
+          text: (
+            <img
+              className="h-4 w-4 align-sub inline-block rounded-full"
+              src={sources[key]}
+              alt={key}
+              title={key}
+              key={key}
+            />
+          ),
+          value: key,
+        })),
+        filterMultiple: false,
+      };
+    } else if (key === "token" || key === "pair") {
+      return {
+        filterDropdown: (filterProps) => (
+          <TableFilterInput
+            t={t}
+            {...filterProps}
+            dataIndex={key}
+          />
+        ),
+        filterIcon: (filtered) => (
+          <FaSearch className={filtered ? "text-themeColor" : ""} />
+        ),
+      };
+    } else {
+      return null;
+    }
+  }, []);
+
   const renderCell = useCallback((key, text, content) => {
     if (key === "name") {
       return (
         <div className="flex items-center">
-          {content.net && <img className="w-4 h-4 mr-1 align-middle rounded-full" src={nets[content.net]} alt="" title={content.net}/>}
+          {content.net && (
+            <img
+              className="w-4 h-4 mr-1 align-middle rounded-full"
+              src={nets[content.net]}
+              alt=""
+              title={content.net}
+            />
+          )}
           <span>{text}</span>
         </div>
       );
     } else if (key === "liquidityChange") {
+      const _title = content.lastDay
+        ? `${t("last-date")}${content.lastDay}`
+        : text;
       const [num] = text.split("%");
       const className =
-        num > 0 ? "text-red-500" : num < 0 ? "text-green-500" : "";
-      return <div className={className}>{text}</div>;
-    } else if (key === "token") {
+        num > 0 ? "text-green-500" : num < 0 ? "text-red-500" : "";
+      return (
+        <div className={className} title={_title}>
+          {text}
+        </div>
+      );
+    } else if (key === "token" || key === "pair") {
       return (
         <Tooltip
           placement="topLeft"
           title={
             <div className="relative">
               <span className="inline">{text}</span>
-              <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1"> 
-                  <FiCopy
-                    className="cursor-pointer"
-                    onClick={() => {
-                      copyText(text, () => {
-                        messageApi.open({
-                          type: 'success',
-                          content: t('copy-success'),
-                        });
+              <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1">
+                <FiCopy
+                  className="cursor-pointer"
+                  onClick={() => {
+                    copyText(text, () => {
+                      messageApi.open({
+                        type: "success",
+                        content: t("copy-success"),
                       });
-                    }}
-                  />
-                  <FaCheckCircle className="text-[#24c197]" />
+                    });
+                  }}
+                />
+                <FaCheckCircle className="text-[#24c197]" />
               </div>
             </div>
           }
@@ -179,23 +257,34 @@ const OverallCase = ({ t }) => {
           <span className="cursor-pointer hover:text-themeColor">{text}</span>
         </Tooltip>
       );
-    } else if (key === 'source') {
+    } else if (key === "source") {
       return (
-        <img src={sources[content.source]} alt="" title={text} className="w-8 h-8 rounded-full"/>
-      )
+        <img
+          src={sources[content.source]}
+          alt=""
+          title={text}
+          className="w-8 h-8 rounded-full"
+        />
+      );
     } else if (key === "isHold") {
       return (
-        <div>
-          {text === "1" ? (
-            <FaHeart
-              className="cursor-pointer text-themeColor"
-              onClick={clickFollow.bind(null, false, content.id)}
-            />
+        <div className="flex justify-between px-4 text-base">
+          {text !== 2 &&
+            (text === "1" ? (
+              <FaHeart
+                className="cursor-pointer text-themeColor"
+                onClick={clickFollow.bind(null, "0", content.id)}
+              />
+            ) : (
+              <FaRegHeart
+                className="cursor-pointer"
+                onClick={clickFollow.bind(null, "1", content.id)}
+              />
+            ))}
+          {text === "2" ? (
+            <IoMdAddCircleOutline className="cursor-pointer" onClick={clickFollow.bind(null, "0", content.id)}/>
           ) : (
-            <FaRegHeart
-              className="cursor-pointer"
-              onClick={clickFollow.bind(null, true, content.id)}
-            />
+            <IoMdRemoveCircle className="cursor-pointer" onClick={clickFollow.bind(null, "2", content.id)}/>
           )}
         </div>
       );
@@ -241,10 +330,13 @@ const OverallCase = ({ t }) => {
   };
 
   const columns = useMemo(() => {
-    return _columns.map((item) => ({
-      ...item,
-      hidden: !checkList.includes(item.key),
-    }));
+    return _columns.map((item) => {
+      return {
+        ...item,
+        ...renderFilter(item.key),
+        hidden: !checkList.includes(item.key),
+      };
+    });
   }, [checkList, t]);
 
   const [data, setData] = useState([]);
@@ -294,6 +386,29 @@ const OverallCase = ({ t }) => {
       pageSize,
     });
   };
+
+  const handleFilterChange = (_, filter) => {
+    const { isHold, name, pair, source, token } = filter;
+    const resetData = {
+      isHold: isHold ? isHold[0] : "",
+      net: name ? name[0] : "",
+      pair: pair ? pair[0] : "",
+      source: source ? source[0] : "",
+      token: token ? token[0] : "",
+    };
+    setReqData({
+      ...reqData,
+      ...resetData,
+    });
+  };
+
+  const searchDebounce = debounce((name) => {
+    setReqData({
+      ...reqData,
+      pageNum: 1,
+      name,
+    });
+  }, 800);
   const rowClassName = (_, index) => {
     // 给偶数行添加一个类名，用于设置背景色
     return index % 2 === 0 ? "striped-row" : undefined;
@@ -313,7 +428,22 @@ const OverallCase = ({ t }) => {
               setCheckList(list);
             }}
           />
-          <Input placeholder={t("input-placer")} style={{ width: "485px" }} />
+          <Input
+            placeholder={t("overall-placeholder")}
+            allowClear
+            style={{ width: "485px" }}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setReqData({
+                  ...reqData,
+                  pageNum: 1,
+                  name: "",
+                });
+              } else {
+                searchDebounce(e.target.value);
+              }
+            }}
+          />
         </section>
         <RestTable>
           <Table
@@ -323,6 +453,7 @@ const OverallCase = ({ t }) => {
             pagination={false}
             rowKey={(record) => record.id}
             rowClassName={rowClassName}
+            onChange={handleFilterChange}
           />
           <Pagination
             current={reqData.pageNum}
