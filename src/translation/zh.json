@@ -16,7 +16,7 @@
   "more": "更多",
   "date": "日期",
   "today": "日期",
-  "source": "项目来源", 
+  "source": "来源", 
   "from_address": "来源地址",
   "to_address": "目标地址",
   "raw_amount": "总量",
@@ -51,5 +51,6 @@
   "removed-follow": "已移除",
   "search": "搜索",
   "reset": "重置",
-  "overall-placeholder": "请输入项目名称"
+  "overall-placeholder": "请输入项目名称",
+  "check-all": "全选"
 }

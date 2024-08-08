@@ -51,5 +51,6 @@
   "removed-follow": "Removed Case",
   "search": "Search ",
   "reset": "Reset",
-  "overall-placeholder": "Please input a name to search"
+  "overall-placeholder": "Please input a name to search",
+  "check-all": "Check all"
 }

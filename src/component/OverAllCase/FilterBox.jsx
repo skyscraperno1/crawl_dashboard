@@ -10,7 +10,7 @@ const FilterWrapper = styled.div`
   box-shadow: 0 3px 11px 0 #585858;
 `;
 
-const FilterBox = ({ defaultCheckedList = [], options = [], onChange }) => {
+const FilterBox = ({ defaultCheckedList = [], options = [], onChange, t }) => {
   const [showFilter, setShowFilter] = useState(false);
   const popConfirmRef = useRef(null);
   const popBtnRef = useRef(null);
@@ -78,7 +78,7 @@ const FilterBox = ({ defaultCheckedList = [], options = [], onChange }) => {
             onChange={onCheckAllChange}
             checked={checkAll}
           >
-            Check all
+            {t('check-all')}
           </Checkbox>
           <Divider style={{ margin: "14px 0" }} />
           <Checkbox.Group

@@ -84,7 +84,6 @@ const dataKeys = [
 const hiddenKeys = [
   "telegram",
   "twitter",
-  "pair",
   "web",
   "qq",
   "discord",
@@ -101,12 +100,13 @@ const disabledKeys = [
 ];
 const tokens = ["wxMsgCount", "qqMsgCount", "tgMsgCount"];
 const coins = ["xhsCount", "dyCount", "wbCount"];
+const copyKeys = ["token", "pair", "web", "telegram", "twitter", "qq", "discord"]
 const renderKeys = [
   "name",
   "liquidityChange",
-  "token",
   "isHold",
   "source",
+  ...copyKeys,
   ...tokens,
   ...coins,
 ];
@@ -152,6 +152,7 @@ const OverallCase = ({ t }) => {
           { text: t("removed-follow"), value: "2" },
         ],
         filterMultiple: false,
+        width: 120,
       };
     } else if (key === "name") {
       return {
@@ -168,6 +169,7 @@ const OverallCase = ({ t }) => {
           value: key,
         })),
         filterMultiple: false,
+        width: 200
       };
     } else if (key === "source") {
       return {
@@ -184,8 +186,9 @@ const OverallCase = ({ t }) => {
           value: key,
         })),
         filterMultiple: false,
+        width: 100
       };
-    } else if (key === "token" || key === "pair") {
+    } else if (copyKeys.includes(key)) {
       return {
         filterDropdown: (filterProps) => (
           <TableFilterInput
@@ -198,6 +201,19 @@ const OverallCase = ({ t }) => {
           <FaSearch className={filtered ? "text-themeColor" : ""} />
         ),
       };
+    } else if ([...tokens, ...coins].includes(key)) {
+      return {
+        width: 120,
+        align: 'center'
+      }
+    } else if (key === "today" || key === "liquidity") {
+      return {
+        width: 120,
+      }
+    } else if (key === "liquidityChange") {
+      return {
+        width: 140
+      }
     } else {
       return null;
     }
@@ -424,6 +440,7 @@ const OverallCase = ({ t }) => {
           <FilterBox
             defaultCheckedList={defaultChecked}
             options={options}
+            t={t}
             onChange={(list) => {
               setCheckList(list);
             }}
