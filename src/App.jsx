@@ -57,7 +57,6 @@ function App() {
             }}
           />
           <BgCanvas index={0} />
-          <BgCanvas index={1} />
         </>
       );
     } else if (currentPage === "/table") {

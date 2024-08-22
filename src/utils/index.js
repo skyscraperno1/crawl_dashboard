@@ -58,3 +58,11 @@ export const calValueType = (value, type) => {
   }
   return typeMap[typeString] || "unknown";
 };
+
+export function camelToSnakeCase(str) {
+  return str
+    // 匹配大写字母并将其转换为下划线后跟大写字母转小写
+    .replace(/([A-Z])/g, (match) => `_${match.toLowerCase()}`)
+    // 移除字符串开头可能存在的下划线（如果有的话）
+    .replace(/^_/, '');
+}

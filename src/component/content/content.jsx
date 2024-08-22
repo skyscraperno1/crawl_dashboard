@@ -3,7 +3,7 @@ import { fadeIn } from "./fadeIn";
 import { TypeAnimation } from "react-type-animation";
 import SearchInput from "../homeInput/SearchInput";
 import "./content.scss";
-const selectItems = ["Bep20", "BNB"];
+const selectItems = ["本地服务", "远程服务"];
 function Content({ t, getData }) {
   const sequence = selectItems.flatMap((item) => [item, 2000]);
 

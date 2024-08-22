@@ -18,6 +18,8 @@ export function getOverAllData() {
  * pair: string,
  * source: string,
  * token: string
+ * order: string,
+ * orderType: "ASC" | "DESC"
  * } data
  * @returns Promise<any>
  */
@@ -34,7 +36,7 @@ export function getProjectPage(data) {
  * @param {
  * id: number,
  * isHold: string,  0或者1
- * } data
+ * } params
  * @returns Promise<any>
  */
 export function followProject(params, showMessage) {
@@ -50,7 +52,7 @@ export function followProject(params, showMessage) {
  * @param {
 * key: "wx" | "tg" | "qq",
 * token: string,
-* } data
+* } params
 * @returns Promise<any>
 */
 export function getTokenInfo(params) {
@@ -66,7 +68,7 @@ export function getTokenInfo(params) {
  * @param {
 * key: "xhs" | "dy" | "wb",
 * coinId: number,
-* } data
+* } params
 * @returns Promise<any>
 */
 export function getCoinInfo(params) {
@@ -75,4 +77,21 @@ export function getCoinInfo(params) {
     method: "POST",
     params
   });
+}
+
+/**
+ *
+ * @param {
+* key: "baidu" | "bing" | "google",
+* coinId: number,
+* } params
+* @returns Promise<any>
+*/
+
+export function getSearchInfo(params) {
+  return Ajax({
+    url: "v1/api/ssBaidu/findDataByCoinId",
+    method: "POST",
+    params
+  })
 }

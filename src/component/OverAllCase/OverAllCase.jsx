@@ -6,9 +6,10 @@ import {
   followProject,
   getTokenInfo,
   getCoinInfo,
+  getSearchInfo
 } from "../../apis/dashBoardApis";
 import { message } from "antd";
-import { copyText } from "../../utils";
+import { copyText, camelToSnakeCase } from "../../utils";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle, FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import FilterBox from "./FilterBox";
@@ -48,8 +49,21 @@ const Main = styled.main`
 const RestTable = styled.div`
   .ant-table-wrapper {
     margin-top: 20px;
+    overflow-x: overlay;
+    .ant-table-thead {
+      .ant-table-cell {
+        font-size: 12px;
+      }
+    }
+    .ant-table-tbody {
+      .ant-table-cell {
+        font-size: 13px;
+        padding: 12px 16px;
+      }
+    }
     .striped-row {
       background-color: #303135;
+      height: 30px;
     }
   }
   .ant-pagination {
@@ -78,17 +92,14 @@ const dataKeys = [
   "xhsCount",
   "dyCount",
   "wbCount",
+  "baiduCount",
+  "bingCount",
+  "googleCount",
+  "totalCount",
   "isHold",
 ];
 
-const hiddenKeys = [
-  "telegram",
-  "twitter",
-  "web",
-  "qq",
-  "discord",
-  "intro",
-];
+const hiddenKeys = ["telegram", "twitter", "web", "qq", "discord", "intro", "wxMsgCount", "qqMsgCount", "tgMsgCount", "xhsCount", "dyCount", "wbCount", "baiduCount", "bingCount", "googleCount"];
 const disabledKeys = [
   "name",
   "liquidity",
@@ -100,15 +111,25 @@ const disabledKeys = [
 ];
 const tokens = ["wxMsgCount", "qqMsgCount", "tgMsgCount"];
 const coins = ["xhsCount", "dyCount", "wbCount"];
-const copyKeys = ["token", "pair", "web", "telegram", "twitter", "qq", "discord"]
+const search = ["baiduCount", "bingCount", "googleCount"]
+const allInfos = [...tokens, ...coins, ...search]
+const copyKeys = [
+  "token",
+  "pair",
+  "web",
+  "telegram",
+  "twitter",
+  "qq",
+  "discord",
+];
+const sorterKeys = ['liquidity', 'liquidityChange', 'today']
 const renderKeys = [
   "name",
   "liquidityChange",
   "isHold",
   "source",
   ...copyKeys,
-  ...tokens,
-  ...coins,
+  ...allInfos,
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
 const OverallCase = ({ t }) => {
@@ -169,7 +190,7 @@ const OverallCase = ({ t }) => {
           value: key,
         })),
         filterMultiple: false,
-        width: 200
+        width: 160,
       };
     } else if (key === "source") {
       return {
@@ -186,34 +207,27 @@ const OverallCase = ({ t }) => {
           value: key,
         })),
         filterMultiple: false,
-        width: 100
+        width: 80,
       };
     } else if (copyKeys.includes(key)) {
       return {
         filterDropdown: (filterProps) => (
-          <TableFilterInput
-            t={t}
-            {...filterProps}
-            dataIndex={key}
-          />
+          <TableFilterInput t={t} {...filterProps} dataIndex={key} />
         ),
         filterIcon: (filtered) => (
           <FaSearch className={filtered ? "text-themeColor" : ""} />
         ),
       };
-    } else if ([...tokens, ...coins].includes(key)) {
+    } else if ([...allInfos].includes(key) || key === "totalCount") {
       return {
-        width: 120,
-        align: 'center'
-      }
-    } else if (key === "today" || key === "liquidity") {
-      return {
-        width: 120,
-      }
-    } else if (key === "liquidityChange") {
-      return {
-        width: 140
-      }
+        width: 100,
+        align: "center",
+      };
+    } else if (sorterKeys.includes(key)) {
+      return { 
+        width: key === 'liquidityChange' ? 80 : 100,
+        sorter: true
+       };
     } else {
       return null;
     }
@@ -221,6 +235,7 @@ const OverallCase = ({ t }) => {
 
   const renderCell = useCallback((key, text, content) => {
     if (key === "name") {
+      const [rCoin, fCoin] = text.split('/')
       return (
         <div className="flex items-center">
           {content.net && (
@@ -231,19 +246,19 @@ const OverallCase = ({ t }) => {
               title={content.net}
             />
           )}
-          <span>{text}</span>
+          <span>{rCoin}</span>
+          {fCoin && <span className="text-neutral-400">/{fCoin}</span>}
         </div>
       );
     } else if (key === "liquidityChange") {
       const _title = content.lastDay
         ? `${t("last-date")}${content.lastDay}`
         : text;
-      const [num] = text.split("%");
       const className =
-        num > 0 ? "text-green-500" : num < 0 ? "text-red-500" : "";
+      text > 0 ? "text-green-500" : text < 0 ? "text-red-500" : "";
       return (
         <div className={className} title={_title}>
-          {text}
+          {text}{text !== 0 && '%'}
         </div>
       );
     } else if (key === "token" || key === "pair") {
@@ -279,28 +294,43 @@ const OverallCase = ({ t }) => {
           src={sources[content.source]}
           alt=""
           title={text}
-          className="w-8 h-8 rounded-full"
+          className="w-6 h-6 rounded-full"
         />
       );
     } else if (key === "isHold") {
       return (
         <div className="flex justify-between px-4 text-base">
-          {text !== 2 &&
+          {text !== '2' &&
             (text === "1" ? (
-              <FaHeart
-                className="cursor-pointer text-themeColor"
+              <div
+                className="bg-zinc-700 cursor-pointer text-themeColor p-1 rounded hover:text-lightTheme hover:bg-zinc-600"
                 onClick={clickFollow.bind(null, "0", content.id)}
-              />
+              >
+                <FaHeart />
+              </div>
             ) : (
-              <FaRegHeart
-                className="cursor-pointer"
+              <div
+                className="bg-zinc-700 cursor-pointer text-zinc-400 p-1 rounded hover:text-zinc-300 hover:bg-gray-700/70"
                 onClick={clickFollow.bind(null, "1", content.id)}
-              />
+              >
+                <FaRegHeart />
+              </div>
             ))}
           {text === "2" ? (
-            <IoMdAddCircleOutline className="cursor-pointer" onClick={clickFollow.bind(null, "0", content.id)}/>
+            <div
+            className="cursor-pointer text-green-300 p-1 hover:text-green-200 hover:bg-green-600 rounded bg-green-300/20"
+            onClick={clickFollow.bind(null, "0", content.id)}
+          >
+            <IoMdAddCircleOutline
+            />
+          </div>
           ) : (
-            <IoMdRemoveCircle className="cursor-pointer" onClick={clickFollow.bind(null, "2", content.id)}/>
+            <div
+              className="cursor-pointer text-red-300 p-1 hover:text-red-200 hover:bg-red-600 rounded bg-red-300/20"
+              onClick={clickFollow.bind(null, "2", content.id)}
+            >
+              <IoMdRemoveCircle />
+            </div>
           )}
         </div>
       );
@@ -328,6 +358,18 @@ const OverallCase = ({ t }) => {
           {text}
         </div>
       );
+    } else if (search.includes(key)) {
+      key = key.replace("Count", "");
+      return (
+        <div
+          className="cursor-pointer hover:text-themeColor"
+          onClick={() => {
+            handleSearchInfo(key, content.id);
+          }}
+        >
+          {text}
+        </div>
+      )
     }
   }, []);
 
@@ -344,6 +386,14 @@ const OverallCase = ({ t }) => {
       token,
     });
   };
+
+  const handleSearchInfo = (key, coinId) => {
+    getSearchInfo({
+      key,
+      coinId,
+      search: searchText
+    })
+  }
 
   const columns = useMemo(() => {
     return _columns.map((item) => {
@@ -380,6 +430,7 @@ const OverallCase = ({ t }) => {
         const newData = data.rows?.map((it) => {
           return {
             ...it,
+            liquidity: it.liquidity ? `$${it.liquidity}` : '',
             name:
               !it.rcoinName && !it.fcoinName
                 ? ""
@@ -402,8 +453,35 @@ const OverallCase = ({ t }) => {
       pageSize,
     });
   };
+  const [sortInfo, setSortInfo] = useState({});
 
-  const handleFilterChange = (_, filter) => {
+  const handleHeaderCellClick = (column) => {
+    if (!sorterKeys.includes(column.dataIndex)) {
+      return;
+    }
+    const lastOrder = sortInfo.field === column.dataIndex ? sortInfo.order : null;
+    if (lastOrder === 'ascend') {
+      setReqData({
+        ...reqData,
+        order: camelToSnakeCase(column.key),
+        orderType: "DESC"
+      })
+    } else if (lastOrder === 'descend') {
+      setReqData({
+        ...reqData,
+        order: undefined,
+        orderType: undefined
+      })
+    } else {
+      setReqData({
+        ...reqData,
+        order: camelToSnakeCase(column.key),
+        orderType: "ASC"
+      })
+    }
+  }
+  const handleFilterChange = (_, filter, sorter) => {
+    setSortInfo(sorter);
     const { isHold, name, pair, source, token } = filter;
     const resetData = {
       isHold: isHold ? isHold[0] : "",
@@ -464,7 +542,12 @@ const OverallCase = ({ t }) => {
         </section>
         <RestTable>
           <Table
-            columns={columns}
+            columns={columns.map((col) => ({
+              ...col,
+              onHeaderCell: (column) => ({
+                onClick: () => handleHeaderCellClick(column)
+              })
+            }))}
             dataSource={data}
             loading={loading}
             pagination={false}

@@ -22,7 +22,8 @@ export default {
         borderGold: 'rgb(189, 124, 64)',
         themeColor: '#bd7c40',
         bg: '#202124',
-        boardBg: '#303135'
+        boardBg: '#303135',
+        lightTheme: 'rgb(220, 130, 40)'
       },
       spacing: {
         calc: 'calc(100% - 48px)'        

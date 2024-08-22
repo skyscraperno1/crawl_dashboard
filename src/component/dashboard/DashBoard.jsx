@@ -31,9 +31,10 @@ const Section = styled.div`
 `;
 const DashBoard = ({ t }) => {
   const columns = [
-    { title: t('pair'), key: "name" },
-    { title: t('liquidity'), key: "liquidity" },
-    { title: t('date'), key: "date" },
+    { title: t('pair'), key: "name", width: '250px' },
+    { title: t('token'), key: "token" },
+    { title: t('liquidity'), key: "liquidity", width: '150px' },
+    { title: t('date'), key: "date", width: '150px' },
   ];
   const [pieChartOptions, setPieChart] = useState(null);
   const [lineChartOptions, setLineChart] = useState(null);
@@ -46,7 +47,7 @@ const DashBoard = ({ t }) => {
   useEffect(() => {
     getOverAllData().then((data) => {
       setPieChart(makePieChart(data.A, data.B));
-      setLineChart(makeLineChart(data.C));
+      setLineChart(makeLineChart(data.C.reverse()));
       const [_info] = data.D;
       setInfo([
         {name: "下降数量", key: "downCount", val: _info.downCount},
@@ -65,9 +66,20 @@ const DashBoard = ({ t }) => {
       token: ""
     }).then((data) => {
         const newData = data.rows.map(it => {
+          let name 
+          if (it.rcoinName && it.fcoinName) {
+            name = it.rcoinName + '/' + it.fcoinName
+          } else if (it.rcoinName && it.fcoinName) {
+            name = it.rcoinName
+          } else if (it.fcoinName) {
+            name = it.fcoinName
+          } else {
+            name = ''
+          }
           return {
-            name: it.rcoinName + '/' + it.fcoinName,
+            name,
             liquidity: it.liquidity,
+            token: it.token,
             date: it.today,
             key: it.id
           }

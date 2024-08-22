@@ -85,16 +85,14 @@ const GraphComponent = ({ t, getData }) => {
   const fetchData = debounce(() => {
     setLoading(true);
     checkAddress(address, type)
-      .then((res) => {
-        if (res.code === 200) {
-          initData.current = res.data.edges;
+      .then((data) => {
+          initData.current = data.edges;
           const _data = handleData(
             initData.current.slice(chunkSize, chunkSize + 20),
             address,
             containerRef.current.clientWidth / 2
           );
           setData(_data);
-        }
       })
       .finally(() => {
         setLoading(false);
@@ -112,18 +110,16 @@ const GraphComponent = ({ t, getData }) => {
         symbol: "",
       },
       type
-    ).then((res) => {
-      if (res.code === 200) {
-        const _data = type === "Bep20" ? res.data : [res.data];
-        setDrawerData(
-          _data.map((it) => {
-            return {
-              ...it,
-              key: it.id,
-            };
-          })
-        );
-      }
+    ).then((data) => {
+      const _data = type === "Bep20" ? data : [data];
+      setDrawerData(
+        _data.map((it) => {
+          return {
+            ...it,
+            key: it.id,
+          };
+        })
+      );
     }).finally(() => {
       setTableLoading(false)
     });

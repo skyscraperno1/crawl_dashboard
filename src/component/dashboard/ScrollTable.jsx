@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { calValueType } from "../../utils";
 import Empty from "../common/Empty";
@@ -57,7 +57,8 @@ const TableHeadCell = styled.div`
   position: relative;
   padding: 16px;
   font-size: 14px;
-  flex: 1;
+  flex: ${props => props.$width ? 'none' : '1'};
+  width: ${props => props.$width ? props.$width : 'auto'};
   text-align: left;
   font-weight: 600;
   &::before {
@@ -95,8 +96,12 @@ const TableRow = styled.div`
 
 const TableCell = styled.div`
   padding: 16px;
-  flex: 1;
+  flex: ${props => props.$width ? 'none' : '1'};
+  width: ${props => props.$width ? props.$width : 'auto'};
   font-size: 14px;
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
   border-bottom: 1px solid #707070;
   cursor: pointer;
 `;
@@ -144,8 +149,7 @@ const ScrollTable = ({
         ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
       ])
 
-      const speedFactor =
-      typeof speed === "number" ? speed : baseSpeed[speed] || 20;
+      const speedFactor = typeof speed === "number" ? speed : baseSpeed[speed] || 20;
       const totalHeight = rowHeight * dataSource.length;
       setAnimation((totalHeight / speedFactor).toFixed(2))
     } else {
@@ -158,7 +162,7 @@ const ScrollTable = ({
     return (
       <TableHead className="scroll-table-header">
         {columns.map((col, index) => (
-          <TableHeadCell key={index}>{col.title}</TableHeadCell>
+          <TableHeadCell $width={col.width} key={index}>{col.title}</TableHeadCell>
         ))}
       </TableHead>
     );
@@ -174,7 +178,7 @@ const ScrollTable = ({
         }}
       >
         {columns.map((col, colIndex) => (
-          <TableCell key={`${row.key}-${colIndex}`}>{row[col.key]}</TableCell>
+          <TableCell $width={col.width} key={`${row.key}-${colIndex}`}>{row[col.key]}</TableCell>
         ))}
       </TableRow>
     ));
