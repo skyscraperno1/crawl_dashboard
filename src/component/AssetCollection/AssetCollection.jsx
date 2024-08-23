@@ -31,7 +31,7 @@ const selectOptions = Object.keys(apis).map((key) => ({
 let currentReq = apis[selectOptions[0].value];
 const AssetMain = ({ t, messageApi }) => {
   const [reqData, setReqData] = useState({
-    address: "",
+    domain: "",
     startTime: null,
     endTime: null,
     pageNum: 1,
@@ -102,7 +102,7 @@ const AssetMain = ({ t, messageApi }) => {
   const onInputChange = debounce((e) => {
     setReqData({
       ...reqData,
-      address: e.target.value || ''
+      domain: e.target.value || ''
     });
   }, 600)
   const onPageChange = (pageNum, pageSize) => {
@@ -158,7 +158,7 @@ const AssetMain = ({ t, messageApi }) => {
             onChange={onDateChange}
             className="min-w-80"
           />
-          <Input onChange={onInputChange} placeholder={t("placeholder")} className="w-96" />
+          <Input onChange={onInputChange} placeholder={t("placeholder")} className="w-96" allowClear/>
         </section>
 
         <ResetTable>
