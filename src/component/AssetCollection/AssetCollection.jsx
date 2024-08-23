@@ -142,7 +142,7 @@ const AssetMain = ({ t, messageApi }) => {
     <section className="bg-neutral-950 pt-[80px] w-full h-full">
       <Main className="lg:px-24 px-8 bg-boardBg py-8">
         <section className="flex gap-6">
-          <Group onChange={(e) => selectChange(e.target.value)}>
+          <Group onChange={(e) => selectChange(e.target.value)} defaultValue={selectOptions[0].value}>
             {
               selectOptions.map(it => {
                 return (
