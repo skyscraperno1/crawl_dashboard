@@ -158,7 +158,7 @@ const AssetMain = ({ t, messageApi }) => {
             onChange={onDateChange}
             className="min-w-80"
           />
-          <Input onChange={onInputChange} placeholder={'请输入一个地址'} className="w-96" />
+          <Input onChange={onInputChange} placeholder={t("placeholder")} className="w-96" />
         </section>
 
         <ResetTable>
