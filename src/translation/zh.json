@@ -25,8 +25,7 @@
   "pie-title": "关注列表",
   "line-chart": "折线图",
   "pair": "池子地址",
-  "liquidity": "流动池大小",
-  "sorterKeys": "池子(万)",
+  "liquidity": "池子(万)",
   "liquidityChange": "涨幅",
   "token": "合约地址",
   "allCase": "所有案件",
@@ -57,5 +56,7 @@
   "search": "搜索",
   "reset": "重置",
   "overall-placeholder": "请输入项目名称",
-  "check-all": "全选"
+  "check-all": "全选",
+  "assetCollection": "资产收集",
+  "inputAddress:": "请输入一个地址"
 }

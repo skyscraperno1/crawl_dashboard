@@ -100,7 +100,7 @@ const TableCell = styled.div`
   width: ${props => props.$width ? props.$width : 'auto'};
   font-size: 14px;
   overflow: hidden;
-  text-wrap: nowrap;
+  white-space: nowrap;
   text-overflow: ellipsis;
   border-bottom: 1px solid #707070;
   cursor: pointer;

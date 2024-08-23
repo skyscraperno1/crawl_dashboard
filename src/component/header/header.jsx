@@ -15,6 +15,7 @@ const list = [
   }], text: "dashboard" },
   { path: "/detail", text: "detail" },
   { path: "/table", text: "table" },
+  { path: "/assetCollection", text: "assetCollection" },
 ];
 
 function Header({ t, showBd }) {

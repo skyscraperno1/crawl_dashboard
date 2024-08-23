@@ -8,12 +8,13 @@ import Detail from "./component/Detail";
 import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
-import { ConfigProvider, theme } from "antd";
+import AssetCollection from "./component/AssetCollection/AssetCollection"
+import { ConfigProvider, theme, message } from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 import enUS from 'antd/lib/locale/en_US'; 
 function App() {
   const { t, i18n } = useTranslation();
-
+  const [messageApi, contextHolder] = message.useMessage();
   const currentLang = useMemo(() => {
     if (i18n.language === 'zh') {
       return zhCN;
@@ -35,7 +36,7 @@ function App() {
     }
   }, [currentPage]);
 
-  function renderPage() {
+  function renderPage(messageApi) {
     if (currentPage.includes("/detail")) {
       return (
         <>
@@ -71,10 +72,15 @@ function App() {
     } else if (currentPage === "/overallCase") {
       return (
         <>
-          <OverAllCase t={t} />
-          {/* <BgCanvas index={0} /> */}
+          <OverAllCase t={t} messageApi={messageApi}/>
         </>
       );
+    } else if (currentPage === '/assetCollection') {
+      return (
+        <>
+          <AssetCollection t={t} messageApi={messageApi}/>
+        </>
+      )
     } else {
       return (
         <div className="h-full w-full mx-auto pt-20 text-center bg-bg">
@@ -85,6 +91,7 @@ function App() {
   }
   return (
     <div className="App h-full font-text text-text">
+      {contextHolder}
       <ConfigProvider
         locale={currentLang}
         theme={{
@@ -93,7 +100,7 @@ function App() {
         }}
       >
         <Header t={t} showBd={showBd} />
-        {renderPage()}
+        {renderPage(messageApi)}
       </ConfigProvider>
     </div>
   );

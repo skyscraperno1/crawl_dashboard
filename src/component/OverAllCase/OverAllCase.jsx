@@ -8,7 +8,6 @@ import {
   getCoinInfo,
   getSearchInfo
 } from "../../apis/dashBoardApis";
-import { message } from "antd";
 import { copyText, camelToSnakeCase } from "../../utils";
 import { FiCopy } from "react-icons/fi";
 import { FaCheckCircle, FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
@@ -51,6 +50,11 @@ const RestTable = styled.div`
     margin-top: 20px;
     overflow-x: overlay;
     .ant-table-thead {
+      .ant-table-cell-fix-right {
+        .ant-table-cell-content {
+          overflow: visible;
+        }
+      }
       .ant-table-cell {
         font-size: 12px;
       }
@@ -64,6 +68,12 @@ const RestTable = styled.div`
     .striped-row {
       background-color: #303135;
       height: 30px;
+      .ant-table-cell-fix-right {
+        background-color: #303135;
+      }
+      .ant-table-cell-row-hover {
+        background-color: #1d1d1d;
+      }
     }
   }
   .ant-pagination {
@@ -132,8 +142,7 @@ const renderKeys = [
   ...allInfos,
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
-const OverallCase = ({ t }) => {
-  const [messageApi, contextHolder] = message.useMessage();
+const OverallCase = ({ t, messageApi }) => {
   const clickFollow = (isHold, id) => {
     followProject(
       {
@@ -174,6 +183,7 @@ const OverallCase = ({ t }) => {
         ],
         filterMultiple: false,
         width: 120,
+        fixed: 'right'
       };
     } else if (key === "name") {
       return {
@@ -246,7 +256,7 @@ const OverallCase = ({ t }) => {
               title={content.net}
             />
           )}
-          <span>{rCoin}</span>
+          <span className="text-xs">{rCoin}</span>
           {fCoin && <span className="text-neutral-400">/{fCoin}</span>}
         </div>
       );
@@ -509,7 +519,6 @@ const OverallCase = ({ t }) => {
   };
   return (
     <section className="bg-neutral-950 pt-[80px] w-full h-full">
-      {contextHolder}
       <Heading className="h-20 text-3xl font-bold lg:px-24 px-8">
         {t("allCase")}
       </Heading>
