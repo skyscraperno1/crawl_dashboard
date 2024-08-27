@@ -1,4 +1,4 @@
-import { Radio, Badge, Table } from 'antd';
+import { Radio, Badge, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react'
 import * as apis from '../../apis/dashBoardApis'
 import { getOverDetailNum } from '../../apis/dashBoardApis'
@@ -6,6 +6,8 @@ import styled from "styled-components";
 import { debounce } from "../../utils";
 import { getAddress, getType } from '../Detail/canvasUtils';
 import { useTranslation } from 'react-i18next';
+import { parseWbText } from '../../utils';
+import CopyText from '../core/CopyText';
 let _options = [
   {
     label: '搜索引擎', value: 'searchEngine', count: 0, children: [
@@ -54,7 +56,7 @@ const ResetTable = styled.div`
 const rowClassName = (_, index) => {
   return index % 2 === 0 ? "striped-row" : undefined;
 };
-const OverallDetail = () => {
+const OverallDetail = ({messageApi}) => {
   const { t } = useTranslation();
   const [tab, setTab] = useState({
     lv1: null,
@@ -121,6 +123,46 @@ const OverallDetail = () => {
       getTableData(params, currentReq)
     }
   }, [tab, token])
+
+  const getColumnConfig = (key) => {
+    if (key === 'url' || key === 'link') {
+      return {
+        render: (text) => <a href={text} target="_blank" className='hover:text-themeColor'>{text}</a>,
+        width: 400
+      }
+    } else if (key === 'token') {
+      return {
+        render: (text) => <CopyText text={text} messageApi={messageApi}/>
+      }
+    } else if (key === 'time'){
+      return {
+        width: 160
+      };
+    } else if (key === 'coinName') {
+      return {
+        width: 120
+      }
+    } else if (key === 'title') {
+      return {
+        width: 400
+      }
+    } else if (key === 'tagList') {
+      return {
+        render: (text) => {
+          if (text) {
+            return text.split(',').map((tag) => {
+              return <Tag size="small" color="#bd7c40" className='mt-1' bordered={false}>{tag}</Tag>
+            })
+          } else {
+            return undefined
+          }
+        },
+        ellipsis: false
+      }
+    } else {
+      return undefined;
+    }
+  }
   
   const getTableData = debounce((reqData, currentReq) => {
     setLoading(true)
@@ -132,12 +174,22 @@ const OverallDetail = () => {
           dataIndex: key,
           hidden: key === 'id',
           ellipsis: true,
+          ...getColumnConfig(key)
         }
       })
       if (data.length) {
-        _columns = _columns.filter(item => item.key !== 'coinId')
-        setColumns(_columns)
-        setTableData(data)
+          _columns = _columns.filter(item => 
+            tab.lv2 === 'wb' 
+            ? item.key !== 'title' && item.key !== 'coinId'
+            : item.key !== 'coinId'
+          )
+          if (tab.lv2 === 'wb') {
+            data.forEach(it => {
+              it.description = parseWbText(it.description)
+            })
+          }
+          setColumns(_columns)
+          setTableData(data)
       } else {
         setColumns([])
         setTableData([])

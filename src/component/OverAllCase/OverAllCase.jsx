@@ -4,9 +4,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   getProjectPage,
   followProject,
-  getTokenInfo,
-  getCoinInfo,
-  getSearchInfo
 } from "../../apis/dashBoardApis";
 import { copyText, camelToSnakeCase } from "../../utils";
 import { FiCopy } from "react-icons/fi";
@@ -24,6 +21,7 @@ import WX from "../../assets/sources/wechat.png";
 import TableFilterInput from "../common/TableFilterInput";
 import { debounce } from "../../utils";
 import { IoMdAddCircleOutline, IoMdRemoveCircle } from "react-icons/io";
+import CopyText from "../core/CopyText";
 const nets = {
   BSC,
   Solana,
@@ -288,32 +286,7 @@ const OverallCase = ({ t, messageApi }) => {
         </div>
       );
     } else if (key === "token" || key === "pair") {
-      return (
-        <Tooltip
-          placement="topLeft"
-          title={
-            <div className="relative">
-              <span className="inline">{text}</span>
-              <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1">
-                <FiCopy
-                  className="cursor-pointer"
-                  onClick={() => {
-                    copyText(text, () => {
-                      messageApi.open({
-                        type: "success",
-                        content: t("copy-success"),
-                      });
-                    });
-                  }}
-                />
-                <FaCheckCircle className="text-[#24c197]" />
-              </div>
-            </div>
-          }
-        >
-          <span className="cursor-pointer hover:text-themeColor">{text}</span>
-        </Tooltip>
-      );
+      return <CopyText text={text} messageApi={messageApi}/>
     } else if (key === "source") {
       return (
         <img

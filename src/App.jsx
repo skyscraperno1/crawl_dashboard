@@ -85,7 +85,7 @@ function App() {
     } else if (currentPage.includes('/overallDetail')) {
       return (
         <>
-          <OverallDetail />
+          <OverallDetail messageApi={messageApi}/>
         </>
       )
     } else {

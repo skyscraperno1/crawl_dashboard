@@ -58,11 +58,19 @@
   "overall-placeholder": "Please input a name to search",
   "check-all": "Check all",
   "assetCollection": "Asset Coll",
-  "overallDetail.coinName": "Coin Name",
+  "overallDetail.coinName": "Keyword",
   "overallDetail.link": "Url",
   "overallDetail.title": "Title",
   "overallDetail.url": "Url",
   "overallDetail.time": "Time",
   "overallDetail.content": "Content",
-  "overallDetail.description": "Description"
+  "overallDetail.description": "Description",
+  "overallDetail.tagList": "Tags",
+  "overallDetail.chatRoomId": "ChatRoom Id",
+  "overallDetail.chatRoomName": "CharRoom Name",
+  "overallDetail.chatMsg": "Message",
+  "overallDetail.token": "Token",
+  "overallDetail.uid": "UId",
+  "overallDetail.fromId": "User Id",
+  "overallDetail.createTime": "Time"
 }

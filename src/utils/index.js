@@ -1,3 +1,4 @@
+import parse from 'html-react-parser';
 export function debounce(func, delay = 0) {
   let timer;
 
@@ -65,4 +66,21 @@ export function camelToSnakeCase(str) {
     .replace(/([A-Z])/g, (match) => `_${match.toLowerCase()}`)
     // 移除字符串开头可能存在的下划线（如果有的话）
     .replace(/^_/, '');
+}
+
+export const parseWbText = (str) => {
+  if (!str) {
+    return ''
+  }
+  const newStr = str.replace(/<a\s+([^>]*)>(.*?)<\/a>/gi, function(match, attrs, innerHTML) {
+    let updatedAttrs = attrs + ' target="_blank"';
+    if (innerHTML === '全文') {
+      updatedAttrs = updatedAttrs.replace(
+        /\/status\/(\d+)/,
+        'https://m.weibo.cn/detail/$1'
+      );
+    }
+    return `<a ${updatedAttrs}>${innerHTML}</a>`;
+  });
+  return parse(newStr)
 }
