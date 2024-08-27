@@ -38,7 +38,7 @@ const Ajax = (req, showMessage) => {
         }
         resolve(result.data)
       } else {
-        const msg = result?.message || '网络错误' 
+        const msg = result?.message || result?.msg || '网络错误' 
         message.error(msg)
         reject(result)
       }

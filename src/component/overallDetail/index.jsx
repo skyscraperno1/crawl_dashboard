@@ -109,8 +109,9 @@ const OverallDetail = () => {
     if (tab.lv1 === 'community') {
       const params = {
         key: tab.lv2,
-        token
+        token: token
       }
+      if (!token) return;
       getTableData(params, currentReq)
     } else {
       const params = {
@@ -119,7 +120,7 @@ const OverallDetail = () => {
       }
       getTableData(params, currentReq)
     }
-  }, [tab])
+  }, [tab, token])
   
   const getTableData = debounce((reqData, currentReq) => {
     setLoading(true)
