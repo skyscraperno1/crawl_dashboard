@@ -57,5 +57,12 @@
   "reset": "Reset",
   "overall-placeholder": "Please input a name to search",
   "check-all": "Check all",
-  "assetCollection": "Asset Coll"
+  "assetCollection": "Asset Coll",
+  "overallDetail.coinName": "Coin Name",
+  "overallDetail.link": "Url",
+  "overallDetail.title": "Title",
+  "overallDetail.url": "Url",
+  "overallDetail.time": "Time",
+  "overallDetail.content": "Content",
+  "overallDetail.description": "Description"
 }

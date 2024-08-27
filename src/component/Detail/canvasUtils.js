@@ -1,8 +1,8 @@
 import { splitTextToFitWidth } from "./G6Config";
-export function getAddress(pathname) {
+export function getAddress(pathname, page = 'detail') {
   const idx = pathname.lastIndexOf("/");
   const hash = pathname.substring(idx + 1);
-  if (hash === "detail") {
+  if (hash === page) {
     return "";
   } else {
     return hash;

@@ -9,6 +9,7 @@ import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
 import AssetCollection from "./component/AssetCollection/AssetCollection"
+import OverallDetail from "./component/overallDetail";
 import { ConfigProvider, theme, message } from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 import enUS from 'antd/lib/locale/en_US'; 
@@ -79,6 +80,12 @@ function App() {
       return (
         <>
           <AssetCollection t={t} messageApi={messageApi}/>
+        </>
+      )
+    } else if (currentPage.includes('/overallDetail')) {
+      return (
+        <>
+          <OverallDetail />
         </>
       )
     } else {

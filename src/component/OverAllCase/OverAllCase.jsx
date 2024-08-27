@@ -138,10 +138,26 @@ const renderKeys = [
   "liquidityChange",
   "isHold",
   "source",
+  "totalCount",
   ...copyKeys,
   ...allInfos,
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
+
+const ToPageCell = ({ text, itemKey, id }) => {
+  const toPage = (key, itemId) => {
+    window.open(`/overallDetail/${key}/${itemId}`)
+  };
+
+  return (
+    <div
+      className="cursor-pointer hover:text-themeColor"
+      onClick={() => toPage(itemKey, id)}
+    >
+      {text}
+    </div>
+  );
+};
 const OverallCase = ({ t, messageApi }) => {
   const clickFollow = (isHold, id) => {
     followProject(
@@ -344,66 +360,14 @@ const OverallCase = ({ t, messageApi }) => {
           )}
         </div>
       );
-    } else if (tokens.includes(key)) {
-      key = key.replace("MsgCount", "");
+    } else if (tokens.includes(key) || coins.includes(key) || search.includes(key) || key === 'totalCount') {
+      const regex = /(Count|MsgCount)/g;
+      key = key.replace(regex, '');
       return (
-        <div
-          className="cursor-pointer hover:text-themeColor"
-          onClick={() => {
-            handleTokens(key, content.token);
-          }}
-        >
-          {text}
-        </div>
-      );
-    } else if (coins.includes(key)) {
-      key = key.replace("Count", "");
-      return (
-        <div
-          className="cursor-pointer hover:text-themeColor"
-          onClick={() => {
-            handleCoins(key, content.id);
-          }}
-        >
-          {text}
-        </div>
-      );
-    } else if (search.includes(key)) {
-      key = key.replace("Count", "");
-      return (
-        <div
-          className="cursor-pointer hover:text-themeColor"
-          onClick={() => {
-            handleSearchInfo(key, content.id);
-          }}
-        >
-          {text}
-        </div>
+        <ToPageCell text={text} itemKey={key} id={content.id} />
       )
     }
   }, []);
-
-  const handleCoins = (key, coinId) => {
-    getCoinInfo({
-      key,
-      coinId,
-    });
-  };
-
-  const handleTokens = (key, token) => {
-    getTokenInfo({
-      key,
-      token,
-    });
-  };
-
-  const handleSearchInfo = (key, coinId) => {
-    getSearchInfo({
-      key,
-      coinId,
-      search: searchText
-    })
-  }
 
   const columns = useMemo(() => {
     return _columns.map((item) => {
@@ -520,7 +484,9 @@ const OverallCase = ({ t, messageApi }) => {
   return (
     <section className="bg-neutral-950 pt-[80px] w-full h-full">
       <Heading className="h-20 text-3xl font-bold lg:px-24 px-8">
-        {t("allCase")}
+      {t("allCase")}
+      {}
+
       </Heading>
       <Main className="lg:px-24 px-8 bg-boardBg py-8">
         <section className="flex px-4">
