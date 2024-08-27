@@ -24,7 +24,7 @@ const Ajax = (req, showMessage) => {
   if (!req.url) {
     throw new Error('请求没有url')
   }
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     Axios.request({
       url,
       method: method || 'GET',
