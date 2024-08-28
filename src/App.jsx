@@ -66,7 +66,7 @@ function App() {
     } else if (currentPage === "/dashboard") {
       return (
         <>
-          <DashBoard t={t} />
+          <DashBoard t={t} messageApi={messageApi}/>
           <BgCanvas index={0} />
         </>
       );

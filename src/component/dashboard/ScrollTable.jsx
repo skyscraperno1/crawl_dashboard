@@ -1,8 +1,21 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { calValueType } from "../../utils";
 import Empty from "../common/Empty";
 import Spin from "../common/Spin";
+import CopyText from "../core/CopyText";
+import BSC from "/src/assets/nets/bsc.png";
+import Solana from "../../assets/nets/solana.png";
+import Ethereum from "../../assets/nets/eth.png";
+import Polygon from "../../assets/nets/polygon.png";
+import Arbitrum from "../../assets/nets/arbitrum.png";
+const nets = {
+  BSC,
+  Solana,
+  Ethereum,
+  Polygon,
+  Arbitrum,
+};
 const scrollAnimation = keyframes`
   to {
     transform: translateY(-50%);
@@ -20,16 +33,15 @@ const TableWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border: 1px solid #333;
   background-color: #222;
   position: relative;
   &::before {
     content: "";
     position: absolute;
-    top: 53px;
+    top: 50px;
     left: 0;
     right: 0;
-    height: calc(100% - 53px);
+    height: calc(100% - 50px);
     background: linear-gradient(
       to bottom,
       #353535,
@@ -46,21 +58,20 @@ const TableWrapper = styled.div`
 
 const TableHead = styled.div`
   display: flex;
-  background-color: #252e37;
-  color: #e9ebf0;
+  background-color: #1D1D1D;
+  font-size: 12px;
+  font-weight: 600;
+  color:rgba(255, 255, 255, 0.85);
   position: sticky;
-  top: 0;
   z-index: 10;
 `;
 
 const TableHeadCell = styled.div`
   position: relative;
   padding: 16px;
-  font-size: 14px;
   flex: ${props => props.$width ? 'none' : '1'};
   width: ${props => props.$width ? props.$width : 'auto'};
   text-align: left;
-  font-weight: 600;
   &::before {
     position: absolute;
     top: 50%;
@@ -82,12 +93,13 @@ const TableBody = styled.div`
   animation-name: ${scrollAnimation};
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-  min-height: 107px;
 `;
 
 const TableRow = styled.div`
   display: flex;
   color: #f0f0f0;
+  line-height: 21px;
+  background-color: #141414;
   transition: background-color 0.2s linear;
   &:hover {
     background-color: #1d1d1d;
@@ -96,24 +108,24 @@ const TableRow = styled.div`
 
 const TableCell = styled.div`
   padding: 16px;
+  height: 49px;
   flex: ${props => props.$width ? 'none' : '1'};
   width: ${props => props.$width ? props.$width : 'auto'};
-  font-size: 14px;
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  border-bottom: 1px solid #707070;
-  cursor: pointer;
+  border-bottom: 1px solid #303030;
 `;
 
 const ProgressBar = styled.div`
   position: absolute;
   left: 0;
-  top: 53px;
+  top: 49px;
   z-index: 100;
   width: 100%;
-  height: 4px;
-  background-color: #dd6b66;
+  height: 2px;
+  border-radius: 1px;
   animation-name: ${scrollBarAnimation};
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -126,59 +138,93 @@ const ScrollTable = ({
   t,
   loading,
   showProcess = true,
+  messageApi
 }) => {
-  const headerHeight = 53;
-  const rowHeight = 54;
+  const headerHeight = 50;
+  const rowHeight = 49;
+
+
 
   const [duplicatedData, setNewData] = useState([])
   const [animationTime, setAnimation] = useState(0)
-  useLayoutEffect(() => {
-    const bodyHeight = document.getElementById('scroll-table-body').clientHeight;
-    const len = dataSource.length;
-    const maxRow = parseInt(bodyHeight / rowHeight)
-    // 计算速率的
+  const [isScroll, setScroll] = useState(true)
+
+  const calcAnimation = () => {
     const baseSpeed = {
       normal: 20,
       fast: 40,
       slow: 10,
     };
-    // 超过就可以加滚动了
-    if (len >= maxRow) {
-      setNewData([
-        ...dataSource,
-        ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
-      ])
+    setNewData([
+      ...dataSource,
+      ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
+    ])
 
-      const speedFactor = typeof speed === "number" ? speed : baseSpeed[speed] || 20;
-      const totalHeight = rowHeight * dataSource.length;
-      setAnimation((totalHeight / speedFactor).toFixed(2))
+    const speedFactor = typeof speed === "number" ? speed : baseSpeed[speed] || 20;
+    const totalHeight = rowHeight * dataSource.length;
+    setAnimation((totalHeight / speedFactor).toFixed(2))
+  }
+ 
+  useLayoutEffect(() => {
+    const scrollBody = document.getElementById('scroll-table-body');
+    const len = dataSource.length;
+    const maxRow = parseInt(scrollBody.clientHeight / rowHeight)
+
+    // 超过就可以加滚动了
+    if (len >= maxRow && isScroll) {
+      scrollBody.style.overflowY = ''
+      calcAnimation()
     } else {
+      scrollBody.style.overflowY = 'overlay'
+      setAnimation(0)
       setNewData(dataSource)
     }
-  }, [speed, dataSource.length])
+  }, [speed, dataSource.length, isScroll])
 
   
   const renderTableHeader = () => {
     return (
       <TableHead className="scroll-table-header">
         {columns.map((col, index) => (
-          <TableHeadCell $width={col.width} key={index}>{col.title}</TableHeadCell>
+          <TableHeadCell $width={col.width} key={index} className="truncate">{col.title}</TableHeadCell>
         ))}
       </TableHead>
     );
   };
 
+  const TableCellContent = ({keyName, text, content}) => {
+    if (keyName === 'name') {
+      const [rCoin, fCoin] = text.split('/')
+      return (
+      <div className="flex items-center">
+        {content.net && (
+          <img
+            className="w-4 h-4 mr-1 align-middle rounded-full"
+            src={nets[content.net]}
+            alt=""
+            title={content.net}
+          />
+        )}
+        <span className="text-xs">{rCoin}</span>
+        {fCoin && <span className="text-neutral-400">/{fCoin}</span>}
+      </div>
+      )
+    } else if (keyName === 'token') {
+      return <CopyText text={text} messageApi={messageApi}/>
+    } else {
+      return <span>{text}</span>
+    }
+  }
   const renderTableBody = () => {
     return duplicatedData.map((row) => (
       <TableRow
         key={row.key}
         className="scroll-table-row"
-        onClick={() => {
-          console.log("click");
-        }}
       >
         {columns.map((col, colIndex) => (
-          <TableCell $width={col.width} key={`${row.key}-${colIndex}`}>{row[col.key]}</TableCell>
+          <TableCell $width={col.width} key={`${row.key}-${colIndex}`}>
+            {<TableCellContent keyName={col.key} content={row} text={row[col.key]} />}
+          </TableCell>
         ))}
       </TableRow>
     ));
@@ -200,28 +246,32 @@ const ScrollTable = ({
   return (
     <TableWrapper
       $hideBefore={animationTime.toString()}
-      className={`rounded-lg ${(loading || !animationTime) ? "no-before" : ""}`}
+      className={`rounded ${(loading || !animationTime) ? "no-before" : ""}`}
       id="scroll-table-wrapper"
     >
       {loading && <Spin />}
       {renderTableHeader()}
-      {(showProcess && !!animationTime) && (
+      {(showProcess && !!animationTime && isScroll) && (
         <ProgressBar
           id="progress-bar"
+          className="bg-blue-500"
           style={{ animationDuration: `${animationTime}s` }}
         />
       )}
       <div
-        style={{ height: `calc(100% - ${headerHeight}px)` }}
+        style={{ height: `calc(100% - ${headerHeight}px)`, overflowY: 'overlay' }}
         className="relative"
         id="scroll-table-body"
       >
         {(calValueType(dataSource, "array") && dataSource.length) ? (
           <TableBody
-            style={{ animationDuration: `${animationTime}s` }}
+            style={{ animationDuration: `${animationTime}s`, overflowX: `${isScroll ? 'hidden' : ''}` }}
             id="scroll-table-body-inner"
             onMouseEnter={() => handleAnimation(true)}
             onMouseLeave={() => handleAnimation(false)}
+            onClick={() => {
+              setScroll(prev => !prev)
+            }}
           >
             {renderTableBody()}
           </TableBody>

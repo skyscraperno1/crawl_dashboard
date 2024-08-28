@@ -10,7 +10,7 @@ const CopyText = ({ messageApi, text }) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     copyText(text, () => {
-      messageApi.open({
+      messageApi?.open({
         type: "success",
         content: t("copy-success"),
       });

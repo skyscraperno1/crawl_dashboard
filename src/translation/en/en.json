@@ -55,6 +55,7 @@
   "removed-follow": "Removed Case",
   "search": "Search ",
   "reset": "Reset",
+  "openDays": "Since Start",
   "overall-placeholder": "Please input a name to search",
   "check-all": "Check all",
   "assetCollection": "Asset Coll",
@@ -72,5 +73,10 @@
   "overallDetail.token": "Token",
   "overallDetail.uid": "UId",
   "overallDetail.fromId": "User Id",
-  "overallDetail.createTime": "Time"
+  "overallDetail.createTime": "Time",
+  "dashboard.lineTitle": "AVE Project Number",
+  "dashboard.lineExplain": "（liquidity above 100k）",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "average": "Average"
 }

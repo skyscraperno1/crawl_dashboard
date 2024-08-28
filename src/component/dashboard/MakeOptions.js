@@ -1,7 +1,7 @@
 const colors = [
-  "#7deff8",
-  "#4071d6",
-  "#47b8e0",
+  "#ef4444",
+  "#4ade80",
+  "#a78bfa",
   "#a5d296",
   "#c4ccd3",
   "#e062ae",
@@ -11,7 +11,17 @@ const colors = [
   "#91ca8c",
   "#f49f42",
 ];
-const bgColor = "#303135";
+
+
+const getMinNum = (arr) => {
+  const min = Math.min(...arr.map((obj) => obj.count));
+  const max = Math.max(...arr.map((obj) => obj.count));
+  if (max - min > min - 0) {
+    return 0
+  } else {
+    return min
+  }
+}
 export const makeLineChart = (sourceArr) => {
   const chartData = sourceArr.reduce(
     (acc, item) => {
@@ -21,9 +31,21 @@ export const makeLineChart = (sourceArr) => {
     },
     { xAxisData: [], seriesData: [] }
   );
+  const min = getMinNum(sourceArr)
   return {
     tooltip: {
       trigger: "axis",
+      formatter: function(params) {
+        const [val] = params
+        return `${val.name}<br />${val.marker} 数量: <b>${val.value}</b>`
+      }
+    },
+    backgroundColor: 'transparent',
+    grid: {
+      left: '60px', 
+      right: '40px', 
+      top: '14%', 
+      bottom: '30px' 
     },
     xAxis: {
       type: "category",
@@ -46,7 +68,11 @@ export const makeLineChart = (sourceArr) => {
       },
       axisLabel: {
           color: '#666' // 设置 Y 轴文字颜色
-      }
+      },
+      lineStyle: {
+        color: '#7C3AED'
+      },
+      min
   },
     series: [
       {
@@ -58,22 +84,22 @@ export const makeLineChart = (sourceArr) => {
   };
 };
 
+const ave = '#286dff'
+const tg = 'rgba(51, 144, 236, 0.8)'
+const wx = '#07c160'
+const qq = '#f43f5e'
 export const makePieChart = (sourceArr, sourceArr1) => {
   let total = 0;
   let pinTotal = 0;
-  const title = "关注/总数";
+  const title = "关注比";
 
-  const chartData = sourceArr.map((it) => {
+  sourceArr.map((it) => {
     total += it.count;
     if (it.is_hold === "1") {
       pinTotal = it.count;
     }
-    return {
-      name: it.is_hold === "0" ? "未关注" : "关注",
-      value: it.count,
-    };
   });
-  const chartData1 = sourceArr1.map((it) => {
+  const chartData = sourceArr1.map((it) => {
     return {
       name: it.source,
       value: it.count,
@@ -81,25 +107,37 @@ export const makePieChart = (sourceArr, sourceArr1) => {
   }); 
   const pin = `${pinTotal}/${total}`;
   return {
-    backgroundColor: bgColor,
-    color: colors,
+    color: [ave, qq, tg, wx],
+    tooltip: {
+      trigger: 'item', // 触发类型，item 表示数据项触发
+      backgroundColor: '#fff', // 背景颜色
+      borderColor: '#333', // 边框颜色
+      borderWidth: 1, // 边框宽度
+      borderRadius: 5, // 边框圆角
+      padding: [10, 10], // 内边距
+      textStyle: {
+        color: '#666', // 字体颜色
+        fontSize: 14, // 字体大小
+      },
+    },
     title: {
       text: "{a|" + pin + "}\n{c|" + title + "}",
-      x: "5%",
-      y: "bottom",
+      x: "center",
+      y: "center",
       textStyle: {
         rich: {
           a: {
-            fontSize: 38,
+            fontSize: 20,
             color: "#ffffff",
           },
           b: {
-            fontSize: 38,
+            fontSize: 20,
             color: "#ffffff",
           },
           c: {
-            fontSize: 30,
+            fontSize: 16,
             color: "#ffffff",
+            fontStyle: 'italic',
             padding: [10, 0, 0, 0],
           },
         },
@@ -108,16 +146,9 @@ export const makePieChart = (sourceArr, sourceArr1) => {
     series: [
       {
         type: "pie",
-        radius: ["55%", "60%"],
-        center: ["50%", "50%"],
-        data: chartData,
-        startAngle: 225,  
-      },
-      {
-        type: "pie",
         radius: ["45%", "50%"],
         center: ["50%", "50%"],
-        data: chartData1
+        data: chartData
       }
     ],
   };

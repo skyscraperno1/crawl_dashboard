@@ -1,13 +1,12 @@
 import styled from "styled-components";
-import { Input, Table, Pagination, Tooltip } from "antd";
+import { Input, Table, Pagination } from "antd";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   getProjectPage,
   followProject,
 } from "../../apis/dashBoardApis";
-import { copyText, camelToSnakeCase } from "../../utils";
-import { FiCopy } from "react-icons/fi";
-import { FaCheckCircle, FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
+import { camelToSnakeCase } from "../../utils";
+import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import FilterBox from "./FilterBox";
 import BSC from "/src/assets/nets/bsc.png";
 import Solana from "../../assets/nets/solana.png";
@@ -104,10 +103,11 @@ const dataKeys = [
   "bingCount",
   "googleCount",
   "totalCount",
-  "isHold",
+  "openDays",
+  "isHold"
 ];
 
-const hiddenKeys = ["telegram", "twitter", "web", "qq", "discord", "intro", "wxMsgCount", "qqMsgCount", "tgMsgCount", "xhsCount", "dyCount", "wbCount", "baiduCount", "bingCount", "googleCount"];
+const hiddenKeys = ["telegram", "twitter", "web", "qq", "discord", "intro", "wxMsgCount", "qqMsgCount",  "xhsCount", "dyCount",  "bingCount", "googleCount"];
 const disabledKeys = [
   "name",
   "liquidity",
@@ -116,6 +116,7 @@ const disabledKeys = [
   "isHold",
   "pair ",
   "source",
+  "openDays"
 ];
 const tokens = ["wxMsgCount", "qqMsgCount", "tgMsgCount"];
 const coins = ["xhsCount", "dyCount", "wbCount"];
@@ -242,7 +243,7 @@ const OverallCase = ({ t, messageApi }) => {
           <FaSearch className={filtered ? "text-themeColor" : ""} />
         ),
       };
-    } else if ([...allInfos].includes(key) || key === "totalCount") {
+    } else if ([...allInfos].includes(key) || key === "totalCount" || key === "openDays") {
       return {
         width: 100,
         align: "center",
