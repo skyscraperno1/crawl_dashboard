@@ -76,6 +76,10 @@
   "overallDetail.createTime": "时间",
   "dashboard.lineTitle": "AVE每日项目数",
   "dashboard.lineExplain": "（数据为池子大小大于10W的项目）",
+  "dashboard.pieTitle": "项目来源",
+  "dashboard.declineNum": "下降数量",
+  "dashboard.eqlNum": "相等数量",
+  "dashboard.increaseNum": "增长数量",
   "startDate": "开始日期",
   "endDate": "截止日期",
   "average": "平均数"

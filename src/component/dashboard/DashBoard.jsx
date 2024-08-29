@@ -5,6 +5,7 @@ import { getOverAllData, getProjectPage } from "../../apis/dashBoardApis";
 import { useEffect, useState } from "react";
 import { makeLineChart, makePieChart } from "./MakeOptions";
 import Card from './Card'
+import { Progress } from 'antd'
 import { FaAngleDoubleUp, FaAngleDoubleDown, FaEquals  } from "react-icons/fa";
 const Section = styled.div`
   overflow: hidden;
@@ -38,9 +39,9 @@ const DashBoard = ({ t, messageApi }) => {
   const [lineChartOptions, setLineChart] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [info, setInfo] = useState([
-    { name: "下降数量", key: "downCount", val: 0, Icon: FaAngleDoubleDown },
-    { name: "相等数量", key: "eqCount", val: 0, Icon: FaEquals },
-    { name: "增长数量", key: "upCount", val: 0, Icon: FaAngleDoubleUp },
+    { name: 'dashboard.declineNum', key: "downCount", val: 0, Icon: FaAngleDoubleDown },
+    { name: 'dashboard.eqlNum', key: "eqCount", val: 0, Icon: FaEquals },
+    { name: 'dashboard.increaseNum', key: "upCount", val: 0, Icon: FaAngleDoubleUp },
   ])
   
   const [dateData, setDateData] = useState({
@@ -58,18 +59,42 @@ const DashBoard = ({ t, messageApi }) => {
       endDate,
       average
     })
-    console.log(startDate, endDate, average);
   }
+
+  const [percentage, setPercentage] = useState(null)
+
+  const mapColor = {
+    Ave: '#286dff',
+    TG: 'rgba(51, 144, 236, 0.8)',
+    WX:  '#07c160',
+    QQ: '#f43f5e'
+  }
+
+  function calculatePercentages(data) {
+    const total = data.reduce((sum, item) => sum + item.count, 0);
+    const percentages = data.map(item => {
+        const percentage = (item.count / total * 100).toFixed(2); // 保留两位小数
+        return {
+            source: item.source,
+            percentage: percentage,
+            color: mapColor[item.source]
+        };
+    });
+    return percentages;
+  }
+
   useEffect(() => {
     getOverAllData().then((data) => {
       setPieChart(makePieChart(data.A, data.B));
+      const _percentage = calculatePercentages(data.B)
+      setPercentage(_percentage)
       setLineChart(makeLineChart(data.C.reverse()));
       getDateData(data.C)
       const [_info] = data.D;
       setInfo([
-        { name: "下降数量", key: "downCount", val: _info.downCount, Icon: FaAngleDoubleDown  },
-        { name: "相等数量", key: "eqCount", val: _info.eqCount, Icon: FaEquals },
-        { name: "增长数量", key: "upCount", val: _info.upCount, Icon: FaAngleDoubleUp },
+        { name: 'dashboard.declineNum', key: "downCount", val: _info.downCount, Icon: FaAngleDoubleDown  },
+        { name: 'dashboard.eqlNum', key: "eqCount", val: _info.eqCount, Icon: FaEquals },
+        { name: 'dashboard.increaseNum', key: "upCount", val: _info.upCount, Icon: FaAngleDoubleUp },
       ]);
     });
     getProjectPage({
@@ -154,11 +179,47 @@ const DashBoard = ({ t, messageApi }) => {
           )
         })}
         {/* PieChart */}
-        <Section $isCard={false} $titleSize="10" className="col-span-2 row-span-2 bg-[#303135f3] rounded">
-          {pieChartOptions && <Charts options={pieChartOptions} />}
+        <Section $isCard={false} $titleSize="10" className="col-span-3 row-span-2 bg-[#303135f3] rounded">
+          <div className="h-full flex flex-col">
+            <div className="text-2xl px-6 leading-loose border-[#545860] border-b-[1px]">
+              {t('dashboard.pieTitle')}
+            </div>
+            <div className="flex-1 flex">
+            <div className="hidden xl:flex w-[40%] flex-col justify-around py-4 px-2">
+              {
+                percentage && percentage.map(it => {
+                  return (
+                    <div className="flex gap-4 justify-center items-center">
+                    <div className="w-10 ml-2 text-xs">{it.source}</div>
+                    <Progress percent={it.percentage} strokeColor={it.color} size='small'/>
+                   </div>
+                  )
+                })
+              }
+             {/* <div className="flex gap-4 justify-center items-center">
+              <div className="w-10">TG</div>
+              <Progress percent={30} strokeColor="rgba(51, 144, 236, 0.8)" />
+             </div>
+             <div className="flex gap-4 justify-center items-center">
+              <div className="w-10">Ave</div>
+              <Progress percent={30} strokeColor="#286dff" />
+             </div>
+             <div className="flex gap-4 justify-center items-center">
+              <div className="w-10">WX</div>
+              <Progress percent={30} strokeColor="#07c160" />
+             </div>
+             <div className="flex gap-4 justify-center items-center">
+              <div className="w-10">QQ</div>
+              <Progress percent={30} strokeColor="#f43f5e" />
+             </div> */}
+            </div>
+            <div className="flex-1">{pieChartOptions && <Charts options={pieChartOptions} />}</div>
+
+            </div>
+          </div>
         </Section>
         {/* ScrollTable */}
-        <Section $isCard={false} $titleSize="46" className="col-span-4 row-span-2 bg-[#303135] rounded">
+        <Section $isCard={false} $titleSize="46" className="col-span-3 row-span-2 bg-[#303135] rounded">
             <ScrollTable messageApi={messageApi} columns={columns} dataSource={tableData} t={t} />
         </Section>
       </section>

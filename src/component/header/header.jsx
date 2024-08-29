@@ -13,8 +13,8 @@ const list = [
     href: "/overallCase",
     name: "详情"
   }], text: "dashboard" },
-  { path: "/detail", text: "detail" },
-  { path: "/table", text: "table" },
+  // { path: "/detail", text: "detail" },
+  // { path: "/table", text: "table" },
   { path: "/assetCollection", text: "assetCollection" },
 ];
 

@@ -51,7 +51,7 @@ export const makeLineChart = (sourceArr) => {
       type: "category",
       data: chartData.xAxisData,
       axisLabel: {
-        color: "#fff",
+        color: "#333",
       },
     },
     yAxis: {
@@ -63,14 +63,14 @@ export const makeLineChart = (sourceArr) => {
       },
       splitLine: {
           lineStyle: {
-              color: ['#ccc'] // 设置 Y 轴分隔线的颜色
+              color: ['#666'] // 设置 Y 轴分隔线的颜色
           }
       },
       axisLabel: {
-          color: '#666' // 设置 Y 轴文字颜色
+          color: '#999' // 设置 Y 轴文字颜色
       },
       lineStyle: {
-        color: '#7C3AED'
+        color: '#FF0000'
       },
       min
   },
@@ -146,7 +146,7 @@ export const makePieChart = (sourceArr, sourceArr1) => {
     series: [
       {
         type: "pie",
-        radius: ["45%", "50%"],
+        radius: ["55%", "65%"],
         center: ["50%", "50%"],
         data: chartData
       }

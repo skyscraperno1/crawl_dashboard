@@ -76,6 +76,10 @@
   "overallDetail.createTime": "Time",
   "dashboard.lineTitle": "AVE Project Number",
   "dashboard.lineExplain": "（liquidity above 100k）",
+  "dashboard.pieTitle": "Project Source",
+  "dashboard.declineNum": "Declined Num",
+  "dashboard.eqlNum": "Equal Num",
+  "dashboard.increaseNum": "Increase Num",
   "startDate": "Start Date",
   "endDate": "End Date",
   "average": "Average"

@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import CountUp from "react-countup";
+import { useTranslation } from 'react-i18next';
+
 const Card = ({ title, subtitle, Icon, type }) => {
+  const { t } = useTranslation();
   const color = useMemo(() => {
     if (type === 'downCount') {
       return 'red'
@@ -45,7 +48,7 @@ const Card = ({ title, subtitle, Icon, type }) => {
         <CountUp start={0} end={title} duration={0.8} />
       </h3>
       <p className={`text-text group-hover:text-${color}-200 relative z-10 duration-300 text-sm mt-1 ml-1`}>
-        {subtitle}
+        {t(subtitle)}
       </p>
     </div>
   );
