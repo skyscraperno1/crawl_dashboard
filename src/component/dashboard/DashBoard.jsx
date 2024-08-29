@@ -77,6 +77,7 @@ const DashBoard = ({ t, messageApi }) => {
         return {
             source: item.source,
             percentage: percentage,
+            count: item.count,
             color: mapColor[item.source]
         };
     });
@@ -191,27 +192,13 @@ const DashBoard = ({ t, messageApi }) => {
                   return (
                     <div className="flex gap-4 justify-center items-center">
                     <div className="w-10 ml-2 text-xs">{it.source}</div>
-                    <Progress percent={it.percentage} strokeColor={it.color} size='small'/>
+                    <Progress percent={it.percentage} strokeColor={it.color} size='small' format={() => {
+                      return it.count
+                    }}/>
                    </div>
                   )
                 })
               }
-             {/* <div className="flex gap-4 justify-center items-center">
-              <div className="w-10">TG</div>
-              <Progress percent={30} strokeColor="rgba(51, 144, 236, 0.8)" />
-             </div>
-             <div className="flex gap-4 justify-center items-center">
-              <div className="w-10">Ave</div>
-              <Progress percent={30} strokeColor="#286dff" />
-             </div>
-             <div className="flex gap-4 justify-center items-center">
-              <div className="w-10">WX</div>
-              <Progress percent={30} strokeColor="#07c160" />
-             </div>
-             <div className="flex gap-4 justify-center items-center">
-              <div className="w-10">QQ</div>
-              <Progress percent={30} strokeColor="#f43f5e" />
-             </div> */}
             </div>
             <div className="flex-1">{pieChartOptions && <Charts options={pieChartOptions} />}</div>
 

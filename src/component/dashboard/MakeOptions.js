@@ -88,10 +88,21 @@ const ave = '#286dff'
 const tg = 'rgba(51, 144, 236, 0.8)'
 const wx = '#07c160'
 const qq = '#f43f5e'
+function calculatePercentages(data) {
+  const total = data.reduce((sum, item) => sum + item.count, 0);
+  const percentages = data.map(item => {
+      const percentage = (item.count / total * 100).toFixed(2); // 保留两位小数
+      return {
+          name: item.source,
+          value: percentage,
+      };
+  });
+  return percentages;
+}
 export const makePieChart = (sourceArr, sourceArr1) => {
   let total = 0;
   let pinTotal = 0;
-  const title = "关注比";
+  const title = "关注/总项目";
 
   sourceArr.map((it) => {
     total += it.count;
@@ -99,12 +110,7 @@ export const makePieChart = (sourceArr, sourceArr1) => {
       pinTotal = it.count;
     }
   });
-  const chartData = sourceArr1.map((it) => {
-    return {
-      name: it.source,
-      value: it.count,
-    };
-  }); 
+  const chartData = calculatePercentages(sourceArr1)
   const pin = `${pinTotal}/${total}`;
   return {
     color: [ave, qq, tg, wx],
@@ -119,6 +125,9 @@ export const makePieChart = (sourceArr, sourceArr1) => {
         color: '#666', // 字体颜色
         fontSize: 14, // 字体大小
       },
+      formatter: (params) => {
+        return `${params.name}<br />${params.marker} 占比: <b>${params.value}%</b>`
+      }
     },
     title: {
       text: "{a|" + pin + "}\n{c|" + title + "}",
