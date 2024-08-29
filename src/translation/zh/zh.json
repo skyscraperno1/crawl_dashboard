@@ -78,7 +78,7 @@
   "dashboard.lineExplain": "（数据为池子大小大于10W的项目）",
   "dashboard.pieTitle": "项目来源",
   "dashboard.declineNum": "流动池金额下降代币数",
-  "dashboard.eqlNum": "流动池金额相等代币数",
+  "dashboard.eqlNum": "流动池金额不变代币数",
   "dashboard.increaseNum": "流动池金额增长代币数",
   "startDate": "开始日期",
   "endDate": "截止日期",
