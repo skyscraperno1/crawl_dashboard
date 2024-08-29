@@ -48,6 +48,12 @@ const ResetTable = styled.div`
   .ant-table-wrapper {
     margin-top: 20px;
     overflow-x: overlay;
+    .ant-table-tbody {
+      .ant-table-cell {
+        font-size: 12px;
+        padding: 12px 16px!important;
+      }
+    }
     .striped-row {
       background-color: #303135;
     }
@@ -203,7 +209,7 @@ const OverallDetail = ({messageApi}) => {
   })
 
   return (
-    <div className="bg-neutral-950 pt-[80px] w-full h-full">
+    <div className="bg-neutral-950 pt-[80px] pb-[80px] w-full min-h-full px-24">
       <div className='mt-4'>
         <Radio.Group value={tab.lv1} onChange={(e) => {
           const _page = options.find(it => it.value === e.target.value).children[0].value
