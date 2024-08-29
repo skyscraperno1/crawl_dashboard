@@ -77,9 +77,9 @@
   "dashboard.lineTitle": "AVE每日项目数",
   "dashboard.lineExplain": "（数据为池子大小大于10W的项目）",
   "dashboard.pieTitle": "项目来源",
-  "dashboard.declineNum": "下降数量",
-  "dashboard.eqlNum": "相等数量",
-  "dashboard.increaseNum": "增长数量",
+  "dashboard.declineNum": "流动池金额下降代币数",
+  "dashboard.eqlNum": "流动池金额相等代币数",
+  "dashboard.increaseNum": "流动池金额增长代币数",
   "startDate": "开始日期",
   "endDate": "截止日期",
   "average": "平均数"
