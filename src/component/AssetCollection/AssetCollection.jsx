@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Table, Pagination, DatePicker, Input, Radio } from "antd";
 import * as apis from '../../apis/assetCollectionApis'
+import { getDomains } from "../../apis/assectCollMain";
 import dayjs from 'dayjs';
 import { debounce, copyText } from "../../utils";
 const Main = styled.main`
@@ -47,6 +48,14 @@ const AssetMain = ({ t, messageApi }) => {
     initData();
   }, [reqData]);
 
+  const [domains, setDomains] = useState([])
+  const [currentDomain, setCurrentDomain] = useState('')
+  const getDomain = () => {
+    getDomains().then((data) => {
+      setDomains(data)
+    })
+  }
+
   const initData = () => {
     setLoading(true)
     currentReq(reqData).then(res => {
@@ -87,11 +96,15 @@ const AssetMain = ({ t, messageApi }) => {
   }
 
   useEffect(() => {
+    getDomain()
     window.addEventListener('dblclick', handleClick)
     return () => {
       window.removeEventListener("dblclick", handleClick);
     };
   }, [])
+
+  useEffect(() => {
+  }, [currentDomain])
 
  
   const selectChange = (val) => {
@@ -99,6 +112,7 @@ const AssetMain = ({ t, messageApi }) => {
     initData()
   }
 
+  const [iptValue, setInput] = useState('')
   const onInputChange = debounce((e) => {
     setReqData({
       ...reqData,
@@ -138,6 +152,19 @@ const AssetMain = ({ t, messageApi }) => {
     }
   }
 
+  function setDomain(e) {
+    let val = ''
+    if (e.target.value !== currentDomain) {
+      val = e.target.value
+    } 
+    setCurrentDomain(val)
+    setInput(val)
+    setReqData({
+      ...reqData,
+      domain: val
+    });
+  }
+
   return (
     <section className="bg-neutral-950 pt-[80px] w-full h-full">
       <Main className="lg:px-24 px-8 bg-boardBg py-8">
@@ -158,7 +185,24 @@ const AssetMain = ({ t, messageApi }) => {
             onChange={onDateChange}
             className="min-w-80"
           />
-          <Input onChange={onInputChange} placeholder={t("placeholder")} className="w-96" allowClear/>
+          <Input onChange={onInputChange} placeholder={t("placeholder")} value={iptValue} className="w-96" allowClear/>
+        </section>
+        <section>
+          {
+            domains.length > 0 && (
+              <Group className="mt-2" size='small' buttonStyle="solid" value={currentDomain}>
+                {
+                  domains.map(it => {
+                    return (
+                      <Button value={it} key={it} onClick={(e) => {
+                        setDomain(e)
+                      }}>{it}</Button>
+                    )
+                  })
+                }
+              </Group>
+            )
+          }
         </section>
 
         <ResetTable>

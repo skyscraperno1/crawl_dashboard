@@ -2,8 +2,9 @@ import axios from 'axios'
 import { message } from 'antd';
 import { calValueType } from '../utils';
 const Axios = axios.create({
-  baseURL: '/api',
-  // baseURL: 'http://' + window.location.hostname + ':9011',
+  baseURL: import.meta.env.MODE === 'development' 
+  ? '/api' 
+  : 'http://' + window.location.hostname + ':9012',
 })
 
 Axios.interceptors.request.use(config => {
