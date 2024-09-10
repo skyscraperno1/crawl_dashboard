@@ -54,7 +54,7 @@ const CopyText = ({ messageApi, text, showIcon = true }) => {
         }
       }}
     >
-      <div className="cursor-pointer hover:text-themeColor h-full">{text}</div>
+      <div className="cursor-pointer hover:text-themeColor h-full overflow-hidden">{text}</div>
     </Tooltip>
   )
 }

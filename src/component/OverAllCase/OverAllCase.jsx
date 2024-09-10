@@ -143,6 +143,35 @@ const renderKeys = [
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
 
+export const NameCell = ({rCoin, fCoin, content}) => {
+  return (
+    <div className="flex items-center">
+      {content.net && (
+        <img
+          className="w-4 h-4 mr-1 align-middle rounded-full"
+          src={nets[content.net]}
+          alt=""
+          title={content.net}
+        />
+      )}
+      <span className="text-xs">{rCoin}</span>
+      {fCoin && <span className="text-neutral-400">/{fCoin}</span>}
+    </div>
+  );
+}
+
+export const LiquidityChangeCell = ({content, text, t}) => {
+  const _title = content.lastDay
+  ? `${t("last-date")}${content.lastDay}`
+  : text;
+  const className =
+  text > 0 ? "text-green-500" : text < 0 ? "text-red-500" : "";
+  return (
+    <div className={className} title={_title}>
+      {text}{text !== 0 && '%'}
+    </div>
+  );
+}
 const ToPageCell = ({ text, itemKey, id }) => {
   const toPage = (key, itemId) => {
     window.open(`/overallDetail/${key}/${itemId}`)
@@ -261,31 +290,9 @@ const OverallCase = ({ t, messageApi }) => {
   const renderCell = useCallback((key, text, content) => {
     if (key === "name") {
       const [rCoin, fCoin] = text.split('/')
-      return (
-        <div className="flex items-center">
-          {content.net && (
-            <img
-              className="w-4 h-4 mr-1 align-middle rounded-full"
-              src={nets[content.net]}
-              alt=""
-              title={content.net}
-            />
-          )}
-          <span className="text-xs">{rCoin}</span>
-          {fCoin && <span className="text-neutral-400">/{fCoin}</span>}
-        </div>
-      );
+      return <NameCell rCoin={rCoin} fCoin={fCoin} content={content}/>
     } else if (key === "liquidityChange") {
-      const _title = content.lastDay
-        ? `${t("last-date")}${content.lastDay}`
-        : text;
-      const className =
-      text > 0 ? "text-green-500" : text < 0 ? "text-red-500" : "";
-      return (
-        <div className={className} title={_title}>
-          {text}{text !== 0 && '%'}
-        </div>
-      );
+      return <LiquidityChangeCell content={content} text={text} t={t}/>
     } else if (key === "token" || key === "pair") {
       return <CopyText text={text} messageApi={messageApi}/>
     } else if (key === "source") {

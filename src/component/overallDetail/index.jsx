@@ -8,6 +8,8 @@ import { getAddress, getType } from '../Detail/canvasUtils';
 import { useTranslation } from 'react-i18next';
 import { parseWbText } from '../../utils';
 import CopyText from '../core/CopyText';
+import { Col, Row } from 'antd';
+import { NameCell, LiquidityChangeCell } from '../OverAllCase/OverAllCase';
 let _options = [
   {
     label: '搜索引擎', value: 'searchEngine', count: 0, children: [
@@ -62,7 +64,14 @@ const ResetTable = styled.div`
 const rowClassName = (_, index) => {
   return index % 2 === 0 ? "striped-row" : undefined;
 };
-const OverallDetail = ({messageApi}) => {
+
+const TitleTag = ({ title, children }) => {
+  return <div className='flex'>
+    <div className='mr-4'>{title}：</div>
+    <div>{children}</div>
+  </div>
+}
+const OverallDetail = ({ messageApi }) => {
   const { t } = useTranslation();
   const [tab, setTab] = useState({
     lv1: null,
@@ -72,6 +81,7 @@ const OverallDetail = ({messageApi}) => {
   const [tableData, setTableData] = useState([])
   const [loading, setLoading] = useState(false)
   const [token, setToken] = useState('')
+  const [content, setContent] = useState({})
   const [options, setOptions] = useState(JSON.parse(JSON.stringify(_options)))
   const id = getAddress(window.location.pathname, 'overallDetail')
   const key = getType(window.location.pathname)
@@ -80,16 +90,18 @@ const OverallDetail = ({messageApi}) => {
     Object.keys(data).forEach((key) => {
       const count = data[key]
       _options.forEach(parent => {
-        if (parent.value === key) {
-          parent.count = count
-        }
+        const addKey = parent.value === 'community' ? 'MsgCount' : 'Count'
         parent.children.forEach((child) => {
-          if (child.value === key) {
+          if (child.value + addKey === key) {
             child.count = count
           }
         })
       })
     })
+    _options.forEach(parentItem => {
+      let totalChildCount = parentItem.children.reduce((acc, child) => acc + child.count, 0);
+      parentItem.count = totalChildCount;
+    });
     setOptions(_options)
   }
   useEffect(() => {
@@ -108,6 +120,7 @@ const OverallDetail = ({messageApi}) => {
     getOverDetailNum(id).then((data) => {
       setToken(data.token);
       handleOptionNum(data)
+      setContent(data)
     })
   }, [])
 
@@ -146,9 +159,9 @@ const OverallDetail = ({messageApi}) => {
       }
     } else if (key === 'token' || key === 'description' || key === 'content' || key === 'chatMsg') {
       return {
-        render: (text) => <CopyText text={text} messageApi={messageApi} showIcon={key === 'token'}/>
+        render: (text) => <CopyText text={text} messageApi={messageApi} showIcon={key === 'token'} />
       }
-    } else if (key === 'time'){
+    } else if (key === 'time') {
       return {
         width: 160
       };
@@ -177,32 +190,32 @@ const OverallDetail = ({messageApi}) => {
       return undefined;
     }
   }
-  
+
   const getTableData = debounce((reqData, currentReq) => {
     setLoading(true)
     currentReq(reqData).then(data => {
       let _columns = Object.keys(data[0]).map((key) => {
         return {
           key,
-          title: t('overallDetail.'+ key),
+          title: t('overallDetail.' + key),
           dataIndex: key,
           ellipsis: true,
           ...getColumnConfig(key)
         }
       })
       if (data.length) {
-          _columns = _columns.filter(item => 
-            tab.lv2 === 'wb' 
+        _columns = _columns.filter(item =>
+          tab.lv2 === 'wb'
             ? item.key !== 'title' && item.key !== 'coinId'
             : item.key !== 'coinId'
-          )
-          if (tab.lv2 === 'wb') {
-            data.forEach(it => {
-              it.description = parseWbText(it.description)
-            })
-          }
-          setColumns(_columns)
-          setTableData(data)
+        )
+        if (tab.lv2 === 'wb') {
+          data.forEach(it => {
+            it.description = parseWbText(it.description)
+          })
+        }
+        setColumns(_columns)
+        setTableData(data)
       } else {
         setColumns([])
         setTableData([])
@@ -217,7 +230,7 @@ const OverallDetail = ({messageApi}) => {
 
   return (
     <div className="bg-neutral-950 pt-[80px] pb-[80px] w-full min-h-full px-24">
-      <div className='mt-4'>
+      <Row className='mt-4'>
         <Radio.Group value={tab.lv1} onChange={(e) => {
           const _page = options.find(it => it.value === e.target.value).children[0].value
           setTab({
@@ -226,51 +239,68 @@ const OverallDetail = ({messageApi}) => {
           })
         }}>
           {options.map(option => (
-            <Badge key={option.value} count={option.count} size="small" style={{ zIndex: 50}}>
+            <Badge key={option.value} count={option.count} size="small" style={{ zIndex: 50 }}>
               <Radio.Button value={option.value}>
                 {option.label}
               </Radio.Button>
             </Badge>
           ))}
         </Radio.Group>
-      </div>
-      <div className='mt-4'>
-        {options.map(option => {
-          return (option.value === tab.lv1 &&
-            <Radio.Group
-              buttonStyle="solid"
-              key={option.value + 'lv2'}
-              value={tab.lv2}
-              size='small'
-              onChange={(e) => {
-                setTab({
-                  ...tab,
-                  lv2: e.target.value
-                })
-              }}
-            >
-              {option.children.map(child => (
-                <Badge key={child.value} count={child.count} size='small'  style={{ zIndex: 50}}>
-                  <Radio.Button value={child.value}>
-                    {child.label}
-                  </Radio.Button>
-                </Badge>
-              ))}
-            </Radio.Group>
-          )
-        })}
-      </div>
+      </Row>
+      <Row className='mt-4'>
+        <Col span={6}>
+          {options.map(option => {
+            return (option.value === tab.lv1 &&
+              <Radio.Group
+                buttonStyle="solid"
+                key={option.value + 'lv2'}
+                value={tab.lv2}
+                size='small'
+                onChange={(e) => {
+                  setTab({
+                    ...tab,
+                    lv2: e.target.value
+                  })
+                }}
+              >
+                {option.children.map(child => (
+                  <Badge key={child.value} count={child.count} size='small' style={{ zIndex: 50 }}>
+                    <Radio.Button value={child.value}>
+                      {child.label}
+                    </Radio.Button>
+                  </Badge>
+                ))}
+              </Radio.Group>
+            )
+          })}
+        </Col>
+        <Col span={6}>
+          <TitleTag title={t('name')}>
+            <NameCell rCoin={content.rcoinName} fCoin={content.fcoinName} content={content} />
+          </TitleTag>
+        </Col>
+        <Col span={6}>
+          <TitleTag title={t('liquidity')}>
+            {content.liquidity}
+          </TitleTag>
+        </Col>
+        <Col span={6}>
+          <TitleTag title={t('liquidityChange')}>
+            <LiquidityChangeCell t={t} content={content} text={content.liquidityChange} />
+          </TitleTag>
+        </Col>
+      </Row>
       <ResetTable>
-          <Table
-            columns={columns}
-            dataSource={tableData}
-            pagination={false}
-            loading={loading}
-            size="middle"
-            rowKey={(record) => record.id}
-            rowClassName={rowClassName}
-          />
-        </ResetTable>
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={false}
+          loading={loading}
+          size="middle"
+          rowKey={(record) => record.id}
+          rowClassName={rowClassName}
+        />
+      </ResetTable>
     </div>
   )
 }
