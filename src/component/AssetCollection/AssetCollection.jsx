@@ -49,7 +49,6 @@ const AssetMain = ({ t, messageApi }) => {
   }, [reqData]);
 
   const [domains, setDomains] = useState([])
-  const [currentDomain, setCurrentDomain] = useState('')
   const getDomain = () => {
     getDomains().then((data) => {
       setDomains(data)
@@ -102,10 +101,6 @@ const AssetMain = ({ t, messageApi }) => {
       window.removeEventListener("dblclick", handleClick);
     };
   }, [])
-
-  useEffect(() => {
-  }, [currentDomain])
-
  
   const selectChange = (val) => {
     currentReq = apis[val];
@@ -113,12 +108,21 @@ const AssetMain = ({ t, messageApi }) => {
   }
 
   const [iptValue, setInput] = useState('')
-  const onInputChange = debounce((e) => {
+  const onInputChange = (e) => {
+    setInput(e.target.value || '')
+  }
+
+  const debounceInput = debounce((val) => {
     setReqData({
       ...reqData,
-      domain: e.target.value || ''
+      domain: val
     });
   }, 600)
+
+  useEffect(() => {
+    debounceInput(iptValue)
+  }, [iptValue])
+  
   const onPageChange = (pageNum, pageSize) => {
     if (pageSize !== reqData.pageSize) {
       pageNum = 1;
@@ -154,15 +158,10 @@ const AssetMain = ({ t, messageApi }) => {
 
   function setDomain(e) {
     let val = ''
-    if (e.target.value !== currentDomain) {
+    if (e.target.value !== iptValue) {
       val = e.target.value
     } 
-    setCurrentDomain(val)
     setInput(val)
-    setReqData({
-      ...reqData,
-      domain: val
-    });
   }
 
   return (
@@ -190,7 +189,7 @@ const AssetMain = ({ t, messageApi }) => {
         <section>
           {
             domains.length > 0 && (
-              <Group className="mt-2" size='small' buttonStyle="solid" value={currentDomain}>
+              <Group className="mt-2" size='small' buttonStyle="solid" value={iptValue}>
                 {
                   domains.map(it => {
                     return (
