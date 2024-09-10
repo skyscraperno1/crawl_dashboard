@@ -134,11 +134,19 @@ const OverallDetail = ({messageApi}) => {
     if (key === 'url' || key === 'link') {
       return {
         render: (text) => <a href={text} target="_blank" className='hover:text-themeColor'>{text}</a>,
-        width: 400
+        width: 400,
       }
-    } else if (key === 'token') {
+    } else if (key === 'uid' || key === 'chatRoomId') {
       return {
-        render: (text) => <CopyText text={text} messageApi={messageApi}/>
+        hidden: tab.lv2 === 'tg'
+      }
+    } else if (key === 'id') {
+      return {
+        hidden: true
+      }
+    } else if (key === 'token' || key === 'description' || key === 'content' || key === 'chatMsg') {
+      return {
+        render: (text) => <CopyText text={text} messageApi={messageApi} showIcon={key === 'token'}/>
       }
     } else if (key === 'time'){
       return {
@@ -178,7 +186,6 @@ const OverallDetail = ({messageApi}) => {
           key,
           title: t('overallDetail.'+ key),
           dataIndex: key,
-          hidden: key === 'id',
           ellipsis: true,
           ...getColumnConfig(key)
         }
