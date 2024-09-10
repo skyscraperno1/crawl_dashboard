@@ -108,10 +108,11 @@ const AssetMain = ({ t, messageApi }) => {
   }
 
   const [iptValue, setInput] = useState('')
+  const [isClick, setIsClick] = useState(false)
   const onInputChange = (e) => {
     setInput(e.target.value || '')
   }
-
+  
   const debounceInput = debounce((val) => {
     setReqData({
       ...reqData,
@@ -120,6 +121,14 @@ const AssetMain = ({ t, messageApi }) => {
   }, 600)
 
   useEffect(() => {
+    if (isClick || iptValue === '') {
+      setReqData({
+        ...reqData,
+        domain: iptValue
+      });
+      setIsClick(false);
+      return
+    }
     debounceInput(iptValue)
   }, [iptValue])
   
@@ -157,6 +166,7 @@ const AssetMain = ({ t, messageApi }) => {
   }
 
   function setDomain(e) {
+    setIsClick(true)
     let val = ''
     if (e.target.value !== iptValue) {
       val = e.target.value
