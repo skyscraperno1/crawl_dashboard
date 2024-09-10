@@ -7,7 +7,7 @@ import HomeSelect from "./HomeSelect";
 import InputHistory from "./History";
 import { useEffect } from "react";
 
-function SearchInput({ t, getData, selectItems, menuClick = null}) {
+function SearchInput({ t, selectItems, menuClick = null}) {
   const [iptValue, setValue] = useState("");
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState(selectItems[0]);
@@ -68,7 +68,6 @@ function SearchInput({ t, getData, selectItems, menuClick = null}) {
       setShowHistory(false);
     }
     if (e.key === "Enter") {
-      getData(iptValue, type)
       const hasItem = historyList.some((it) => (it.value === iptValue && it.chain === type));
       if (hasItem) return;
       const newHistory = [

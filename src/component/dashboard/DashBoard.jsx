@@ -188,13 +188,13 @@ const DashBoard = ({ t, messageApi }) => {
             <div className="flex-1 flex">
             <div className="hidden xl:flex w-[40%] flex-col justify-around py-4 px-2">
               {
-                percentage && percentage.map(it => {
+                percentage && percentage.map((it, idx) => {
                   return (
-                    <div className="flex gap-4 justify-center items-center">
-                    <div className="w-10 ml-2 text-xs">{it.source}</div>
-                    <Progress percent={it.percentage} strokeColor={it.color} size='small' format={() => {
-                      return it.count
-                    }}/>
+                    <div className="flex gap-4 justify-center items-center" key={'percent_' + idx}>
+                      <div className="w-10 ml-2 text-xs">{it.source}</div>
+                      <Progress percent={it.percentage} strokeColor={it.color} size='small' format={() => {
+                        return it.count
+                      }}/>
                    </div>
                   )
                 })

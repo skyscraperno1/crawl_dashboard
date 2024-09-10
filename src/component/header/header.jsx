@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Switcher from "./langSwitch";
 import { calValueType } from "../../utils";
 import FlyoutLink from "../common/Flyout";
@@ -6,37 +6,38 @@ import HeaderMenu from "./headerMenu";
 import MobileBtn from './MobileBtn'
 const list = [
   { path: "/", text: "home" },
-  { path: '/dashboard',
+  {
+    text: 'dashboard',
     children: [{
-    href: "/dashboard",
-    name: "看板"
-  }, {
-    href: "/overallCase",
-    name: "详情"
-  }], text: "dashboard" },
+      path: "/dashboard",
+      text: "board"
+    }, {
+      path: "/overallCase",
+      text: "detail"
+    }]
+  },
   { path: "/assetCollection", text: "assetCollection" },
 ];
 
-function Header({ t, showBd }) {
+function Header({ t }) {
   const [activeItem, setActive] = useState("");
   const handleEnter = (path) => {
     setActive(path);
   };
 
+  const handleClick = (it) => {
+    if (!it.children) {
+      window.location.href = it.path;
+    } else {
+      window.location.href = it.children[0].path
+    }
+  }
   const handleLeave = () => {
     setActive("");
   };
-
-  const handleClick = (path) => {
-    if (calValueType(path, "string")) {
-      window.location.href = path;
-    } 
-  };
   return (
     <header
-      className={`${
-        showBd ? "border-b border-[#303030]" : ""
-      } h-[80px] w-full fixed top-0 left-0 right-0 z-20 backdrop-blur-sm px-2 sm:px-8`}
+      className="border-b border-[#303030] h-[80px] w-full fixed top-0 left-0 right-0 z-20 backdrop-blur-sm px-2 sm:px-8"
     >
       <div className="p-4 flex items-center h-full">
         {/* Logo */}
@@ -52,14 +53,13 @@ function Header({ t, showBd }) {
             {list.map((it) => {
               return (
                 <div
-                  key={it.path}
-                  className={`${
-                    activeItem === it.path || activeItem === ""
+                  key={it.text}
+                  className={`${activeItem === it.path || activeItem === ""
                       ? ""
                       : "opacity-80"
-                  } text-2xl duration-300 font-semibold px-8 cursor-pointer text-nowrap`}
+                    } text-2xl duration-300 font-semibold px-8 cursor-pointer text-nowrap`}
                   onClick={() => {
-                    handleClick(it.path);
+                    handleClick(it)
                   }}
                   onMouseEnter={handleEnter.bind(null, it.path)}
                   onMouseLeave={handleLeave}

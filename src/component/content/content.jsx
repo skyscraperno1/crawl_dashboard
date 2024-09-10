@@ -4,7 +4,7 @@ import { TypeAnimation } from "react-type-animation";
 import SearchInput from "../homeInput/SearchInput";
 import "./content.scss";
 const selectItems = ["本地服务", "远程服务"];
-function Content({ t, getData }) {
+function Content({ t }) {
   const sequence = selectItems.flatMap((item) => [item, 2000]);
 
   return (
@@ -32,7 +32,6 @@ function Content({ t, getData }) {
         <div className="h-24 w-full px-12">
           <SearchInput
             t={t}
-            getData={getData}
             selectItems={selectItems}
           ></SearchInput>
         </div>
