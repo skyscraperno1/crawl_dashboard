@@ -6,15 +6,14 @@ import HeaderMenu from "./headerMenu";
 import MobileBtn from './MobileBtn'
 const list = [
   { path: "/", text: "home" },
-  { path: [{
+  { path: '/dashboard',
+    children: [{
     href: "/dashboard",
     name: "看板"
   }, {
     href: "/overallCase",
     name: "详情"
   }], text: "dashboard" },
-  // { path: "/detail", text: "detail" },
-  // { path: "/table", text: "table" },
   { path: "/assetCollection", text: "assetCollection" },
 ];
 
@@ -65,8 +64,8 @@ function Header({ t, showBd }) {
                   onMouseEnter={handleEnter.bind(null, it.path)}
                   onMouseLeave={handleLeave}
                 >
-                  {calValueType(it.path, "array") ? (
-                    <FlyoutLink FlyoutContent={HeaderMenu} menuList={it.path}>
+                  {calValueType(it.children, "array") ? (
+                    <FlyoutLink FlyoutContent={HeaderMenu} menuList={it.children}>
                       {t(it.text)}
                     </FlyoutLink>
                   ) : (
