@@ -80,7 +80,6 @@ const MiniTable = ({ t, id, options, emitData }) => {
         let _columns = Object.keys(data[0]).map((key) => {
           return {
             key,
-            title: t("overallDetail." + key),
             dataIndex: key,
             ellipsis: true,
             hidden: hiddenTag(tab, key),
@@ -105,6 +104,16 @@ const MiniTable = ({ t, id, options, emitData }) => {
       });
   };
 
+  const _columns = useMemo(() => {
+    return columns.map((it) => {
+      const { key } = it
+      return {
+        ...it,
+        title: tab === 'wb' && key === 'title' ? t("overallDetail.author") : t("overallDetail." + key),
+      }
+    })
+  }, [t, columns]);
+
   useEffect(() => {
     if (!id) return;
     getTableData(tab);
@@ -120,7 +129,7 @@ const MiniTable = ({ t, id, options, emitData }) => {
   return (
     <div className="flex flex-col h-full w-full" ref={ref}>
       <div className="h-8 flex justify-between px-2">
-        <div>{options.label}</div>
+        <div>{t('overallDetail.' + options.value)}</div>
         <Radio.Group
           size="small"
           buttonStyle="solid"
@@ -136,14 +145,14 @@ const MiniTable = ({ t, id, options, emitData }) => {
               size="small"
               style={{ zIndex: 40 }}
             >
-              <Radio.Button value={child.value}>{child.label}</Radio.Button>
+              <Radio.Button value={child.value}>{t('overallDetail.' + child.value)}</Radio.Button>
             </Badge>
           ))}
         </Radio.Group>
       </div>
       <TableWrapper className="flex-1">
         <Table
-          columns={columns}
+          columns={_columns}
           dataSource={tableData}
           loading={loading}
           pagination={false}

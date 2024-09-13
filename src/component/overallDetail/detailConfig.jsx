@@ -3,24 +3,24 @@ import { Tag } from "antd";
 import CopyText from "../core/CopyText";
 export const _options = [
   {
-    label: '搜索引擎', value: 'searchEngine', api: getSearchInfo, children: [
-      { label: '百度', value: 'baidu', count: 0 },
-      { label: '必应', value: 'bing', count: 0 },
-      { label: '谷歌', value: 'google', count: 0 },
+    value: 'searchEngine', api: getSearchInfo, children: [
+      { value: 'baidu', count: 0 },
+      { value: 'bing', count: 0 },
+      { value: 'google', count: 0 },
     ]
   },
   {
-    label: '社交媒体', value: 'socialMedia', api: getCoinInfo, children: [
-      { label: '小红书', value: 'xhs', count: 0 },
-      { label: '抖音', value: 'dy', count: 0 },
-      { label: '微博', value: 'wb', count: 0 },
+     value: 'socialMedia', api: getCoinInfo, children: [
+      { value: 'xhs', count: 0 },
+      { value: 'dy', count: 0 },
+      { value: 'wb', count: 0 },
     ]
   },
   {
-    label: '社群消息', value: 'community', api: getTokenInfo, children: [
-      { label: '微信', value: 'wx', count: 0 },
-      { label: '电报', value: 'tg', count: 0 },
-      { label: 'QQ', value: 'qq', count: 0 },
+    value: 'community', api: getTokenInfo, children: [
+      { value: 'wx', count: 0 },
+      { value: 'tg', count: 0 },
+      { value: 'qq', count: 0 },
     ]
   },
 ];
