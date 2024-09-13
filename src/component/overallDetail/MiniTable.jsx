@@ -55,7 +55,7 @@ const MiniTable = ({ t, id, options, emitData }) => {
     } else if (tab === "wx" || tab === "tg" || tab === "qq") {
       return key !== "chatMsg";
     } else if (tab === "baidu" || tab === "bing" || tab === "google") {
-      return key === "id" || key === "coinId" || key === "link";
+      return key === "id" || key === "coinId" || key === "link" || key === 'coinName';
     }
   };
   const getTableData = (tab) => {
@@ -162,7 +162,7 @@ const MiniTable = ({ t, id, options, emitData }) => {
           onRow={() => {
             return {
               onClick: () => {
-                emitData(columns, tableData);
+                emitData(_columns, tableData);
               },
             };
           }}
