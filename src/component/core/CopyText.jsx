@@ -5,7 +5,7 @@ import { copyText } from "../../utils";
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-const CopyText = ({ messageApi, text, showIcon = true }) => {
+const CopyText = ({ messageApi = null, text, showIcon = true }) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
@@ -20,9 +20,11 @@ const CopyText = ({ messageApi, text, showIcon = true }) => {
   return (
     <Tooltip
       placement="topLeft"
+      destroyTooltipOnHide
+      overlayClassName="custom-tooltip"
       title={
         <div className="relative">
-          <span className="inline">{text}</span>
+          <span className="text-xs inline">{text}</span>
           {
             showIcon && (
               <div className="absolute bottom-[4px] inline w-[14px] h-[14px] overflow-hidden translate-x-1">

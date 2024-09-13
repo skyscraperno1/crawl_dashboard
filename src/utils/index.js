@@ -84,3 +84,44 @@ export const parseWbText = (str) => {
   });
   return parse(newStr)
 }
+
+export function cloneDeep(value) {
+  // 检查是否是 null 或者 undefined
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  // 检查是否是原始类型（字符串、数字、布尔值等）
+  if (typeof value !== 'object') {
+    return value;
+  }
+
+  // 检查是否是日期对象
+  if (value instanceof Date) {
+    return new Date(value);
+  }
+
+  // 检查是否是正则表达式对象
+  if (value instanceof RegExp) {
+    return new RegExp(value);
+  }
+
+  // 检查是否是数组
+  if (Array.isArray(value)) {
+    const cloneArr = [];
+    for (let i = 0; i < value.length; i++) {
+      cloneArr[i] = cloneDeep(value[i]);
+    }
+    return cloneArr;
+  }
+
+  // 检查是否是普通对象
+  const cloneObj = {};
+  for (const key in value) {
+    if (value.hasOwnProperty(key)) {
+      cloneObj[key] = cloneDeep(value[key]);
+    }
+  }
+
+  return cloneObj;
+}

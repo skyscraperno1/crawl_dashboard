@@ -96,7 +96,7 @@ export function getSearchInfo(params) {
   })
 }
 
-export function getOverDetailNum(id) {
+export function getOverDetail(id) {
   return Ajax({
     url: '/v1/api/coin/findPlatformCountById',
     method: 'POST',

@@ -74,7 +74,10 @@ function App() {
             />
             <Route
               path="/overallDetail/:type/:id"
-              element={<OverallDetail messageApi={messageApi} />}
+              element={   <>
+                <OverallDetail messageApi={messageApi} />
+                 <BgCanvas index={0} />
+               </>}
             />
             <Route path="*" element={<EmptyPage />}></Route>
           </Routes>

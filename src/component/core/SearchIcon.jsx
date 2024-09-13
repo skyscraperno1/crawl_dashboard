@@ -24,7 +24,7 @@ function Button({ children, onClick, disabled, ariaLabel }) {
   );
 }
 
-function AssetCollection() {
+function SearchIcon() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -33,46 +33,44 @@ function AssetCollection() {
   });
 
   return (
-    <div className="pt-[80px]">
-      <MotionConfig transition={transition}>
-        <div className="absolute top-[90px]" ref={containerRef}>
-          <div className="h-full w-full rounded-xl border border-zinc-950/10 bg-white">
-            <motion.div
-              animate={{
-                width: isOpen ? "300px" : "52px",
-              }}
-              initial={false}
-            >
-              <div className="overflow-hidden p-2">
-                {!isOpen ? (
-                  <Button
-                    onClick={() => setIsOpen(true)}
-                    ariaLabel="Search notes"
-                  >
-                    <FaSearch className="h-5 w-5" />
+    <MotionConfig transition={transition}>
+      <div ref={containerRef}>
+        <div className="h-full w-full text-text">
+          <motion.div
+            animate={{
+              width: isOpen ? "300px" : "52px",
+            }}
+            initial={false}
+          >
+            <div className="overflow-hidden p-2">
+              {!isOpen ? (
+                <Button
+                  onClick={() => setIsOpen(true)}
+                  ariaLabel="Search notes"
+                >
+                  <FaSearch className="h-5 w-5" />
+                </Button>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button onClick={() => setIsOpen(false)} ariaLabel="Back">
+                    <FaArrowLeft className="h-5 w-5" />
                   </Button>
-                ) : (
-                  <div className="flex space-x-2">
-                    <Button onClick={() => setIsOpen(false)} ariaLabel="Back">
-                      <FaArrowLeft className="h-5 w-5" />
-                    </Button>
-                    <div className="relative w-full">
-                      <input
-                        className="h-9 w-full rounded-lg border border-zinc-950/10 bg-transparent p-2 text-zinc-900 placeholder-zinc-500 focus:outline-none"
-                        autoFocus
-                        placeholder="Search notes"
-                      />
-                      <div className="absolute right-1 top-0 flex h-full items-center justify-center"></div>
-                    </div>
+                  <div className="relative w-full">
+                    <input
+                      className="h-9 w-full rounded-lg border border-zinc-100/10 bg-transparent p-2 placeholder-zinc-500 focus:outline-none"
+                      autoFocus
+                      placeholder="Search notes"
+                    />
+                    <div className="absolute right-1 top-0 flex h-full items-center justify-center"></div>
                   </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
-      </MotionConfig>
-    </div>
+      </div>
+    </MotionConfig>
   );
 }
 
-export default AssetCollection;
+export default SearchIcon;
