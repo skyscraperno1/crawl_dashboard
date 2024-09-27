@@ -47,3 +47,8 @@ code {
   border-radius: 4px;
   background-color: #686868;
 }
+
+.ant-table {
+  scrollbar-width: auto!important;
+  scrollbar-color: auto!important;
+}

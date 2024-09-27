@@ -1,0 +1,11 @@
+.small-table {
+  padding: 0!important;
+  .ant-table-thead .ant-table-cell{
+    padding: 8px 16px!important;
+    font-size: 12px!important;
+    line-height: 18px;
+  }
+  .ant-table-body {
+    overflow-y: overlay!important;
+  }
+}

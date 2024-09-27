@@ -4,17 +4,17 @@ import { calValueType } from "../../utils";
 import Empty from "../common/Empty";
 import Spin from "../common/Spin";
 import CopyText from "../core/CopyText";
-import BSC from "/src/assets/nets/bsc.png";
-import Solana from "../../assets/nets/solana.png";
-import Ethereum from "../../assets/nets/eth.png";
-import Polygon from "../../assets/nets/polygon.png";
-import Arbitrum from "../../assets/nets/arbitrum.png";
+import bsc from "/src/assets/nets/bsc.png";
+import solana from "../../assets/nets/solana.png";
+import eth from "../../assets/nets/eth.png";
+import polygon from "../../assets/nets/polygon.png";
+import arbitrum from "../../assets/nets/arbitrum.png";
 const nets = {
-  BSC,
-  Solana,
-  Ethereum,
-  Polygon,
-  Arbitrum,
+  bsc,
+  solana,
+  eth,
+  polygon,
+  arbitrum,
 };
 const scrollAnimation = keyframes`
   to {
@@ -157,7 +157,7 @@ const ScrollTable = ({
     };
     setNewData([
       ...dataSource,
-      ...dataSource.map((item) => ({ ...item, key: `dup-${item.key}` })),
+      ...dataSource.map((item) => ({ ...item, id: `dup-${item.id}` })),
     ])
 
     const speedFactor = typeof speed === "number" ? speed : baseSpeed[speed] || 20;
@@ -218,7 +218,7 @@ const ScrollTable = ({
   const renderTableBody = () => {
     return duplicatedData.map((row) => (
       <TableRow
-        key={row.key}
+        key={row.id}
         className="scroll-table-row"
       >
         {columns.map((col, colIndex) => (

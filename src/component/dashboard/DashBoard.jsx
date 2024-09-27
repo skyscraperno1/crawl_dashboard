@@ -30,7 +30,7 @@ const Section = styled.div`
 `;
 const DashBoard = ({ t, messageApi }) => {
   const columns = [
-    { title: t('pair'), key: "name", width: '160px' },
+    { title: t('pair'), key: "name", width: '100px' },
     { title: t('token'), key: "token" },
     { title: t('liquidity'), key: "liquidity", width: '100px' },
     { title: t('date'), key: "date", width: '100px' },
@@ -64,10 +64,11 @@ const DashBoard = ({ t, messageApi }) => {
   const [percentage, setPercentage] = useState(null)
 
   const mapColor = {
-    Ave: '#286dff',
-    TG: 'rgba(51, 144, 236, 0.8)',
-    WX:  '#07c160',
-    QQ: '#f43f5e'
+    arbitrum: '#499eee',
+    bsc: '#eabb27',
+    eth:  '#6c7de8',
+    polygon: '#8446e3',
+    solana: '#4ed1b4'
   }
 
   function calculatePercentages(data) {
@@ -75,10 +76,10 @@ const DashBoard = ({ t, messageApi }) => {
     const percentages = data.map(item => {
         const percentage = (item.count / total * 100).toFixed(2); // 保留两位小数
         return {
-            source: item.source,
+            source: item.net,
             percentage: percentage,
             count: item.count,
-            color: mapColor[item.source]
+            color: mapColor[item.net]
         };
     });
     return percentages;
@@ -87,7 +88,7 @@ const DashBoard = ({ t, messageApi }) => {
   useEffect(() => {
     getOverAllData().then((data) => {
       setPieChart(makePieChart(data.A, data.B));
-      const _percentage = calculatePercentages(data.B)
+      const _percentage = calculatePercentages(data.E)
       setPercentage(_percentage)
       setLineChart(makeLineChart(data.C.reverse()));
       getDateData(data.C)
@@ -109,23 +110,9 @@ const DashBoard = ({ t, messageApi }) => {
       token: ""
     }).then((data) => {
       const newData = data.rows.map(it => {
-        let name
-        if (it.rcoinName && it.fcoinName) {
-          name = it.rcoinName + '/' + it.fcoinName
-        } else if (it.rcoinName && it.fcoinName) {
-          name = it.rcoinName
-        } else if (it.fcoinName) {
-          name = it.fcoinName
-        } else {
-          name = ''
-        }
         return {
-          name,
-          liquidity: it.liquidity,
-          token: it.token,
-          date: it.today,
-          key: it.id,
-          net: it.net
+          ...it,
+          name: it.rcoinName
         }
       })
       setTableData(newData)
@@ -191,7 +178,7 @@ const DashBoard = ({ t, messageApi }) => {
                 percentage && percentage.map((it, idx) => {
                   return (
                     <div className="flex gap-4 justify-center items-center" key={'percent_' + idx}>
-                      <div className="w-10 ml-2 text-xs">{it.source}</div>
+                      <div className="w-24 ml-2 text-xs uppercase" style={{ color: it.color}}>{it.source}</div>
                       <Progress percent={it.percentage} strokeColor={it.color} size='small' format={() => {
                         return it.count
                       }}/>

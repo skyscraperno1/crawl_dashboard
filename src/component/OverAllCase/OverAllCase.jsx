@@ -8,11 +8,11 @@ import {
 import { camelToSnakeCase } from "../../utils";
 import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import FilterBox from "./FilterBox";
-import BSC from "/src/assets/nets/bsc.png";
-import Solana from "../../assets/nets/solana.png";
-import Ethereum from "../../assets/nets/eth.png";
-import Polygon from "../../assets/nets/polygon.png";
-import Arbitrum from "../../assets/nets/arbitrum.png";
+import bsc from "/src/assets/nets/bsc.png";
+import solana from "../../assets/nets/solana.png";
+import eth from "../../assets/nets/eth.png";
+import polygon from "../../assets/nets/polygon.png";
+import arbitrum from "../../assets/nets/arbitrum.png";
 import AVE from "../../assets/sources/ave.png";
 import QQ from "../../assets/sources/qq.png";
 import TG from "../../assets/sources/telegram.png";
@@ -21,12 +21,13 @@ import TableFilterInput from "../common/TableFilterInput";
 import { debounce } from "../../utils";
 import { IoMdAddCircleOutline, IoMdRemoveCircle } from "react-icons/io";
 import CopyText from "../core/CopyText";
+import Popover from "../core/Popover";
 const nets = {
-  BSC,
-  Solana,
-  Ethereum,
-  Polygon,
-  Arbitrum,
+  bsc,
+  solana,
+  eth,
+  polygon,
+  arbitrum,
 };
 const sources = {
   TG,
@@ -44,8 +45,6 @@ const Main = styled.main`
 `;
 const RestTable = styled.div`
   .ant-table-wrapper {
-    margin-top: 20px;
-    overflow-x: overlay;
     .ant-table-thead {
       .ant-table-cell-fix-right {
         .ant-table-cell-content {
@@ -83,8 +82,8 @@ const dataKeys = [
   "name",
   "liquidity",
   "liquidityChange",
-  "token",
   "pair",
+  "token",
   "today",
   "source",
   "web",
@@ -107,7 +106,7 @@ const dataKeys = [
   "isHold"
 ];
 
-const hiddenKeys = ["telegram", "twitter", "web", "qq", "discord", "intro", "wxMsgCount", "qqMsgCount",  "xhsCount", "dyCount",  "bingCount", "googleCount"];
+const hiddenKeys = ["telegram", "twitter", "web", "discord", "intro", "xhsCount", "dyCount", "bingCount", "googleCount"];
 const disabledKeys = [
   "name",
   "liquidity",
@@ -122,23 +121,18 @@ const tokens = ["wxMsgCount", "qqMsgCount", "tgMsgCount"];
 const coins = ["xhsCount", "dyCount", "wbCount"];
 const search = ["baiduCount", "bingCount", "googleCount"]
 const allInfos = [...tokens, ...coins, ...search]
-const copyKeys = [
+const searchKeys = [
   "token",
   "pair",
-  "web",
-  "telegram",
-  "twitter",
-  "qq",
-  "discord",
 ];
-const sorterKeys = ['liquidity', 'liquidityChange', 'today']
+const sorterKeys = ['liquidity', 'liquidityChange', 'today', 'qq', ...tokens]
 const renderKeys = [
   "name",
   "liquidityChange",
   "isHold",
   "source",
   "totalCount",
-  ...copyKeys,
+  ...searchKeys,
   ...allInfos,
 ];
 const defaultChecked = dataKeys.filter((it) => !hiddenKeys.includes(it));
@@ -168,7 +162,7 @@ export const LiquidityChangeCell = ({content, text, t}) => {
   text > 0 ? "text-green-500" : text < 0 ? "text-red-500" : "";
   return (
     <div className={className} title={_title}>
-      {text}{text !== 0 && '%'}
+      {text}{!!text && '%'}
     </div>
   );
 }
@@ -213,8 +207,8 @@ const OverallCase = ({ t, messageApi }) => {
     render: renderKeys.includes(it)
       ? (text, content) => renderCell(it, text, content)
       : undefined,
-    hidden: !hiddenKeys.includes(it),
     ellipsis: true,
+    hidden: !hiddenKeys.includes(it),
   }));
 
   const renderFilter = useCallback((key) => {
@@ -244,7 +238,7 @@ const OverallCase = ({ t, messageApi }) => {
           value: key,
         })),
         filterMultiple: false,
-        width: 160,
+        width: 100,
       };
     } else if (key === "source") {
       return {
@@ -263,7 +257,7 @@ const OverallCase = ({ t, messageApi }) => {
         filterMultiple: false,
         width: 80,
       };
-    } else if (copyKeys.includes(key)) {
+    } else if (searchKeys.includes(key)) {
       return {
         filterDropdown: (filterProps) => (
           <TableFilterInput t={t} {...filterProps} dataIndex={key} />
@@ -271,17 +265,21 @@ const OverallCase = ({ t, messageApi }) => {
         filterIcon: (filtered) => (
           <FaSearch className={filtered ? "text-themeColor" : ""} />
         ),
+        ellipsis: key !== 'pair',
+        width: key === 'pair' ? 100 : undefined
       };
+    } else if (sorterKeys.includes(key)) {
+      const isTokens = tokens.includes(key)
+      return { 
+        width: key === 'liquidityChange' ? 80 : isTokens ? 110 : 100,
+        sorter: true,
+        align: isTokens ? "center" : undefined
+       };
     } else if ([...allInfos].includes(key) || key === "totalCount" || key === "openDays") {
       return {
         width: 100,
         align: "center",
       };
-    } else if (sorterKeys.includes(key)) {
-      return { 
-        width: key === 'liquidityChange' ? 80 : 100,
-        sorter: true
-       };
     } else {
       return null;
     }
@@ -293,7 +291,9 @@ const OverallCase = ({ t, messageApi }) => {
       return <NameCell rCoin={rCoin} fCoin={fCoin} content={content}/>
     } else if (key === "liquidityChange") {
       return <LiquidityChangeCell content={content} text={text} t={t}/>
-    } else if (key === "token" || key === "pair") {
+    } else if (key === "pair") {
+      return <Popover data={JSON.parse(text || '[]')} t={t} messageApi={messageApi} />
+    } else if (key === "token") {
       return <CopyText text={text} messageApi={messageApi}/>
     } else if (key === "source") {
       return (
@@ -470,7 +470,7 @@ const OverallCase = ({ t, messageApi }) => {
 
       </Heading>
       <Main className="lg:px-24 px-8 bg-boardBg py-8">
-        <section className="flex px-4">
+        <section className="flex px-4 mb-5">
           <FilterBox
             defaultCheckedList={defaultChecked}
             options={options}
