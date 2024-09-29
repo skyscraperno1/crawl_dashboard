@@ -9,6 +9,9 @@ const TRANSITION = {
   type: 'spring',
   bounce: 0.05,
   duration: 0.3,
+  // ease: 'easeInOut',
+  // stiffness: 140,
+  // damping: 20
 };
 
 export default function Popover({ data, t, messageApi }) {
@@ -75,12 +78,12 @@ export default function Popover({ data, t, messageApi }) {
           }}
           onClick={openMenu}
         >
-          <motion.span
+          <span
             layoutId={`popover-label-${uniqueId}`}
             className='text-xs text-center'
           >
             {data.length}
-          </motion.span>
+          </span>
         </motion.div>
         <AnimatePresence>
           {isOpen && (
