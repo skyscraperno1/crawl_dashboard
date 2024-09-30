@@ -1,0 +1,38 @@
+.tool-bar {
+  background-color: #2e2e30;
+  overflow: hidden;
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.75rem;
+    border-right: 1px solid #3a3a3c;
+    padding: 2px;
+    &:last-child {
+      border-right: none;
+    }
+    svg {
+      width: 0.75rem;
+      height: 0.75rem;
+      cursor: pointer;
+    }
+    p {
+      width: 0.75rem;
+      height: 0.75rem;
+      line-height: 0.75re,;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+  }
+}
+#overall-g6{
+  background-color: #1c1c1e;
+
+  canvas {
+    will-change: width, height;
+  }
+}

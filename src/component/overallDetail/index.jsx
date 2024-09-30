@@ -9,6 +9,7 @@ import styled from "styled-components";
 import DragCloseDrawer from "./DragCloseDrawer";
 import { cloneDeep } from "../../utils";
 import MiniTable from './MiniTable'
+import OverallG6 from "./overallG6/OverallG6";
 
 const ResetTable = styled.div`
   .ant-table-wrapper {
@@ -99,7 +100,9 @@ const OverallDetail = ({ messageApi }) => {
           />
         </div>
         {/* G6图 */}
-        <div className="border-sky-300 border-2 col-span-2 row-span-2 overflow-hidden"></div>
+        <div className="col-span-2 row-span-2 rounded relative">
+          <OverallG6 />
+        </div>
         {/* 社群消息 */}
         <div className="row-span-2">
           <MiniTable
