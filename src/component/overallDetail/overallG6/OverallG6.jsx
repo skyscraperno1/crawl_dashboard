@@ -1,12 +1,13 @@
 import G6 from "@antv/g6";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { MdZoomOutMap, MdZoomInMap  } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
 import { getFromData, getToData } from '../../../apis/checkApis'
-import { _handleData } from "./canvasUtils";
+import { handleData } from "./canvasUtils";
+import { defaultCfg, registerX, behaviors } from "./canvasConfig";
 
 const OverallG6 = () => {
   const ref = useRef(null);
@@ -49,146 +50,24 @@ const OverallG6 = () => {
     if (!ref.current) {
       return;
     }
+    window.addEventListener("resize", handleResize);
     setX(ref.current.getBoundingClientRect().left)
     setY(ref.current.getBoundingClientRect().top)
     if (!graph.current) {
-      const nodeStateStyles = {
-        hover: {
-          main_rect: {
-            stroke: "#b18046",
-            lineWidth: 3,
-          },
-          "to": {
-            stroke: "#b18046",
-            lineWidth: 2,
-          },
-          "from": {
-            stroke: "#b18046", 
-            lineWidth: 2,
-          },
-        },
-        highlight: {
-          opacity: 1,
-        },
-        dark: {
-          opacity: 0.2,
-        },
-      };
-      
-      G6.registerNode(
-        "base_node",
-        {
-          draw(cfg, group) {
-            // Main shape
-            const rect = group.addShape("rect", {
-              attrs: {
-                x: -100,
-                y: -35,
-                width: 200,
-                height: 70,
-                stroke: "#1f1f1f",
-                fill: '#212121',
-                radius: 10,
-              },
-              name: "main_rect",
-            });
-            // 节点左边 “+” 图标，点击添加出金记录
-            group.addShape("marker", {
-              attrs: {
-                x: 100,
-                y: 0,
-                r: 8,
-                cursor: "pointer",
-                symbol: G6.Marker.expand,
-                stroke: "#fff",
-                fill: '#212121',
-                lineWidth: 1,
-              },
-              name: "to",
-            });
-            // 节点左边 “+” 图标，点击添加入金记录
-            group.addShape("marker", {
-              attrs: {
-                x: -100,
-                y: 0,
-                r: 8,
-                cursor: "pointer",
-                symbol: G6.Marker.expand,
-                fill: '#212121',
-                stroke: "#fff",
-                lineWidth: 1,
-              },
-              name: "from",
-            });
-    
-            // 节点信息，地址
-            if (cfg.label) {
-              group.addShape("text", {
-                attrs: {
-                  x: -87,
-                  y: 10,
-                  textAlign: "left",
-                  textBaseline: "middle",
-                  text: cfg.label,
-                  fill: "#a2a2a2",
-                  fontFamily: "Inter",
-                  cursor: "pointer",
-                },
-                name: "address",
-              });
-            }
-    
-            // 节点信息标签，地址标签
-            if (cfg.label) {
-              group.addShape("text", {
-                attrs: {
-                  x: -87,
-                  y: -10,
-                  textAlign: "left",
-                  textBaseline: "middle",
-                  text: cfg.year,
-                  fill: "#ffffff",
-                  fontFamily: "Inter",
-                  cursor: "pointer",
-                },
-                name: "address_label",
-              });
-            }
-            return rect;
-          },
-        },
-        "rect"
-      );
-      graph.current = new G6.Graph({
-        container: document.getElementById('overall-g6'),
-        fitView: false,
-        defaultNode: {
-          type: "base_node",
-        },
-        layout: {
-          type: "dagre",
-          rankdir: "LR",
-          align: 'DL',
-          nodesepFunc: () => 10,
-          ranksepFunc: () => 200,
-        },
-        modes: {
-          default: ["drag-canvas", "zoom-canvas", "drag-node"],
-        },
-        nodeStateStyles,
-        minZoom: 0.2,
-        maxZoom: 2
-      });
-  
-     
+      registerX();  
+      graph.current = new G6.Graph(defaultCfg(document.getElementById('overall-g6')))
       setScale(20)
       graph.current.on('wheel', () => {
         setScale((graph.current.getZoom() * 100).toFixed(0))
       });
+      behaviors(graph.current, showNextPage)
+      initData()
     }
-
-  }, [ref.current]);
-
+    () => {
+      graph.current?.destroy();
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   
   const getVariants = () => ({
     zoom: {
@@ -245,7 +124,7 @@ const OverallG6 = () => {
             const _edges = res.edges.filter(item => {
               return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
             })
-            const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+            const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
             nodeDataCache[nodeId].fromData = _edges
             nodeDataCache[nodeId].fromLoaded = 1
             data = {
@@ -264,7 +143,7 @@ const OverallG6 = () => {
             const _edges = res.edges.filter(item => {
               return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
             })
-            const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+            const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
             nodeDataCache[nodeId].toData = _edges
             nodeDataCache[nodeId].toLoaded = 1
             data = {
@@ -290,7 +169,7 @@ const OverallG6 = () => {
               const _edges = res.edges.filter(item => {
                 return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
               })
-              const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+              const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
               nodeDataCache[nodeId].fromData = _edges
               nodeDataCache[nodeId].fromLoaded = 1
               data = {
@@ -309,7 +188,7 @@ const OverallG6 = () => {
               const _edges = res.edges.filter(item => {
                 return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
               })
-              const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+              const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
               nodeDataCache[nodeId].toData = _edges
               nodeDataCache[nodeId].toLoaded = 1
               data = {
@@ -326,7 +205,7 @@ const OverallG6 = () => {
         if (direction === 'from') {
           nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
           const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-          const { nodes, edges } = _handleData(nextPage, address) 
+          const { nodes, edges } = handleData(nextPage, address) 
           data = {
             nodes: [...data.nodes, ...nodes],
             edges: [...data.edges, ...edges]
@@ -336,7 +215,7 @@ const OverallG6 = () => {
         } else {
           nodeDataCache[nodeId].toLoaded = loadedCount + 1;
           const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-          const { nodes, edges } = _handleData(nextPage, address) 
+          const { nodes, edges } = handleData(nextPage, address) 
           data = {
             nodes: [...data.nodes, ...nodes],
             edges: [...data.edges, ...edges]
@@ -354,10 +233,10 @@ const OverallG6 = () => {
     nodes: [], edges: []
   }
   const address = '0x5f04708b524ecf5e182e3cfe48c9e8c4a14fd6e1'
-  const fetchData = () => {
+  const initData = () => {
     Promise.all([getToData(address), getFromData(address)]).then(([toData, fromData]) => {
-      const _fromData = _handleData(fromData.edges.slice(0, PAGE_SIZE), address, true)
-      const _toData = _handleData(toData.edges.slice(0, PAGE_SIZE), address)
+      const _fromData = handleData(fromData.edges.slice(0, PAGE_SIZE), address, true)
+      const _toData = handleData(toData.edges.slice(0, PAGE_SIZE), address)
       data = {
         nodes: [..._fromData.nodes, ..._toData.nodes],
         edges: [..._fromData.edges, ..._toData.edges]
@@ -366,27 +245,10 @@ const OverallG6 = () => {
       nodeDataCache[address].toData = toData.edges
       graph.current.data(data)
       graph.current.render()
-      graph.current.on("node:click", function (e) {
-        const target = e.target; 
-        const item = e.item; 
-        const name = target.get("name"); 
-        if (name === "to" || name === 'from') {
-          const address = item.getModel().address
-          const nodeId = item.get("id");
-          showNextPage(address, name, nodeId)
-        }
-      });
     })
   }
 
-  useEffect(() => {
-    fetchData()
-    window.addEventListener("resize", handleResize);
-    () => {
-      graph.current?.destroy();
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [])
+
   return (
       
     <motion.div ref={ref} className="w-full h-full"
