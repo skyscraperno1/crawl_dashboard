@@ -96,5 +96,6 @@
   "dashboard.increaseNum": "Increase Num",
   "startDate": "Start Date",
   "endDate": "End Date",
-  "average": "Average"
+  "average": "Average",
+  "noMore": "No More"
 }

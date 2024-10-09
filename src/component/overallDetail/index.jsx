@@ -101,7 +101,7 @@ const OverallDetail = ({ messageApi }) => {
         </div>
         {/* G6图 */}
         <div className="col-span-2 row-span-2 rounded relative">
-          <OverallG6 />
+          <OverallG6 messageApi={messageApi}/>
         </div>
         {/* 社群消息 */}
         <div className="row-span-2">

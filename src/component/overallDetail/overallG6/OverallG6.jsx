@@ -2,18 +2,23 @@ import G6 from "@antv/g6";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FaPlus, FaMinus } from "react-icons/fa";
-import { MdZoomOutMap, MdZoomInMap  } from "react-icons/md";
+import { MdZoomOutMap, MdZoomInMap } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
 import { getFromData, getToData } from '../../../apis/checkApis'
 import { handleData } from "./canvasUtils";
 import { defaultCfg, registerX, behaviors } from "./canvasConfig";
+import Spin from '../../common/Spin'
+import { useTranslation } from "react-i18next";
 
-const OverallG6 = () => {
+
+const OverallG6 = ({ messageApi }) => {
+  const { t } = useTranslation();
   const ref = useRef(null);
   const graph = useRef(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [scale, setScale] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   const zoomIn = () => {
     const currentZoom = graph.current.getZoom();
@@ -21,13 +26,13 @@ const OverallG6 = () => {
     graph.current.zoomTo(newZoom);
     setScale((newZoom * 100).toFixed(0));
   };
-  
+
   const zoomOut = () => {
     const currentZoom = graph.current.getZoom();
     const newZoom = Math.max(currentZoom - 0.1, graph.current.get('minZoom'));
     graph.current.zoomTo(newZoom);
     setScale((newZoom * 100).toFixed(0));
-  };  
+  };
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
       setIsZoomed(false)
@@ -45,7 +50,7 @@ const OverallG6 = () => {
   const [offsetX, setX] = useState(0)
   const [offsetY, setY] = useState(0)
 
-  
+
   useEffect(() => {
     if (!ref.current) {
       return;
@@ -54,7 +59,7 @@ const OverallG6 = () => {
     setX(ref.current.getBoundingClientRect().left)
     setY(ref.current.getBoundingClientRect().top)
     if (!graph.current) {
-      registerX();  
+      registerX();
       graph.current = new G6.Graph(defaultCfg(document.getElementById('overall-g6')))
       setScale(20)
       graph.current.on('wheel', () => {
@@ -68,7 +73,7 @@ const OverallG6 = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
   const getVariants = () => ({
     zoom: {
       width: window.innerWidth,
@@ -93,186 +98,180 @@ const OverallG6 = () => {
       const newHeight = ref.current.offsetHeight;
       graph.current.changeSize(newWidth, newHeight);
     }
-  }); 
+  });
+
+  const address = '0x0000000000000000000000000000000000000000'
 
   let nodeDataCache = {
-    "0x5f04708b524ecf5e182e3cfe48c9e8c4a14fd6e1": {
-      fromData: [],    
-      toData: [],    
+    [address]: {
+      fromData: [],
+      toData: [],
       fromLoaded: 1,
-      toLoaded: 1,   
+      toLoaded: 1,
     }
   };
 
-
   const PAGE_SIZE = 10
+  const fetchFromData = (address, nodeId) => {
+    setLoading(true)
+    getFromData(address).then(res => {
+      if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
+        messageApi?.open({
+          type: 'error',
+          content: t("noMore"),
+        });
+      } else {
+        const _edges = res.edges.filter(item => {
+          return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
+        })
+        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+        nodeDataCache[nodeId].fromData = _edges
+        nodeDataCache[nodeId].fromLoaded = 1
+        data = {
+          nodes: [...data.nodes, ...nodes],
+          edges: [...data.edges, ...edges]
+        }
+        graph.current.data(data)
+        graph.current.render();
+      }
+    }).finally(() => {
+      setLoading(false)
+    })
+  }
+
+  const fetchToData = (address, nodeId) => {
+    setLoading(true)
+    getToData(address).then(res => {
+      if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
+        messageApi?.open({
+          type: 'error',
+          content: t("noMore"),
+        });
+      } else {
+        const _edges = res.edges.filter(item => {
+          return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
+        })
+        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+        nodeDataCache[nodeId].toData = _edges
+        nodeDataCache[nodeId].toLoaded = 1
+        data = {
+          nodes: [...data.nodes, ...nodes],
+          edges: [...data.edges, ...edges]
+        }
+        graph.current.data(data)
+        graph.current.render();
+      }
+    }).finally(() => {
+      setLoading(false)
+    })
+  }
+
+  const fetchLocalFrom = (nodeId, address, loadedCount, transactions) => {
+    nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
+    const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
+    const { nodes, edges } = handleData(nextPage, address)
+    data = {
+      nodes: [...data.nodes, ...nodes],
+      edges: [...data.edges, ...edges]
+    }
+    graph.current.data(data)
+    graph.current.render();
+  }
+  const fetchLocalTo = (nodeId, address, loadedCount, transactions) => {
+    nodeDataCache[nodeId].toLoaded = loadedCount + 1;
+    const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
+    const { nodes, edges } = handleData(nextPage, address)
+    data = {
+      nodes: [...data.nodes, ...nodes],
+      edges: [...data.edges, ...edges]
+    }
+    graph.current.data(data)
+    graph.current.render();
+  }
   function showNextPage(address, direction, nodeId) {
     let nodeCache = nodeDataCache[nodeId];
-    
     if (!nodeCache) {
-      nodeDataCache[nodeId] = { 
+      nodeDataCache[nodeId] = {
         fromData: [],
         toData: [],
         fromLoaded: 0,
         toLoaded: 0
       };
       if (direction === 'from') {
-        getFromData(address).then(res => {
-          if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
-            alert('没有数据了')
-          } else {
-            const _edges = res.edges.filter(item => {
-              return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
-            })
-            const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
-            nodeDataCache[nodeId].fromData = _edges
-            nodeDataCache[nodeId].fromLoaded = 1
-            data = {
-              nodes: [...data.nodes, ...nodes],
-              edges: [...data.edges, ...edges]
-            }
-            graph.current.data(data)
-            graph.current.render();
-          }
-        })
+        fetchFromData(address, nodeId)
       } else {
-        getToData(address).then(res => {
-          if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
-            alert('没有数据了')
-          } else {
-            const _edges = res.edges.filter(item => {
-              return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
-            })
-            const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
-            nodeDataCache[nodeId].toData = _edges
-            nodeDataCache[nodeId].toLoaded = 1
-            data = {
-              nodes: [...data.nodes, ...nodes],
-              edges: [...data.edges, ...edges]
-            }
-            graph.current.data(data)
-            graph.current.render();
-          }
-        })
+        fetchToData(address, nodeId)
       }
     } else {
-
-      // 这里是已经加载过的
       const transactions = direction === 'from' ? nodeCache.fromData : nodeCache.toData;
       const loadedCount = direction === 'from' ? nodeCache.fromLoaded : nodeCache.toLoaded;
       if (loadedCount === 0) {
         if (direction === 'from') {
-          getFromData(address).then(res => {
-            if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
-              alert('没有数据了')
-            } else {
-              const _edges = res.edges.filter(item => {
-                return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
-              })
-              const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
-              nodeDataCache[nodeId].fromData = _edges
-              nodeDataCache[nodeId].fromLoaded = 1
-              data = {
-                nodes: [...data.nodes, ...nodes],
-                edges: [...data.edges, ...edges]
-              }
-              graph.current.data(data)
-              graph.current.render();
-            }
-          })
+          fetchFromData(address, nodeId)
         } else {
-          getToData(address).then(res => {
-            if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
-              alert('没有数据了')
-            } else {
-              const _edges = res.edges.filter(item => {
-                return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
-              })
-              const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
-              nodeDataCache[nodeId].toData = _edges
-              nodeDataCache[nodeId].toLoaded = 1
-              data = {
-                nodes: [...data.nodes, ...nodes],
-                edges: [...data.edges, ...edges]
-              }
-              graph.current.data(data)
-              graph.current.render();
-            }
-          })
+          fetchToData(address, nodeId)
         }
       }
       else if (transactions.length > loadedCount * PAGE_SIZE) {
         if (direction === 'from') {
-          nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
-          const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-          const { nodes, edges } = handleData(nextPage, address) 
-          data = {
-            nodes: [...data.nodes, ...nodes],
-            edges: [...data.edges, ...edges]
-          }
-          graph.current.data(data)
-          graph.current.render();
+          fetchLocalFrom(nodeId, address, loadedCount, transactions)
         } else {
-          nodeDataCache[nodeId].toLoaded = loadedCount + 1;
-          const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-          const { nodes, edges } = handleData(nextPage, address) 
-          data = {
-            nodes: [...data.nodes, ...nodes],
-            edges: [...data.edges, ...edges]
-          }
-          graph.current.data(data)
-          graph.current.render();
+          fetchLocalTo(nodeId, address, loadedCount, transactions)
         }
       } else {
-        alert('加载完啦')
+        messageApi?.open({
+          type: 'error',
+          content: t("noMore"),
+        });
       }
     }
   }
-  
+
   let data = {
     nodes: [], edges: []
   }
-  const address = '0x5f04708b524ecf5e182e3cfe48c9e8c4a14fd6e1'
   const initData = () => {
+    setLoading(true)
     Promise.all([getToData(address), getFromData(address)]).then(([toData, fromData]) => {
-      const _fromData = handleData(fromData.edges.slice(0, PAGE_SIZE), address, true)
-      const _toData = handleData(toData.edges.slice(0, PAGE_SIZE), address)
+      const fromEdges = fromData?.edges || []
+      const toEdges = toData?.edges || []
+      const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true)
+      const _toData = handleData(toEdges.slice(0, PAGE_SIZE), address)
       data = {
         nodes: [..._fromData.nodes, ..._toData.nodes],
         edges: [..._fromData.edges, ..._toData.edges]
       }
-      nodeDataCache[address].fromData = fromData.edges
-      nodeDataCache[address].toData = toData.edges
+      nodeDataCache[address].fromData = fromEdges
+      nodeDataCache[address].toData = toEdges
       graph.current.data(data)
+      G6.Util.processParallelEdges(data['edges'], 12.5, 'custom-quadratic', 'custom-line');
       graph.current.render()
+    }).finally(() => {
+      setLoading(false)
     })
   }
 
 
   return (
-      
-    <motion.div ref={ref} className="w-full h-full"
-    initial="normal"
-    animate={isZoomed ? "zoom" : "normal"}
-    transition={{ type: "spring", bounce: 0.05, duration: 0.3 }}
-    variants={getVariants()}
-    onUpdate={handleResize}
+    <motion.div ref={ref} className="w-full h-full overflow-hidden rounded-lg"
+      initial="normal"
+      animate={isZoomed ? "zoom" : "normal"}
+      transition={{ type: "spring", bounce: 0.05, duration: 0.3 }}
+      variants={getVariants()}
+      onUpdate={handleResize}
     >
-    <div
-      id='overall-g6'
-      className="rounded-lg w-full h-full overflow-hidden bg-gray-950 z-50"
-     
-    >
-    <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded gap font-thin">
-      <li><FaPlus onClick={zoomIn}/></li>
-      <li ><p>{scale}</p></li>
-      <li ><FaMinus onClick={zoomOut}/></li>
-      <li >{
-        isZoomed ? <MdZoomInMap onClick={() => setIsZoomed(false)} /> 
-        : <MdZoomOutMap onClick={() => setIsZoomed(true)}/>
-      }</li>
-    </ul>
-    </div>
+      {loading && <Spin />}
+      <div id='overall-g6' className="rounded-lg w-full h-full overflow-hidden bg-gray-950 z-50">
+        <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded gap font-thin">
+          <li><FaPlus onClick={zoomIn} /></li>
+          <li ><p>{scale}</p></li>
+          <li ><FaMinus onClick={zoomOut} /></li>
+          <li >{
+            isZoomed ? <MdZoomInMap onClick={() => setIsZoomed(false)} />
+              : <MdZoomOutMap onClick={() => setIsZoomed(true)} />
+          }</li>
+        </ul>
+      </div>
     </motion.div>
 
   );

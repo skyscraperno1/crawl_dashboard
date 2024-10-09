@@ -33,7 +33,7 @@ export function handleData(edges, address, first, nodeId) {
   edges.forEach((it) => {
     const nodeAddress = it.from_address === address ? it.to_address : it.from_address;
     _nodes.push({
-      id: `${nodeAddress}__${uniqueId()}`,
+      id: `${nodeAddress}__${uniqueId() + Date.now()}`,
       address: nodeAddress,
       label: splitTextToFitWidth(nodeAddress, 176),
     })
