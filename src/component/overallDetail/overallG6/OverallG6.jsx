@@ -5,197 +5,8 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import { MdZoomOutMap, MdZoomInMap  } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
-const data = {
-  nodes: [
-    {
-      id: '1',
-      dataType: 'alps',
-      name: 'alps_file1',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '2',
-      dataType: 'alps',
-      name: 'alps_file2',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '3',
-      dataType: 'alps',
-      name: 'alps_file3',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '4',
-      dataType: 'sql',
-      name: 'sql_file1',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '5',
-      dataType: 'sql',
-      name: 'sql_file2',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '6',
-      dataType: 'feature_etl',
-      name: 'feature_etl_1',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '7',
-      dataType: 'feature_etl',
-      name: 'feature_etl_1',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-    {
-      id: '8',
-      dataType: 'feature_extractor',
-      name: 'feature_extractor',
-      conf: [
-        {
-          label: 'conf',
-          value: 'pai_graph.conf',
-        },
-        {
-          label: 'dot',
-          value: 'pai_graph.dot',
-        },
-        {
-          label: 'init',
-          value: 'init.rc',
-        },
-      ],
-    },
-  ],
-  edges: [
-    {
-      source: '1',
-      target: '2',
-    },
-    {
-      source: '1',
-      target: '3',
-    },
-    {
-      source: '2',
-      target: '4',
-    },
-    {
-      source: '3',
-      target: '4',
-    },
-    {
-      source: '4',
-      target: '5',
-    },
-    {
-      source: '5',
-      target: '6',
-    },
-    {
-      source: '6',
-      target: '7',
-    },
-    {
-      source: '6',
-      target: '8',
-    },
-  ],
-};
-
+import { getFromData, getToData } from '../../../apis/checkApis'
+import { handleData, _handleData } from "../../Detail/canvasUtils";
 
 const OverallG6 = () => {
   const ref = useRef(null);
@@ -232,6 +43,7 @@ const OverallG6 = () => {
 
   const [offsetX, setX] = useState(0)
   const [offsetY, setY] = useState(0)
+
   
   useEffect(() => {
     if (!ref.current) {
@@ -240,36 +52,138 @@ const OverallG6 = () => {
     setX(ref.current.getBoundingClientRect().left)
     setY(ref.current.getBoundingClientRect().top)
     if (!graph.current) {
+      const nodeStateStyles = {
+        hover: {
+          main_rect: {
+            stroke: "#b18046",
+            lineWidth: 3,
+          },
+          "to": {
+            stroke: "#b18046",
+            lineWidth: 2,
+          },
+          "from": {
+            stroke: "#b18046", 
+            lineWidth: 2,
+          },
+        },
+        highlight: {
+          opacity: 1,
+        },
+        dark: {
+          opacity: 0.2,
+        },
+      };
+      
+      G6.registerNode(
+        "base_node",
+        {
+          draw(cfg, group) {
+            // Main shape
+            const rect = group.addShape("rect", {
+              attrs: {
+                x: -100,
+                y: -35,
+                width: 200,
+                height: 70,
+                stroke: "#1f1f1f",
+                fill: '#212121',
+                radius: 10,
+              },
+              name: "main_rect",
+            });
+            // 节点左边 “+” 图标，点击添加出金记录
+            group.addShape("marker", {
+              attrs: {
+                x: 100,
+                y: 0,
+                r: 8,
+                cursor: "pointer",
+                symbol: G6.Marker.expand,
+                stroke: "#fff",
+                fill: '#212121',
+                lineWidth: 1,
+              },
+              name: "to",
+            });
+            // 节点左边 “+” 图标，点击添加入金记录
+            group.addShape("marker", {
+              attrs: {
+                x: -100,
+                y: 0,
+                r: 8,
+                cursor: "pointer",
+                symbol: G6.Marker.expand,
+                fill: '#212121',
+                stroke: "#fff",
+                lineWidth: 1,
+              },
+              name: "from",
+            });
+    
+            // 节点信息，地址
+            if (cfg.label) {
+              group.addShape("text", {
+                attrs: {
+                  x: -87,
+                  y: 10,
+                  textAlign: "left",
+                  textBaseline: "middle",
+                  text: cfg.label,
+                  fill: "#a2a2a2",
+                  fontFamily: "Inter",
+                  cursor: "pointer",
+                },
+                name: "address",
+              });
+            }
+    
+            // 节点信息标签，地址标签
+            if (cfg.label) {
+              group.addShape("text", {
+                attrs: {
+                  x: -87,
+                  y: -10,
+                  textAlign: "left",
+                  textBaseline: "middle",
+                  text: cfg.year,
+                  fill: "#ffffff",
+                  fontFamily: "Inter",
+                  cursor: "pointer",
+                },
+                name: "address_label",
+              });
+            }
+            return rect;
+          },
+        },
+        "rect"
+      );
       graph.current = new G6.Graph({
         container: document.getElementById('overall-g6'),
-        fitView: true,
-        background: {
-          color: 'red',
+        fitView: false,
+        defaultNode: {
+          type: "base_node",
         },
         layout: {
-          type: 'dagre',
-          nodesepFunc: (d) => {
-            if (d.id === '3') {
-              return 500;
-            }
-            return 50;
-          },
-          ranksep: 70,
-          controlPoints: true,
+          type: "dagre",
+          rankdir: "LR",
+          align: 'DL',
+          nodesepFunc: () => 10,
+          ranksepFunc: () => 200,
         },
         modes: {
           default: ["drag-canvas", "zoom-canvas", "drag-node"],
         },
+        nodeStateStyles,
         minZoom: 0.2,
         maxZoom: 2
       });
   
-      graph.current.data(data);
-      graph.current.render();
-      setScale(38)
+     
+      setScale(20)
       graph.current.on('wheel', () => {
-        console.log(graph.current.getZoom());
-        // setScale((graph.current.getZoom() * 100).toFixed(0))
+        setScale((graph.current.getZoom() * 100).toFixed(0))
       });
     }
 
@@ -302,7 +216,177 @@ const OverallG6 = () => {
     }
   }); 
 
- 
+  let nodeDataCache = {
+    "0x5f04708b524ecf5e182e3cfe48c9e8c4a14fd6e1": {
+      fromData: [],    
+      toData: [],    
+      fromLoaded: 1,
+      toLoaded: 1,   
+    }
+  };
+
+
+  const PAGE_SIZE = 10
+  function showNextPage(address, direction, nodeId) {
+    let nodeCache = nodeDataCache[nodeId];
+    
+    if (!nodeCache) {
+      nodeDataCache[nodeId] = { 
+        fromData: [],
+        toData: [],
+        fromLoaded: 0,
+        toLoaded: 0
+      };
+      if (direction === 'from') {
+        getFromData(address).then(res => {
+          if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
+            alert('没有数据了')
+          } else {
+            const _edges = res.edges.filter(item => {
+              return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
+            })
+            const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+            nodeDataCache[nodeId].fromData = _edges
+            nodeDataCache[nodeId].fromLoaded = 1
+            data = {
+              nodes: [...data.nodes, ...nodes],
+              edges: [...data.edges, ...edges]
+            }
+            graph.current.data(data)
+            graph.current.render();
+          }
+        })
+      } else {
+        getToData(address).then(res => {
+          if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
+            alert('没有数据了')
+          } else {
+            const _edges = res.edges.filter(item => {
+              return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
+            })
+            const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+            nodeDataCache[nodeId].toData = _edges
+            nodeDataCache[nodeId].toLoaded = 1
+            data = {
+              nodes: [...data.nodes, ...nodes],
+              edges: [...data.edges, ...edges]
+            }
+            graph.current.data(data)
+            graph.current.render();
+          }
+        })
+      }
+    } else {
+
+      // 这里是已经加载过的
+      const transactions = direction === 'from' ? nodeCache.fromData : nodeCache.toData;
+      const loadedCount = direction === 'from' ? nodeCache.fromLoaded : nodeCache.toLoaded;
+      if (loadedCount === 0) {
+        if (direction === 'from') {
+          getFromData(address).then(res => {
+            if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
+              alert('没有数据了')
+            } else {
+              const _edges = res.edges.filter(item => {
+                return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
+              })
+              const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+              nodeDataCache[nodeId].fromData = _edges
+              nodeDataCache[nodeId].fromLoaded = 1
+              data = {
+                nodes: [...data.nodes, ...nodes],
+                edges: [...data.edges, ...edges]
+              }
+              graph.current.data(data)
+              graph.current.render();
+            }
+          })
+        } else {
+          getToData(address).then(res => {
+            if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
+              alert('没有数据了')
+            } else {
+              const _edges = res.edges.filter(item => {
+                return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
+              })
+              const { nodes, edges } = _handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+              nodeDataCache[nodeId].toData = _edges
+              nodeDataCache[nodeId].toLoaded = 1
+              data = {
+                nodes: [...data.nodes, ...nodes],
+                edges: [...data.edges, ...edges]
+              }
+              graph.current.data(data)
+              graph.current.render();
+            }
+          })
+        }
+      }
+      else if (transactions.length > loadedCount * PAGE_SIZE) {
+        if (direction === 'from') {
+          nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
+          const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
+          const { nodes, edges } = _handleData(nextPage, address) 
+          data = {
+            nodes: [...data.nodes, ...nodes],
+            edges: [...data.edges, ...edges]
+          }
+          graph.current.data(data)
+          graph.current.render();
+        } else {
+          nodeDataCache[nodeId].toLoaded = loadedCount + 1;
+          const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
+          const { nodes, edges } = _handleData(nextPage, address) 
+          data = {
+            nodes: [...data.nodes, ...nodes],
+            edges: [...data.edges, ...edges]
+          }
+          graph.current.data(data)
+          graph.current.render();
+        }
+      } else {
+        alert('加载完啦')
+      }
+    }
+  }
+  
+  let data = {
+    nodes: [], edges: []
+  }
+  const address = '0x5f04708b524ecf5e182e3cfe48c9e8c4a14fd6e1'
+  const fetchData = () => {
+    Promise.all([getToData(address), getFromData(address)]).then(([toData, fromData]) => {
+      const _fromData = _handleData(fromData.edges.slice(0, PAGE_SIZE), address, true)
+      const _toData = _handleData(toData.edges.slice(0, PAGE_SIZE), address)
+      data = {
+        nodes: [..._fromData.nodes, ..._toData.nodes],
+        edges: [..._fromData.edges, ..._toData.edges]
+      }
+      nodeDataCache[address].fromData = fromData.edges
+      nodeDataCache[address].toData = toData.edges
+      graph.current.data(data)
+      graph.current.render()
+      graph.current.on("node:click", function (e) {
+        const target = e.target; 
+        const item = e.item; 
+        const name = target.get("name"); 
+        if (name === "to" || name === 'from') {
+          const address = item.getModel().address
+          const nodeId = item.get("id");
+          showNextPage(address, name, nodeId)
+        }
+      });
+    })
+  }
+
+  useEffect(() => {
+    fetchData()
+    window.addEventListener("resize", handleResize);
+    () => {
+      graph.current?.destroy();
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [])
   return (
       
     <motion.div ref={ref} className="w-full h-full"
