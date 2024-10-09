@@ -120,9 +120,17 @@ const OverallG6 = ({ messageApi }) => {
           type: 'error',
           content: t("noMore"),
         });
+        nodeDataCache[nodeId].fromLoaded = 1
       } else {
         const _edges = res.edges.filter(item => {
-          return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.from_address)
+          const { from_address, to_address } = item;
+          return !data.edges.some(edge => {
+            let { source, target } = edge;
+            source = source.split("__")[0]
+            target = target.split("__")[0]
+            return (source === from_address && target === to_address) || (source === to_address && target === from_address)
+          }
+          );
         })
         const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
         nodeDataCache[nodeId].fromData = _edges
@@ -147,9 +155,17 @@ const OverallG6 = ({ messageApi }) => {
           type: 'error',
           content: t("noMore"),
         });
+        nodeDataCache[nodeId].toLoaded = 1
       } else {
         const _edges = res.edges.filter(item => {
-          return !Object.keys(nodeDataCache).some(key => key.split("__")[0] === item.to_address)
+          const { from_address, to_address } = item;
+          return !data.edges.some(edge => {
+            let { source, target } = edge;
+            source = source.split("__")[0]
+            target = target.split("__")[0]
+            return (source === from_address && target === to_address) || (source === to_address && target === from_address)
+          }
+          );
         })
         const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
         nodeDataCache[nodeId].toData = _edges
@@ -169,7 +185,7 @@ const OverallG6 = ({ messageApi }) => {
   const fetchLocalFrom = (nodeId, address, loadedCount, transactions) => {
     nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-    const { nodes, edges } = handleData(nextPage, address)
+    const { nodes, edges } = handleData(nextPage, address, false, nodeId)
     data = {
       nodes: [...data.nodes, ...nodes],
       edges: [...data.edges, ...edges]
@@ -180,7 +196,8 @@ const OverallG6 = ({ messageApi }) => {
   const fetchLocalTo = (nodeId, address, loadedCount, transactions) => {
     nodeDataCache[nodeId].toLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-    const { nodes, edges } = handleData(nextPage, address)
+    const { nodes, edges } = handleData(nextPage, address, false, nodeId)
+    console.log(nodes, edges);
     data = {
       nodes: [...data.nodes, ...nodes],
       edges: [...data.edges, ...edges]
