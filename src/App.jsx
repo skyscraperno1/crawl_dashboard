@@ -5,8 +5,6 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Header from "./component/header/header";
 import Content from "./component/content/content";
 import BgCanvas from "./component/BgCanvas";
-import Detail from "./component/Detail";
-import MyTable from "./component//table/tableIndex";
 import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
 import AssetCollection from "./component/AssetCollection/AssetCollection";

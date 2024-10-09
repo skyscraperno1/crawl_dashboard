@@ -6,7 +6,7 @@ import { MdZoomOutMap, MdZoomInMap  } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
 import { getFromData, getToData } from '../../../apis/checkApis'
-import { handleData, _handleData } from "../../Detail/canvasUtils";
+import { _handleData } from "./canvasUtils";
 
 const OverallG6 = () => {
   const ref = useRef(null);
