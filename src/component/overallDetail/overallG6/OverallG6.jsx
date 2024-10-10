@@ -16,7 +16,7 @@ const OverallG6 = ({ messageApi }) => {
   const { t } = useTranslation();
   const ref = useRef(null);
   const graph = useRef(null);
-  const [isZoomed, setIsZoomed] = useState(true);
+  const [isZoomed, setIsZoomed] = useState(false);
   const [scale, setScale] = useState(0)
   const [loading, setLoading] = useState(false)
 
