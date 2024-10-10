@@ -189,7 +189,7 @@ export const registerX = (t) => {
       group.addShape('text', {
         attrs: {
           x: (startPoint.x + endPoint.x) / 2, 
-          y: endPoint.y - 10, 
+          y: endPoint.y - 12, 
           text: cfg.time || 'Time', 
           fill: text_color,
           fontSize: 12,
@@ -202,7 +202,7 @@ export const registerX = (t) => {
       group.addShape('text', {
         attrs: {
           x: (startPoint.x + endPoint.x) / 2,
-          y: endPoint.y + 10,
+          y: endPoint.y + 12,
           text: t('count') + cfg.count || 'Count',
           fill: text_color,
           fontSize: 12,
