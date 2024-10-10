@@ -97,5 +97,6 @@
   "startDate": "开始日期",
   "endDate": "截止日期",
   "average": "平均数",
-  "noMore": "没有更多了"
+  "noMore": "没有更多了",
+  "count": "交易次数："
 }

@@ -27,7 +27,8 @@ export function handleData(edges, address, first, nodeId) {
   let _nodes = first ? [{
     id: address,
     address,
-    label: splitTextToFitWidth(address, 176)
+    label: splitTextToFitWidth(address, 176),
+    highlight: false
   }] : [];
 
   edges.forEach((it) => {
@@ -36,6 +37,7 @@ export function handleData(edges, address, first, nodeId) {
       id: `${nodeAddress}__${uniqueId() + Date.now()}`,
       address: nodeAddress,
       label: splitTextToFitWidth(nodeAddress, 176),
+      highlight: false
     })
   })
   const nodeMap = {};
@@ -47,15 +49,21 @@ export function handleData(edges, address, first, nodeId) {
       return {
         amount: it.raw_amount,
         time: `[${it.year}-${it.month}-${it.day}]`,
+        count: it.cishu,
         source: nodeId ? nodeId : address,
         target: nodeMap[it.to_address],
+        highlight_in: false,
+        highlight_out: false
       }
     } else {
       return {
         amount: it.raw_amount,
         time: `[${it.year}-${it.month}-${it.day}]`,
+        count: it.cishu,
         source: nodeMap[it.from_address],
         target:  nodeId ? nodeId : address,
+        highlight_in: false,
+        highlight_out: false
       }
     }
   });

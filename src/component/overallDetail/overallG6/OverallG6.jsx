@@ -16,7 +16,7 @@ const OverallG6 = ({ messageApi }) => {
   const { t } = useTranslation();
   const ref = useRef(null);
   const graph = useRef(null);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(true);
   const [scale, setScale] = useState(0)
   const [loading, setLoading] = useState(false)
 
@@ -59,13 +59,13 @@ const OverallG6 = ({ messageApi }) => {
     setX(ref.current.getBoundingClientRect().left)
     setY(ref.current.getBoundingClientRect().top)
     if (!graph.current) {
-      registerX();
+      registerX(t);
       graph.current = new G6.Graph(defaultCfg(document.getElementById('overall-g6')))
       setScale(20)
       graph.current.on('wheel', () => {
         setScale((graph.current.getZoom() * 100).toFixed(0))
       });
-      behaviors(graph.current, showNextPage)
+      behaviors(graph.current, showNextPage, messageApi, t)
       initData()
     }
     () => {

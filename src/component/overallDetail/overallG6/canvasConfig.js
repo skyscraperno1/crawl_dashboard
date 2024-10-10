@@ -1,55 +1,26 @@
-
 import G6 from "@antv/g6";
-const edgeStateStyles = {
-  highlight_in: {
-    stroke: "#6dc542",
-  },
-  highlight_out: {
-    stroke: "#e43c1a",
-  },
-  dark: {
-    stroke: "#000000",
-  },
-};
+import { copyText } from "../../../utils";
 
-const defaultEdge = {
-  type: "custom-line",
-  style: {
-    stroke: "#bd7c40",
-    lineWidth: 2,
-    endArrow: {
-      path: G6.Arrow.triangle(6, 8, 2),
-      d: -5,
-      fill: "#bd7c40",
-    },
-  },
-  labelCfg: {
-    style: {
-      fill: "#fff",
-    },
-  },
-};
+const getArrow = (fill) => {
+  return {
+    path: G6.Arrow.triangle(6, 8, 2),
+    d: -5,
+    fill,
+  }
+}
+const fill_color = "#212121";
+const fill_highlight = "#484848"
+const text_color = "#a2a2a2"
+const text_highlight = "#c4c4c4"
+
+const edge_color = "#bd7c40"
+const in_color = "#A58CFF"
+const out_color = "#FF6B6B"
 
 const nodeStateStyles = {
-  hover: {
-    main_rect: {
-      stroke: "#b18046",
-      lineWidth: 3,
-    },
-    "to": {
-      stroke: "#b18046",
-      lineWidth: 2,
-    },
-    "from": {
-      stroke: "#b18046", 
-      lineWidth: 2,
-    },
-  },
   highlight: {
-    opacity: 1,
-  },
-  dark: {
-    opacity: 0.2,
+    fill: 'rgb(189, 124, 64)',
+    stroke: "rgb(189, 124, 64)"
   },
 };
 const modes = {
@@ -58,27 +29,29 @@ const modes = {
 export const defaultCfg = (container) => {
   return {
     container,
-    fitView: false,
+    fitView: true,
     defaultNode: {
       type: "base_node",
+    },
+    defaultEdge: {
+      type: "fund-polyline",
     },
     layout: {
       type: "dagre",
       rankdir: "LR",
       align: 'DL',
-      nodesepFunc: () => 10,
-      ranksepFunc: () => 200,
+      nodesep: 10,
+      ranksep: 200,
     },
     modes,
-    defaultEdge,
     nodeStateStyles,
-    edgeStateStyles,
     minZoom: 0.2,
     maxZoom: 2
   };
 };
-const node_nor_color = "#212121";
-export const registerX = () => {
+
+
+export const registerX = (t) => {
   G6.registerNode(
     "base_node",
     {
@@ -89,9 +62,8 @@ export const registerX = () => {
             y: -35,
             width: 200,
             height: 60,
-            stroke: "#1f1f1f",
-            fill: node_nor_color,
-            radius: 10,
+            fill: fill_color,
+            radius: 8,
           },
           name: "main_rect",
         });
@@ -102,8 +74,8 @@ export const registerX = () => {
             r: 8,
             cursor: "pointer",
             symbol: G6.Marker.expand,
-            stroke: "#fff",
-            fill: node_nor_color,
+            stroke: "#a2a2a2",
+            fill: fill_color,
             lineWidth: 1,
           },
           name: "to",
@@ -115,8 +87,8 @@ export const registerX = () => {
             r: 8,
             cursor: "pointer",
             symbol: G6.Marker.expand,
-            fill: node_nor_color,
-            stroke: "#fff",
+            fill: fill_color,
+            stroke: text_color,
             lineWidth: 1,
           },
           name: "from",
@@ -130,7 +102,7 @@ export const registerX = () => {
               textAlign: "left",
               textBaseline: "bottom",
               text: cfg.label,
-              fill: "#a2a2a2",
+              fill: text_color,
               fontSize: 12,
               fontFamily: "Inter",
               cursor: "normal",
@@ -140,12 +112,146 @@ export const registerX = () => {
         }
         return rect;
       },
+      setState(name, value, item) {
+        const group = item.getContainer();
+        const rect = group.find((element) => element.get("name") === "main_rect");
+        const text = group.find((element) => element.get("name") === "address");
+        if (name === "highlight") {
+          const fillColor = value ? fill_highlight : fill_color;
+          const textColor = value ? text_highlight : text_color;
+          
+          rect.attr("fill", fillColor);
+          text.attr("fill", textColor);
+        }
+      }
     },
     "rect"
   );
+  G6.registerEdge('fund-polyline', {
+    itemType: 'edge',
+    draw: function draw(cfg, group) {
+      const startPoint = cfg.startPoint;
+      const endPoint = cfg.endPoint;
+  
+      const Ydiff = endPoint.y - startPoint.y;
+  
+      const slope = Ydiff !== 0 ? Math.min(800 / Math.abs(Ydiff), 40) : 0;
+  
+      const cpOffset = slope > 40 ? 0 : 42;
+      const offset = Ydiff < 0 ? cpOffset : -cpOffset;
+  
+      const firstSegmentLength = 30;
+      const firstLineEndPoint = {
+        x: startPoint.x + firstSegmentLength,
+        y: startPoint.y,
+      };
+  
+      const line1EndPoint = {
+        x: firstLineEndPoint.x + slope,
+        y: endPoint.y + offset,
+      };
+  
+      const line2StartPoint = {
+        x: line1EndPoint.x + cpOffset,
+        y: endPoint.y,
+      };
+     
+      const controlPoint = {
+        x: ((line1EndPoint.x - firstLineEndPoint.x) * (endPoint.y - firstLineEndPoint.y)) / (line1EndPoint.y - firstLineEndPoint.y) + firstLineEndPoint.x,
+        y: endPoint.y,
+      };
+  
+      let path = [
+        ['M', startPoint.x, startPoint.y], 
+        ['L', firstLineEndPoint.x, firstLineEndPoint.y], 
+        ['L', line1EndPoint.x, line1EndPoint.y],
+        ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y], 
+        ['L', endPoint.x, endPoint.y],
+      ];
+  
+      if (Math.abs(Ydiff) <= 5) {
+        path = [
+          ['M', startPoint.x, startPoint.y],
+          ['L', endPoint.x, endPoint.y],
+        ];
+      }
+  
+      const line = group.addShape('path', {
+        attrs: {
+          path,
+          stroke: edge_color, 
+          lineWidth: 2,
+          endArrow: getArrow(edge_color),
+        },
+        name: 'path-shape',
+      });
+
+      group.addShape('text', {
+        attrs: {
+          x: (startPoint.x + endPoint.x) / 2, 
+          y: endPoint.y - 10, 
+          text: cfg.time || 'Time', 
+          fill: text_color,
+          fontSize: 12,
+          textAlign: 'center',
+          textBaseline: 'middle',
+        },
+        name: 'time-text',
+      });
+  
+      group.addShape('text', {
+        attrs: {
+          x: (startPoint.x + endPoint.x) / 2,
+          y: endPoint.y + 10,
+          text: t('count') + cfg.count || 'Count',
+          fill: text_color,
+          fontSize: 12,
+          textAlign: 'center',
+          textBaseline: 'middle',
+        },
+        name: 'count-text',
+      });
+  
+      return line;
+    },
+    setState(name, value, item) {
+      const group = item.getContainer(); 
+      const shape = group.get('children')[0];
+      const children = group.getChildren()
+      let countTextShape = null;
+      let timeTextShape = null
+
+      children.forEach(child => {
+        if (child.get('name') === 'count-text') {
+          countTextShape = child;
+        }
+        if (child.get('name') === 'time-text') {
+          timeTextShape = child;
+        }
+      });
+
+      if (name === 'highlight_in' && value) {
+        shape.attr('stroke', in_color); 
+        shape.attr('endArrow', getArrow(in_color));
+        countTextShape.attr('fill', text_highlight); 
+        timeTextShape.attr('fill', text_highlight); 
+      } else if (name === 'highlight_out' && value) {
+        shape.attr('stroke', out_color); 
+        shape.attr('endArrow', getArrow(out_color));
+        countTextShape.attr('fill', text_highlight); 
+        timeTextShape.attr('fill', text_highlight); 
+      } else if (!value) {
+        shape.attr('stroke', edge_color); 
+        shape.attr('endArrow', getArrow(edge_color));
+        countTextShape.attr('fill', text_color); 
+        timeTextShape.attr('fill', text_color); 
+      }
+    },
+  });
 };
 
-export const behaviors = (graph, callback) => {
+let hoverNode = null;
+export const behaviors = (graph, callback, messageApi, t) => {
   function clearAllStats() {
     graph.setAutoPaint(false);
     graph.getNodes().forEach(function (node) {
@@ -158,7 +264,33 @@ export const behaviors = (graph, callback) => {
     graph.setAutoPaint(true);
   }
 
+  graph.on("mousemove", function (e) {
+    const name = e.target.get("name");
+    if (name === 'to' || name === 'from') {
+      hoverNode = e.target;
+      hoverNode.attr('fill', "rgb(220, 130, 40)")
+      hoverNode.attr('stroke', '#ECECEC')
+    } else {
+      if (hoverNode) {
+        hoverNode.attr('fill', fill_color)
+        hoverNode.attr('stroke', '#a2a2a2')
+      }
+    }
+  });
+
+  graph.on('node:dblclick', function(e) {
+    const address = e.item.getModel().address
+    copyText(address, () => {
+      messageApi.open({
+        type: 'success',
+        content: t("copy-success"),
+      });
+    })
+  })
+
   graph.on("node:click", function (e) {
+    const isHighlighted  = e.item.getModel()
+    console.log(isHighlighted.highlight);
     clearAllStats()
     graph.paint();
     graph.setAutoPaint(true);
@@ -170,14 +302,6 @@ export const behaviors = (graph, callback) => {
       callback(address, name, nodeId)
     } else {
       graph.setAutoPaint(false);
-      graph.getNodes().forEach(function (node) {
-        graph.setItemState(node, "dark", true);
-      });
-      graph.getEdges().forEach(function (edge) {
-        graph.setItemState(edge, "dark", true);
-      });
-  
-      graph.setItemState(item, "dark", false);
       graph.setItemState(item, "highlight", true);
   
       const edges = graph.getEdges();
@@ -185,15 +309,11 @@ export const behaviors = (graph, callback) => {
         const source = edge.getSource();
         const target = edge.getTarget();
         if (source === item) {
-          graph.setItemState(target, "dark", false);
           graph.setItemState(target, "highlight", true);
           graph.setItemState(edge, "highlight_in", true);
-          edge.toFront();
         } else if (target === item) {
-          graph.setItemState(source, "dark", false);
           graph.setItemState(source, "highlight", true);
           graph.setItemState(edge, "highlight_out", true);
-          edge.toFront();
         }
       });
   

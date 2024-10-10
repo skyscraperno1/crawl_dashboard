@@ -97,5 +97,6 @@
   "startDate": "Start Date",
   "endDate": "End Date",
   "average": "Average",
-  "noMore": "No More"
+  "noMore": "No More",
+  "count": "Trans Count:"
 }
