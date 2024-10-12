@@ -296,7 +296,7 @@ const OverallG6 = ({ messageApi, token }) => {
   }
 
   useEffect(() => {
-    if (!address) return;
+    if (!address || !token) return;
     data = {nodes: [], edges: []}
     nodeDataCache = {
       [address]: {
@@ -307,7 +307,7 @@ const OverallG6 = ({ messageApi, token }) => {
       }
     };
     initData(activeTab)
-  }, [activeTab, address])
+  }, [activeTab, address, token])
 
   return (
     <motion.div ref={ref} className="w-full h-full overflow-hidden rounded-lg"
