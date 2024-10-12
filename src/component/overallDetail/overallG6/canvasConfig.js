@@ -56,6 +56,7 @@ export const registerX = (t) => {
     "base_node",
     {
       draw(cfg, group) {
+        const { trans } = cfg;
         const rect = group.addShape("rect", {
           attrs: {
             x: -100,
@@ -67,7 +68,7 @@ export const registerX = (t) => {
           },
           name: "main_rect",
         });
-        group.addShape("marker", {
+        (trans === 'to' || !trans) && group.addShape("marker", {
           attrs: {
             x: 100,
             y: -5,
@@ -80,7 +81,7 @@ export const registerX = (t) => {
           },
           name: "to",
         });
-        group.addShape("marker", {
+        (trans === 'from' || !trans) && group.addShape("marker", {
           attrs: {
             x: -100,
             y: -5,
@@ -130,6 +131,7 @@ export const registerX = (t) => {
   G6.registerEdge('fund-polyline', {
     itemType: 'edge',
     draw: function draw(cfg, group) {
+      const { trans } = cfg;
       const startPoint = cfg.startPoint;
       const endPoint = cfg.endPoint;
   
@@ -161,13 +163,22 @@ export const registerX = (t) => {
         y: endPoint.y,
       };
   
-      let path = [
-        ['M', startPoint.x, startPoint.y], 
-        ['L', firstLineEndPoint.x, firstLineEndPoint.y], 
-        ['L', line1EndPoint.x, line1EndPoint.y],
-        ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y], 
-        ['L', endPoint.x, endPoint.y],
-      ];
+      let path 
+      if (trans === 'to') {
+        path = [
+          ['M', startPoint.x, startPoint.y],
+          ['L', firstLineEndPoint.x, firstLineEndPoint.y],
+          ['L', line1EndPoint.x, line1EndPoint.y],
+          ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y],
+          ['L', endPoint.x, endPoint.y],
+        ];
+      } else {
+        path = [
+          ['M', startPoint.x, startPoint.y],
+          ['L', startPoint.x + 350, startPoint.y],
+          ['L', endPoint.x, endPoint.y]
+        ]
+      }
   
       if (Math.abs(Ydiff) <= 5) {
         path = [
@@ -189,7 +200,7 @@ export const registerX = (t) => {
       group.addShape('text', {
         attrs: {
           x: (startPoint.x + endPoint.x) / 2, 
-          y: endPoint.y - 12, 
+          y: trans === 'to' ? endPoint.y - 12 : startPoint.y - 12, 
           text: cfg.time || 'Time', 
           fill: text_color,
           fontSize: 12,
@@ -202,7 +213,7 @@ export const registerX = (t) => {
       group.addShape('text', {
         attrs: {
           x: (startPoint.x + endPoint.x) / 2,
-          y: endPoint.y + 12,
+          y: trans === 'to' ? endPoint.y + 12 : startPoint.y + 12,
           text: t('count') + cfg.count || 'Count',
           fill: text_color,
           fontSize: 12,
@@ -252,6 +263,7 @@ export const registerX = (t) => {
 
 let hoverNode = null;
 export const behaviors = (graph, callback, messageApi, t) => {
+  let timer = null
   function clearAllStats() {
     graph.setAutoPaint(false);
     graph.getNodes().forEach(function (node) {
@@ -268,7 +280,7 @@ export const behaviors = (graph, callback, messageApi, t) => {
     const name = e.target.get("name");
     if (name === 'to' || name === 'from') {
       hoverNode = e.target;
-      hoverNode.attr('fill', "rgb(220, 130, 40)")
+      hoverNode.attr('fill', "#b78c5d")
       hoverNode.attr('stroke', '#ECECEC')
     } else {
       if (hoverNode) {
@@ -280,6 +292,10 @@ export const behaviors = (graph, callback, messageApi, t) => {
 
   graph.on('node:dblclick', function(e) {
     const address = e.item.getModel().address
+    if (timer) {
+      clearTimeout(timer)
+      timer = null;
+    }
     copyText(address, () => {
       messageApi.open({
         type: 'success',
@@ -295,30 +311,36 @@ export const behaviors = (graph, callback, messageApi, t) => {
     const item = e.item;
     const name = e.target.get("name"); 
     const currentAddress = item.getModel().address;
-    let count = 0
-    graph.getNodes().forEach((node) => {
-      const model = node.getModel();
-      if (model.address === currentAddress) {
-        count++;
-        graph.setItemState(node, 'highlight', true);
-      } else {
-        graph.setItemState(node, 'highlight', false);
-      }
-    });
-    if (count > 1) {
-      messageApi.open({
-        type: 'success',
-        content: t("sameCount") + count,
-      })
-    }
+    
     if (name === 'to' || name === 'from') {
-      const address = item.getModel().address
-      const nodeId = item.get("id");
+      const { address } = item.getModel()
+      const nodeId = item.get("id")
       callback(address, name, nodeId)
     } else {
+      if (timer) {
+        clearTimeout(timer);
+      }
       graph.setAutoPaint(false);
       graph.setItemState(item, "highlight", true);
-  
+      let count = 0
+      graph.getNodes().forEach((node) => {
+        const model = node.getModel();
+        if (model.address === currentAddress) {
+          count++;
+          graph.setItemState(node, 'highlight', true);
+        } else {
+          graph.setItemState(node, 'highlight', false);
+        }
+      });
+      if (count > 1) {
+        timer = setTimeout(() => {
+          messageApi.open({
+            type: 'success',
+            content: t("sameCount") + count,
+          })
+          timer = null
+        }, 300)
+      }
       const edges = graph.getEdges();
       edges.forEach(function (edge) {
         const source = edge.getSource();

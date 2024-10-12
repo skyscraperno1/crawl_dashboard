@@ -21,6 +21,7 @@ const OverallG6 = ({ messageApi }) => {
   const [isFull, setIsFull] = useState(false)
   useEffect(() => {
     if (type === 'bep20' || type === 'bnb') {
+      setActive(type)
       setIsFull(true)
       setAddress(add)
     } else {
@@ -135,7 +136,7 @@ const OverallG6 = ({ messageApi }) => {
           }
           );
         })
-        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId, 'from')
         nodeDataCache[nodeId].fromData = _edges
         nodeDataCache[nodeId].fromLoaded = 1
         data = {
@@ -170,7 +171,7 @@ const OverallG6 = ({ messageApi }) => {
           }
           );
         })
-        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId)
+        const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId, 'to')
         nodeDataCache[nodeId].toData = _edges
         nodeDataCache[nodeId].toLoaded = 1
         data = {
@@ -188,7 +189,7 @@ const OverallG6 = ({ messageApi }) => {
   const fetchLocalFrom = (nodeId, address, loadedCount, transactions) => {
     nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-    const { nodes, edges } = handleData(nextPage, address, false, nodeId)
+    const { nodes, edges } = handleData(nextPage, address, false, nodeId, 'from')
     data = {
       nodes: [...data.nodes, ...nodes],
       edges: [...data.edges, ...edges]
@@ -199,7 +200,7 @@ const OverallG6 = ({ messageApi }) => {
   const fetchLocalTo = (nodeId, address, loadedCount, transactions) => {
     nodeDataCache[nodeId].toLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
-    const { nodes, edges } = handleData(nextPage, address, false, nodeId)
+    const { nodes, edges } = handleData(nextPage, address, false, nodeId, 'to')
     data = {
       nodes: [...data.nodes, ...nodes],
       edges: [...data.edges, ...edges]
@@ -263,8 +264,8 @@ const OverallG6 = ({ messageApi }) => {
     Promise.all([getToData(address, tab), getFromData(address, tab)]).then(([toData, fromData]) => {
       const fromEdges = fromData?.edges || []
       const toEdges = toData?.edges || []
-      const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true)
-      const _toData = handleData(toEdges.slice(0, PAGE_SIZE), address)
+      const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true, undefined, 'from')
+      const _toData = handleData(toEdges.slice(0, PAGE_SIZE), address, false, undefined, 'to')
       data = {
         nodes: [..._fromData.nodes, ..._toData.nodes],
         edges: [..._fromData.edges, ..._toData.edges]

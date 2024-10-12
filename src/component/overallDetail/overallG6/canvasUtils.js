@@ -23,7 +23,7 @@ export function splitTextToFitWidth(text, maxWidth, font = "12px Inter") {
   return result;
 }
 
-export function handleData(edges, address, first, nodeId) {
+export function handleData(edges, address, first, nodeId, trans) {
   let _nodes = first ? [{
     id: address,
     address,
@@ -37,7 +37,8 @@ export function handleData(edges, address, first, nodeId) {
       id: `${nodeAddress}__${uniqueId() + Date.now()}`,
       address: nodeAddress,
       label: splitTextToFitWidth(nodeAddress, 176),
-      highlight: false
+      highlight: false,
+      trans
     })
   })
   const nodeMap = {};
@@ -53,7 +54,8 @@ export function handleData(edges, address, first, nodeId) {
         source: nodeId ? nodeId : address,
         target: nodeMap[it.to_address],
         highlight_in: false,
-        highlight_out: false
+        highlight_out: false,
+        trans
       }
     } else {
       return {
@@ -63,7 +65,8 @@ export function handleData(edges, address, first, nodeId) {
         source: nodeMap[it.from_address],
         target:  nodeId ? nodeId : address,
         highlight_in: false,
-        highlight_out: false
+        highlight_out: false,
+        trans
       }
     }
   });
