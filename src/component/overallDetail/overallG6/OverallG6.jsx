@@ -15,7 +15,7 @@ import { Modal } from "antd";
 import { useParams } from "react-router-dom";
 const Tabs = ['bep20', 'bnb']
 const { confirm } = Modal;
-const OverallG6 = ({ messageApi }) => {
+const OverallG6 = ({ messageApi, token }) => {
   const { type, add } = useParams()
   const [address, setAddress] = useState('')
   const [isFull, setIsFull] = useState(false)
@@ -118,7 +118,7 @@ const OverallG6 = ({ messageApi }) => {
   const PAGE_SIZE = 10
   const fetchFromData = (address, nodeId) => {
     setLoading(true)
-    getFromData(address, activeTab).then(res => {
+    getFromData(address, activeTab, token).then(res => {
       if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
         messageApi?.open({
           type: 'error',
@@ -153,7 +153,7 @@ const OverallG6 = ({ messageApi }) => {
 
   const fetchToData = (address, nodeId) => {
     setLoading(true)
-    getToData(address, activeTab).then(res => {
+    getToData(address, activeTab, token).then(res => {
       if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
         messageApi?.open({
           type: 'error',
@@ -261,7 +261,7 @@ const OverallG6 = ({ messageApi }) => {
   };
   const initData = (tab) => {
     setLoading(true)
-    Promise.all([getToData(address, tab), getFromData(address, tab)]).then(([toData, fromData]) => {
+    Promise.all([getToData(address, tab, token), getFromData(address, tab, token)]).then(([toData, fromData]) => {
       const fromEdges = fromData?.edges || []
       const toEdges = toData?.edges || []
       const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true, undefined, 'from')
