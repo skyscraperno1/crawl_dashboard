@@ -197,7 +197,6 @@ const OverallG6 = ({ messageApi }) => {
     nodeDataCache[nodeId].toLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
     const { nodes, edges } = handleData(nextPage, address, false, nodeId)
-    console.log(nodes, edges);
     data = {
       nodes: [...data.nodes, ...nodes],
       edges: [...data.edges, ...edges]
@@ -261,7 +260,6 @@ const OverallG6 = ({ messageApi }) => {
       nodeDataCache[address].fromData = fromEdges
       nodeDataCache[address].toData = toEdges
       graph.current.data(data)
-      G6.Util.processParallelEdges(data['edges'], 12.5, 'custom-quadratic', 'custom-line');
       graph.current.render()
     }).finally(() => {
       setLoading(false)

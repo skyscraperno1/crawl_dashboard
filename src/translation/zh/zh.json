@@ -98,5 +98,6 @@
   "endDate": "截止日期",
   "average": "平均数",
   "noMore": "没有更多了",
-  "count": "交易次数："
+  "count": "交易次数：",
+  "sameCount": "相同地址数量："
 }

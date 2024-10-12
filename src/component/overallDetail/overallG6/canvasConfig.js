@@ -289,13 +289,28 @@ export const behaviors = (graph, callback, messageApi, t) => {
   })
 
   graph.on("node:click", function (e) {
-    const isHighlighted  = e.item.getModel()
-    console.log(isHighlighted.highlight);
     clearAllStats()
     graph.paint();
     graph.setAutoPaint(true);
     const item = e.item;
     const name = e.target.get("name"); 
+    const currentAddress = item.getModel().address;
+    let count = 0
+    graph.getNodes().forEach((node) => {
+      const model = node.getModel();
+      if (model.address === currentAddress) {
+        count++;
+        graph.setItemState(node, 'highlight', true);
+      } else {
+        graph.setItemState(node, 'highlight', false);
+      }
+    });
+    if (count > 1) {
+      messageApi.open({
+        type: 'success',
+        content: t("sameCount") + count,
+      })
+    }
     if (name === 'to' || name === 'from') {
       const address = item.getModel().address
       const nodeId = item.get("id");

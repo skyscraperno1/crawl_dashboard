@@ -98,5 +98,6 @@
   "endDate": "End Date",
   "average": "Average",
   "noMore": "No More",
-  "count": "Trans Count:"
+  "count": "Trans Count:",
+  "sameCount": "Same Count:"
 }
