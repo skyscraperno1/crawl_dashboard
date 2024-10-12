@@ -2,10 +2,12 @@
   background-color: #2e2e30;
   overflow: hidden;
   li {
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 1.5rem;
+    cursor: pointer;
     width: 1.75rem;
     border-right: 1px solid #3a3a3c;
     padding: 2px;

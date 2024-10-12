@@ -1,22 +1,8 @@
 import Ajax from "./Ajax";
 
-export function checkAddress(address, type) {
-  const url =
-    type === "Bep20"
-      ? "/v1/api/bep20/findBep20ByAddress"
-      : "/v1/api/bnb/queryBnbByAddress";
+export function getFromData(toAddress, type) {
   return Ajax({
-    url,
-    method: "POST",
-    params: {
-      address,
-    },
-  });
-}
-
-export function getFromData(toAddress) {
-  return Ajax({
-    url: "/v1/api/bep20/findFromByTo",
+    url: `/v1/api/${type}/findFromByTo`,
     method: "POST",
     params: {
       toAddress,
@@ -26,9 +12,9 @@ export function getFromData(toAddress) {
   });
 }
 
-export function getToData(fromAddress) {
+export function getToData(fromAddress, type) {
   return Ajax({
-    url: "/v1/api/bep20/findToByFrom",
+    url: `/v1/api/${type}/findToByFrom`,
     method: "POST",
     params: {
       fromAddress,

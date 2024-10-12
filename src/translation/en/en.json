@@ -99,5 +99,9 @@
   "average": "Average",
   "noMore": "No More",
   "count": "Trans Count:",
-  "sameCount": "Same Count:"
+  "sameCount": "Same Count:",
+  "OK": "OK",
+  "Cancel": "Cancel",
+  "sureTitle": "Are you sure you want to do this?",
+  "sureContent": "Current data will lost after switch"
 }

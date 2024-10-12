@@ -7,7 +7,7 @@ import HomeSelect from "./HomeSelect";
 import InputHistory from "./History";
 import { useEffect } from "react";
 
-function SearchInput({ t, selectItems, menuClick = null}) {
+function SearchInput({ t, selectItems }) {
   const [iptValue, setValue] = useState("");
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState(selectItems[0]);
@@ -62,14 +62,19 @@ function SearchInput({ t, selectItems, menuClick = null}) {
     selectRef.current.focus()
   }
 
-  const handleKeyUp = (e) => {
+  const handleKeyDown = (e) => {
     if (!iptValue) return;
     if (showHistory) {
       setShowHistory(false);
     }
     if (e.key === "Enter") {
-      const hasItem = historyList.some((it) => (it.value === iptValue && it.chain === type));
-      if (hasItem) return;
+      menuClick()
+    }
+  };
+
+  const menuClick = () => {
+    const hasItem = historyList.some((it) => (it.value === iptValue && it.chain === type));
+    if (!hasItem) {
       const newHistory = [
         ...historyList,
         {
@@ -80,7 +85,8 @@ function SearchInput({ t, selectItems, menuClick = null}) {
       setHistory(newHistory);
       localStorage.setItem("search_option", JSON.stringify(newHistory));
     }
-  };
+    window.open(`/track/${type}/${iptValue}`)
+  }
   return (
     <div
       className={`${
@@ -103,7 +109,7 @@ function SearchInput({ t, selectItems, menuClick = null}) {
           value={iptValue}
           className="flex-1 h-full bg-transparent text-white text-base"
           onChange={handleChange}
-          onKeyUp={handleKeyUp}
+          onKeyDown={handleKeyDown}
           placeholder={t("input-placer")}
           onFocus={() => {
             setIsFocused(true);
@@ -143,7 +149,7 @@ function SearchInput({ t, selectItems, menuClick = null}) {
               />
             </motion.div>
           )}
-          <CgMenu className={`${menuClick ? 'cursor-pointer' : 'cursor-normal'} text-slate-300 text-2xl`} onClick={menuClick}/>
+          <CgMenu className={`cursor-pointer  text-slate-300 text-2xl`} onClick={menuClick}/>
         </AnimatePresence>
       </div>
     </div>

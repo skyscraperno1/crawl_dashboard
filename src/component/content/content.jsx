@@ -3,12 +3,12 @@ import { fadeIn } from "./fadeIn";
 import { TypeAnimation } from "react-type-animation";
 import SearchInput from "../homeInput/SearchInput";
 import "./content.scss";
-const selectItems = ["BNB", "Bep20"];
+const selectItems = ["bnb", "bep20"];
 function Content({ t }) {
   const sequence = selectItems.flatMap((item) => [item, 2000]);
 
   return (
-    <section className="flex-1 relative pt-60 h-[100vh] text-white px-40">
+    <section className="flex-1 relative pt-60 h-[100vh] text-white px-40 overflow-hidden">
       <motion.div
         variants={fadeIn("down", 0.2)}
         initial="hidden"

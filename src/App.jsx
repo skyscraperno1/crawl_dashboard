@@ -9,6 +9,7 @@ import DashBoard from "./component/dashboard/DashBoard";
 import OverAllCase from "./component/OverAllCase/OverAllCase";
 import AssetCollection from "./component/AssetCollection/AssetCollection";
 import OverallDetail from "./component/overallDetail";
+import OverallG6 from "./component/overallDetail/overallG6/OverallG6";
 import { ConfigProvider, theme, message } from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 import enUS from "antd/lib/locale/en_US";
@@ -77,6 +78,7 @@ function App() {
                  <BgCanvas index={0} />
                </>}
             />
+            <Route path="/track/:type/:add" element={<OverallG6 messageApi={messageApi}/>}/>
             <Route path="*" element={<EmptyPage />}></Route>
           </Routes>
         </ConfigProvider>

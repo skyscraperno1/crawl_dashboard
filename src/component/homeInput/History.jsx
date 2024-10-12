@@ -20,7 +20,7 @@ const InputHistory = ({
     [handleChoose]
   );
   return (
-    <div className="absolute left-2 top-[100%] translate-y-1 rounded-md hide-scrollbar w-[95%] bg-[#191819] py-2">
+    <div className="absolute left-2 top-[100%] translate-y-1 rounded-md hide-scrollbar w-[95%] bg-[#191819] py-2 max-h-64">
       {list.map((it) => (
         <div
           className="flex items-center justify-between truncate hover:bg-[#ffffff20] h-10 w-full cursor-pointer py-2 text-base leading-4 px-4"

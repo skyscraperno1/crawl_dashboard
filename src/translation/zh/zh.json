@@ -99,5 +99,9 @@
   "average": "平均数",
   "noMore": "没有更多了",
   "count": "交易次数：",
-  "sameCount": "相同地址数量："
+  "sameCount": "相同地址数量：",
+  "OK": "确定",
+  "Cancel": "取消",
+  "sureTitle": "你确定要这么做吗？",
+  "sureContent": "切换后当前数据会重新加载"
 }

@@ -9,10 +9,25 @@ import { getFromData, getToData } from '../../../apis/checkApis'
 import { handleData } from "./canvasUtils";
 import { defaultCfg, registerX, behaviors } from "./canvasConfig";
 import Spin from '../../common/Spin'
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
-
-
+import { Modal } from "antd";
+import { useParams } from "react-router-dom";
+const Tabs = ['bep20', 'bnb']
+const { confirm } = Modal;
 const OverallG6 = ({ messageApi }) => {
+  const { type, add } = useParams()
+  const [address, setAddress] = useState('')
+  const [isFull, setIsFull] = useState(false)
+  useEffect(() => {
+    if (type === 'bep20' || type === 'bnb') {
+      setIsFull(true)
+      setAddress(add)
+    } else {
+      setIsFull(false)
+      setAddress('0x0000000000000000000000000000000000000000')
+    }
+  }, [type, add])
   const { t } = useTranslation();
   const ref = useRef(null);
   const graph = useRef(null);
@@ -52,7 +67,7 @@ const OverallG6 = ({ messageApi }) => {
 
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!ref.current || !address) {
       return;
     }
     window.addEventListener("resize", handleResize);
@@ -66,13 +81,12 @@ const OverallG6 = ({ messageApi }) => {
         setScale((graph.current.getZoom() * 100).toFixed(0))
       });
       behaviors(graph.current, showNextPage, messageApi, t)
-      initData()
     }
     () => {
       graph.current?.destroy();
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [address]);
 
   const getVariants = () => ({
     zoom: {
@@ -100,21 +114,10 @@ const OverallG6 = ({ messageApi }) => {
     }
   });
 
-  const address = '0x0000000000000000000000000000000000000000'
-
-  let nodeDataCache = {
-    [address]: {
-      fromData: [],
-      toData: [],
-      fromLoaded: 1,
-      toLoaded: 1,
-    }
-  };
-
   const PAGE_SIZE = 10
   const fetchFromData = (address, nodeId) => {
     setLoading(true)
-    getFromData(address).then(res => {
+    getFromData(address, activeTab).then(res => {
       if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].from_address))) {
         messageApi?.open({
           type: 'error',
@@ -149,7 +152,7 @@ const OverallG6 = ({ messageApi }) => {
 
   const fetchToData = (address, nodeId) => {
     setLoading(true)
-    getToData(address).then(res => {
+    getToData(address, activeTab).then(res => {
       if (!res.edges || (res.edges.length === 1 && data.nodes.some(item => item.address === res.edges[0].to_address))) {
         messageApi?.open({
           type: 'error',
@@ -246,9 +249,18 @@ const OverallG6 = ({ messageApi }) => {
   let data = {
     nodes: [], edges: []
   }
-  const initData = () => {
+
+  let nodeDataCache = {
+    [address]: {
+      fromData: [],
+      toData: [],
+      fromLoaded: 1,
+      toLoaded: 1,
+    }
+  };
+  const initData = (tab) => {
     setLoading(true)
-    Promise.all([getToData(address), getFromData(address)]).then(([toData, fromData]) => {
+    Promise.all([getToData(address, tab), getFromData(address, tab)]).then(([toData, fromData]) => {
       const fromEdges = fromData?.edges || []
       const toEdges = toData?.edges || []
       const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true)
@@ -265,7 +277,36 @@ const OverallG6 = ({ messageApi }) => {
       setLoading(false)
     })
   }
+  
+  const [activeTab, setActive] = useState('bep20')
 
+  const changeTab = (tab) => {
+    if (tab === activeTab) return
+    confirm({
+      title: t('sureTitle'),
+      content: t('sureContent'),
+      icon: <QuestionCircleOutlined style={{ color: 'red' }} />,
+      okText: t('OK'),
+      cancelText: t('Cancel'),
+      onOk() {
+        setActive(tab)
+      },
+    });
+  }
+
+  useEffect(() => {
+    if (!address) return;
+    data = {nodes: [], edges: []}
+    nodeDataCache = {
+      [address]: {
+        fromData: [],
+        toData: [],
+        fromLoaded: 1,
+        toLoaded: 1,
+      }
+    };
+    initData(activeTab)
+  }, [activeTab, address])
 
   return (
     <motion.div ref={ref} className="w-full h-full overflow-hidden rounded-lg"
@@ -277,14 +318,26 @@ const OverallG6 = ({ messageApi }) => {
     >
       {loading && <Spin />}
       <div id='overall-g6' className="rounded-lg w-full h-full overflow-hidden bg-gray-950 z-50">
-        <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded gap font-thin">
+        <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded font-thin">
           <li><FaPlus onClick={zoomIn} /></li>
-          <li ><p>{scale}</p></li>
+          <li style={{ cursor: 'unset'}}><p>{scale}</p></li>
           <li ><FaMinus onClick={zoomOut} /></li>
-          <li >{
+          <li className={`${isFull ? 'pointer-events-none opacity-70' : ''}`}>{
             isZoomed ? <MdZoomInMap onClick={() => setIsZoomed(false)} />
               : <MdZoomOutMap onClick={() => setIsZoomed(true)} />
           }</li>
+        </ul>
+        <ul className="tool-bar flex absolute top-4 text-xs justify-end right-4 rounded font-thin">
+          {Tabs.map((tab) => (
+            <li
+              key={tab}
+              className={`uppercase hover:text-themeColor select-none cursor-pointer ${activeTab === tab ? 'hover:text-white text-white bg-themeColor hover:bg-[#a46c39] active:bg-[#b78c5d]' : ''}`}
+              style={{ width: 'fit-content', padding: '2px 6px' }}
+              onClick={() => changeTab(tab)} 
+            >
+              {tab}
+            </li>
+          ))}
         </ul>
       </div>
     </motion.div>

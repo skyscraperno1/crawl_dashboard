@@ -40,7 +40,7 @@ const HomeSelect = ({ options, onChange, disabled, selValue }) => {
       <div
         className={`${
           disabled ? "cursor-not-allowed" : "cursor-pointer"
-        } flex-1 truncate`}
+        } flex-1 truncate uppercase`}
         onClick={handleClick}
       >
         {selValue}
@@ -54,7 +54,7 @@ const HomeSelect = ({ options, onChange, disabled, selValue }) => {
             {options.map((option, index) => (
               <div
                 key={index}
-                className={`justify-between hover:bg-[#ffffff20] h-8 leading-8 w-full cursor-pointer ${
+                className={`uppercase justify-between hover:bg-[#ffffff20] h-8 leading-8 w-full cursor-pointer ${
                   selValue === option.value ? "bg-themeColor" : ""
                 }`}
                 onClick={() => handleSelectOption(option.value)}
