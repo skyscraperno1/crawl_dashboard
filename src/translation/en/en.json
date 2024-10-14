@@ -103,5 +103,9 @@
   "OK": "OK",
   "Cancel": "Cancel",
   "sureTitle": "Are you sure you want to do this?",
-  "sureContent": "Current data will lost after switch"
+  "sureContent": "Current data will lost after switch",
+  "loadingLong": "Loading may take a long time. Are you sure you want to proceed?",
+  "G6.time": "Transaction Time",
+  "G6.amount": "Transaction Amount",
+  "G6.hash": "Transaction Hash"
 }

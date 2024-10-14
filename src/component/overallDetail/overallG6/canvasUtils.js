@@ -48,7 +48,7 @@ export function handleData(edges, address, first, nodeId, trans) {
   const _edges = edges.map((it) => {
     if (it.from_address === address) {
       return {
-        amount: it.raw_amount,
+        raw_amount: it.raw_amount,
         time: `[${it.year}-${it.month}-${it.day}]`,
         count: it.cishu,
         source: nodeId ? nodeId : address,
@@ -59,7 +59,7 @@ export function handleData(edges, address, first, nodeId, trans) {
       }
     } else {
       return {
-        amount: it.raw_amount,
+        raw_amount: it.raw_amount,
         time: `[${it.year}-${it.month}-${it.day}]`,
         count: it.cishu,
         source: nodeMap[it.from_address],

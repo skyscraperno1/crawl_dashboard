@@ -28,16 +28,12 @@ export function getToData(fromAddress, type, token) {
 
 /**
  *
- * @param {toAddress: string, fromAddress: string, tokenAddress: string} params
+ * @param {toAddress: string, fromAddress: string, tokenAddress: string | undefined} params
  * @returns
  */
-export function checkEdgeAdd(params, type) {
-  const url =
-    type === "Bep20"
-      ? "/v1/api/bep20/findAddressByEdge"
-      : "/v1/api/bnb/queryEdge";
+export function checkDetail(params, type) {
   return Ajax({
-    url,
+    url: `/v1/api/${type}/findAddressByEdge`,
     method: "POST",
     params,
   });

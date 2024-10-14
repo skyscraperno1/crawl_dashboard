@@ -24,12 +24,41 @@ const nodeStateStyles = {
   },
 };
 const modes = {
-  default: ["drag-canvas", "zoom-canvas", "drag-node"],
+  default: ["drag-canvas", "zoom-canvas", "drag-node", "click-select"],
 };
+
+const getTooltip = () => {
+  return new G6.Tooltip({
+    offsetX: 10,
+    offsetY: 10,
+    getContent(e) {
+      const model = e.item.getModel();
+      let { raw_amount } = model;
+      if (!raw_amount) {
+        raw_amount = 0
+      }
+      const tooltipDiv = document.createElement('div');
+      tooltipDiv.style.width = 'fit-content';
+      tooltipDiv.style.backgroundColor = 'transparent';
+      tooltipDiv.style.color = 'black';
+      tooltipDiv.style.border = 'none';
+      tooltipDiv.innerHTML = `
+        <p>总量: ${raw_amount}</p>
+      `;
+      return tooltipDiv;
+    },
+    shouldBegin(e) {
+      return e.item && e.item.getType() === 'edge';
+    },
+  })
+}
 export const defaultCfg = (container) => {
   return {
     container,
     fitView: true,
+    plugins: [
+      getTooltip()
+    ],
     defaultNode: {
       type: "base_node",
     },
@@ -192,6 +221,7 @@ export const registerX = (t) => {
           path,
           stroke: edge_color, 
           lineWidth: 2,
+          cursor: 'pointer',
           endArrow: getArrow(edge_color),
         },
         name: 'path-shape',
@@ -205,6 +235,7 @@ export const registerX = (t) => {
           fill: text_color,
           fontSize: 12,
           textAlign: 'center',
+          cursor: 'pointer',
           textBaseline: 'middle',
         },
         name: 'time-text',
@@ -218,6 +249,7 @@ export const registerX = (t) => {
           fill: text_color,
           fontSize: 12,
           textAlign: 'center',
+          cursor: 'pointer',
           textBaseline: 'middle',
         },
         name: 'count-text',
@@ -262,7 +294,7 @@ export const registerX = (t) => {
 };
 
 let hoverNode = null;
-export const behaviors = (graph, callback, messageApi, t) => {
+export const behaviors = (graph, callback, messageApi, t, edgeCallback) => {
   let timer = null
   function clearAllStats() {
     graph.setAutoPaint(false);
@@ -306,8 +338,6 @@ export const behaviors = (graph, callback, messageApi, t) => {
 
   graph.on("node:click", function (e) {
     clearAllStats()
-    graph.paint();
-    graph.setAutoPaint(true);
     const item = e.item;
     const name = e.target.get("name"); 
     const currentAddress = item.getModel().address;
@@ -353,11 +383,31 @@ export const behaviors = (graph, callback, messageApi, t) => {
           graph.setItemState(edge, "highlight_out", true);
         }
       });
-  
-      graph.paint();
-      graph.setAutoPaint(true);
     }
   });
+
+  graph.on("edge:click", function (e) {
+    clearAllStats()
+    const item = e.item; 
+    graph.setItemState(item, "highlight_in", true);
+    const edges = graph.getEdges();
+    edges.forEach(function (edge) {
+      if (edge !== item) {
+        graph.setItemState(edge, "highlight_in", false);
+        graph.setItemState(edge, "highlight_out", false);
+      }
+    });
+  
+    graph.getNodes().forEach(function (node) {
+      graph.setItemState(node, "highlight", false);
+    });
+    const model = item.getModel()
+    const [source] = model.source.split('__')
+    const [target] = model.target.split('__')
+    const { count } = model
+    edgeCallback(source, target, count)
+  });
+  
   
   graph.on("canvas:click", clearAllStats);
 };

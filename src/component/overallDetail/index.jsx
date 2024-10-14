@@ -11,7 +11,7 @@ import { cloneDeep } from "../../utils";
 import MiniTable from './MiniTable'
 import OverallG6 from "./overallG6/OverallG6";
 
-const ResetTable = styled.div`
+export const ResetTable = styled.div`
   .ant-table-wrapper {
     .ant-table-cell {
       font-size: 12px;

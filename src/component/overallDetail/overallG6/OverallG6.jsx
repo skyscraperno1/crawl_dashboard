@@ -1,11 +1,11 @@
 import G6 from "@antv/g6";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { MdZoomOutMap, MdZoomInMap } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
-import { getFromData, getToData } from '../../../apis/checkApis'
+import { getFromData, getToData, checkDetail } from '../../../apis/checkApis'
 import { handleData } from "./canvasUtils";
 import { defaultCfg, registerX, behaviors } from "./canvasConfig";
 import Spin from '../../common/Spin'
@@ -13,6 +13,10 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
 import { Modal } from "antd";
 import { useParams } from "react-router-dom";
+import SearchIcon from "../../core/SearchIcon";
+import DragCloseDrawer from "../DragCloseDrawer";
+import { Table } from 'antd'
+import { ResetTable } from '../index'
 const Tabs = ['bep20', 'bnb']
 const { confirm } = Modal;
 const OverallG6 = ({ messageApi, token }) => {
@@ -32,7 +36,7 @@ const OverallG6 = ({ messageApi, token }) => {
   const { t } = useTranslation();
   const ref = useRef(null);
   const graph = useRef(null);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(type === 'bep20' || type === 'bnb');
   const [scale, setScale] = useState(0)
   const [loading, setLoading] = useState(false)
 
@@ -81,7 +85,7 @@ const OverallG6 = ({ messageApi, token }) => {
       graph.current.on('wheel', () => {
         setScale((graph.current.getZoom() * 100).toFixed(0))
       });
-      behaviors(graph.current, showNextPage, messageApi, t)
+      behaviors(graph.current, showNextPage, messageApi, t, edgeCallback)
     }
     () => {
       graph.current?.destroy();
@@ -281,6 +285,93 @@ const OverallG6 = ({ messageApi, token }) => {
   
   const [activeTab, setActive] = useState('bep20')
 
+  const activeTabRef = useRef(activeTab);
+  const isZoomedRef = useRef(isZoomed);
+  const tokenRef= useRef(token)
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
+
+  useEffect(() => {
+    isZoomedRef.current = isZoomed;
+  }, [isZoomed]);
+
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token])
+
+  const [open, setOpen] = useState(false);
+  const columns = [
+    {
+      title: t('G6.time'),
+      dataIndex: "block_time",
+      key: "block_time",
+    },
+    {
+      title:  t('G6.amount'),
+      dataIndex: "raw_amount",
+      key: "raw_amount",
+    },
+    {
+      title:  t('G6.hash'),
+      dataIndex: "trans_hash",
+      key: "trans_hash",
+    }
+  ]
+  const [dataSource, setDataSource] = useState([])
+  const showDetail = (fromAddress, toAddress) => {
+    const tokenAddress = activeTabRef.current === 'bnb' ? undefined : tokenRef.current
+    setLoading(true)
+    checkDetail({ fromAddress, toAddress, tokenAddress }, activeTabRef.current).then((data) => {
+      setDataSource(data)
+      setOpen(true)
+    }).finally(() => {
+      setLoading(false)
+    })
+  }
+
+  const edgeCallback = (fromAddress, toAddress, count) => {
+    if (!isZoomedRef.current) return;
+    if (count > 500) {
+      confirm({
+        content: t('loadingLong'),
+        okText: t('OK'),
+        cancelText: t('Cancel'),
+        onOk() {
+          showDetail(fromAddress, toAddress)
+        },
+      });
+    } else {
+      showDetail(fromAddress, toAddress)
+    }
+  }
+  const [currentPage, setCurrentPage] = useState(1); 
+  const pageSize = 20;
+
+  const paginatedData = useMemo(() => {
+    return dataSource.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
+  }, [dataSource, currentPage]);
+  const paginationConfig = {
+    current: currentPage,
+    pageSize, 
+    total: dataSource.length, 
+    onChange: (page) => {
+      setCurrentPage(page);  
+    },
+    showSizeChanger: false, 
+  };
+
+  useEffect(() => {
+    if (!open) {
+      // 关闭后重置page和data
+      setCurrentPage(1);
+      setDataSource([]);
+    }
+  }, [open])
+
   const changeTab = (tab) => {
     if (tab === activeTab) return
     confirm({
@@ -319,6 +410,9 @@ const OverallG6 = ({ messageApi, token }) => {
     >
       {loading && <Spin />}
       <div id='overall-g6' className="rounded-lg w-full h-full overflow-hidden bg-gray-950 z-50">
+        <div className="absolute top-4 left-4">
+          <SearchIcon />
+        </div>
         <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded font-thin">
           <li><FaPlus onClick={zoomIn} /></li>
           <li style={{ cursor: 'unset'}}><p>{scale}</p></li>
@@ -341,8 +435,18 @@ const OverallG6 = ({ messageApi, token }) => {
           ))}
         </ul>
       </div>
+      <DragCloseDrawer open={open} setOpen={setOpen}>
+        <ResetTable>
+            <Table
+              columns={columns}
+              dataSource={paginatedData} 
+              rowKey={(record) => "tab_" + record.id} 
+              pagination={paginationConfig}
+              scroll={{ y: 'calc(85vh - 180px)' }} 
+            ></Table>
+        </ResetTable>
+      </DragCloseDrawer>
     </motion.div>
-
   );
 };
 

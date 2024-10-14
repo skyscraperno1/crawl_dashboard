@@ -78,7 +78,7 @@ function App() {
                  <BgCanvas index={0} />
                </>}
             />
-            <Route path="/track/:type/:add" element={<OverallG6 messageApi={messageApi}/>}/>
+            <Route path="/track/:type/:add" element={<OverallG6 messageApi={messageApi} token='0x55d398326f99059ff775485246999027b3197955' />}/>
             <Route path="*" element={<EmptyPage />}></Route>
           </Routes>
         </ConfigProvider>
