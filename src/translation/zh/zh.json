@@ -107,5 +107,8 @@
   "loadingLong": "数据量较大，加载可能需要较长时间。确定要继续加载吗？",
   "G6.time": "交易时间",
   "G6.amount": "交易金额",
-  "G6.hash": "交易哈希"
+  "G6.hash": "交易哈希",
+  "G6.search": "输入地址查询",
+  "found_address": "找到 {{count}} 处地址",
+  "found_address_plural": "找到 {{count}} 处地址"
 }

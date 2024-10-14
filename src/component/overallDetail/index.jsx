@@ -21,6 +21,9 @@ export const ResetTable = styled.div`
         background-color: #303135;
       }
     }
+    .ant-pagination {
+      margin-bottom: 0;
+    }
   }
 `;
 const TitleTag = ({ title, children }) => {
@@ -131,6 +134,7 @@ const OverallDetail = ({ messageApi }) => {
             pagination={false}
             size="middle"
             rowKey={(record) => "tab_" + record.id}
+            scroll={{ y: 'calc(85vh - 116px)' }} 
             onRow={(row) => {
               return {
                 onDoubleClick: () => {

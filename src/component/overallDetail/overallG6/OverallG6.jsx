@@ -100,13 +100,13 @@ const OverallG6 = ({ messageApi, token }) => {
       x: -offsetX,
       y: -offsetY,
       zIndex: 100,
-      position: 'absolute'
+      position: 'absolute',
     },
     normal: {
       zIndex: 50,
       position: 'absolute',
       x: 0,
-      y: 0
+      y: 0,
     }
   });
 
@@ -400,8 +400,36 @@ const OverallG6 = ({ messageApi, token }) => {
     initData(activeTab)
   }, [activeTab, address, token])
 
+  const handleSearch = (searchValue) => {
+    if (!graph.current) return;
+    graph.current.setAutoPaint(false);
+    graph.current.getNodes().forEach((node) => {
+      graph.current.setItemState(node, 'highlight', false);
+    });
+    graph.current.getEdges().forEach((edge) => {
+      graph.current.setItemState(edge, "highlight_in", false);
+      graph.current.setItemState(edge, "highlight_out", false);
+    });
+    graph.current.paint()
+    graph.current.setAutoPaint(true);
+    let count = 0;
+    graph.current.getNodes().forEach((node) => {
+      const model = node.getModel();
+      if (model.address === searchValue) {
+        count++
+        graph.current.setItemState(node, 'highlight', true); 
+      }
+    });
+    if (count > 0) {
+      messageApi?.open({
+        type: 'success',
+        content: t('found_address', { count }),
+      });
+    }
+  }
+
   return (
-    <motion.div ref={ref} className="w-full h-full overflow-hidden rounded-lg"
+    <motion.div ref={ref} className="w-full h-full overflow-hidden"
       initial="normal"
       animate={isZoomed ? "zoom" : "normal"}
       transition={{ type: "spring", bounce: 0.05, duration: 0.3 }}
@@ -409,9 +437,9 @@ const OverallG6 = ({ messageApi, token }) => {
       onUpdate={handleResize}
     >
       {loading && <Spin />}
-      <div id='overall-g6' className="rounded-lg w-full h-full overflow-hidden bg-gray-950 z-50">
+      <div id='overall-g6' className={"w-full h-full overflow-hidden bg-gray-950 z-50" + (isZoomed ? '' : ' rounded-lg' )}>
         <div className="absolute top-4 left-4">
-          <SearchIcon />
+          <SearchIcon onSearch={handleSearch}/>
         </div>
         <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded font-thin">
           <li><FaPlus onClick={zoomIn} /></li>
@@ -442,7 +470,7 @@ const OverallG6 = ({ messageApi, token }) => {
               dataSource={paginatedData} 
               rowKey={(record) => "tab_" + record.id} 
               pagination={paginationConfig}
-              scroll={{ y: 'calc(85vh - 180px)' }} 
+              scroll={{ y: 'calc(85vh - 164px)' }} 
             ></Table>
         </ResetTable>
       </DragCloseDrawer>

@@ -107,5 +107,8 @@
   "loadingLong": "Loading may take a long time. Are you sure you want to proceed?",
   "G6.time": "Transaction Time",
   "G6.amount": "Transaction Amount",
-  "G6.hash": "Transaction Hash"
+  "G6.hash": "Transaction Hash",
+  "G6.search": "Input Address",
+  "found_address": "Found {{count}} address",
+  "found_address_plural": "Found {{count}} addresses"
 }
