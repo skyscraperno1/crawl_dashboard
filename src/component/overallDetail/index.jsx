@@ -10,6 +10,7 @@ import DragCloseDrawer from "./DragCloseDrawer";
 import { cloneDeep } from "../../utils";
 import MiniTable from './MiniTable'
 import OverallG6 from "./overallG6/OverallG6";
+import Spin from "../common/Spin";
 
 export const ResetTable = styled.div`
   .ant-table-wrapper {
@@ -104,7 +105,7 @@ const OverallDetail = ({ messageApi }) => {
         </div>
         {/* G6图 */}
         <div className="col-span-2 row-span-2 rounded relative">
-          <OverallG6 messageApi={messageApi} token={token}/>
+          {token ? <OverallG6 messageApi={messageApi} token={token}/> : <Spin />}
         </div>
         {/* 社群消息 */}
         <div className="row-span-2">
