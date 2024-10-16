@@ -53,7 +53,7 @@ const DashBoard = ({ t, messageApi }) => {
     const len = dataArr.length;
     const startDate = dataArr[0].today
     const endDate = dataArr[len - 1].today
-    const average = dataArr.reduce((acc, cur) => acc + cur.count, 0) / len;
+    const average = (dataArr.reduce((acc, cur) => acc + cur.count, 0) / len).toFixed(2);
     setDateData({
       startDate,
       endDate,

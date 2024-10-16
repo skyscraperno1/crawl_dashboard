@@ -104,7 +104,7 @@ const OverallDetail = ({ messageApi }) => {
           />
         </div>
         {/* G6图 */}
-        <div className="col-span-2 row-span-2 rounded relative">
+        <div className="col-span-2 row-span-2 rounded relative overflow-hidden">
           {token ? <OverallG6 messageApi={messageApi} token={token}/> : <Spin />}
         </div>
         {/* 社群消息 */}

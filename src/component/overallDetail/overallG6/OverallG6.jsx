@@ -1,6 +1,5 @@
 import G6 from "@antv/g6";
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { MdZoomOutMap, MdZoomInMap } from "react-icons/md";
 import './toolbar.scss'
@@ -53,31 +52,45 @@ const OverallG6 = ({ messageApi, token }) => {
     graph.current.zoomTo(newZoom);
     setScale((newZoom * 100).toFixed(0));
   };
-  const handleKeyDown = (event) => {
-    if (event.key === 'Escape') {
-      setIsZoomed(false)
-    }
-  };
 
   useEffect(() => {
-    if (isZoomed) {
-      window.addEventListener('keydown', handleKeyDown)
-    } else {
-      window.removeEventListener('keydown', handleKeyDown)
+    document.addEventListener('fullscreenchange', handleResize)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleResize)
     }
-  }, [isZoomed])
+  }, [])
 
-  const [offsetX, setX] = useState(0)
-  const [offsetY, setY] = useState(0)
+  const toFullScreen = () => {
+    const divElement = ref.current;
+    if (!divElement) return;
+    if (divElement.requestFullscreen) {
+      divElement.requestFullscreen(); 
+    } else if (divElement.mozRequestFullScreen) {
+      divElement.mozRequestFullScreen();
+    } else if (divElement.webkitRequestFullscreen) { 
+      divElement.webkitRequestFullscreen();
+    } else if (divElement.msRequestFullscreen) { 
+      divElement.msRequestFullscreen();
+    }
+  }
+
+  const exitFullScreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { 
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { 
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { 
+      document.msExitFullscreen();
+    }
+  }
 
 
   useEffect(() => {
     if (!ref.current || !address) {
       return;
     }
-    window.addEventListener("resize", handleResize);
-    setX(ref.current.getBoundingClientRect().left)
-    setY(ref.current.getBoundingClientRect().top)
     if (!graph.current) {
       registerX(t);
       graph.current = new G6.Graph(defaultCfg(document.getElementById('overall-g6')))
@@ -89,29 +102,15 @@ const OverallG6 = ({ messageApi, token }) => {
     }
     () => {
       graph.current?.destroy();
-      window.removeEventListener("resize", handleResize);
     };
   }, [address]);
 
-  const getVariants = () => ({
-    zoom: {
-      width: window.innerWidth,
-      height: window.innerHeight,
-      x: -offsetX,
-      y: -offsetY,
-      zIndex: 100,
-      position: 'absolute',
-    },
-    normal: {
-      zIndex: 50,
-      position: 'absolute',
-      x: 0,
-      y: 0,
-    }
-  });
-
-
   const handleResize = debounce(() => {
+    if (document.fullscreenElement) {
+      setIsZoomed(true)
+    } else {
+      setIsZoomed(false)
+    }
     if (ref.current && graph.current) {
       const newWidth = ref.current.offsetWidth;
       const newHeight = ref.current.offsetHeight;
@@ -282,7 +281,7 @@ const OverallG6 = ({ messageApi, token }) => {
       setLoading(false)
     })
   }
-  
+
   const [activeTab, setActive] = useState('bep20')
 
   const activeTabRef = useRef(activeTab);
@@ -291,7 +290,7 @@ const OverallG6 = ({ messageApi, token }) => {
   useEffect(() => {
     activeTabRef.current = activeTab;
   }, [activeTab]);
-
+  
   useEffect(() => {
     isZoomedRef.current = isZoomed;
   }, [isZoomed]);
@@ -429,15 +428,9 @@ const OverallG6 = ({ messageApi, token }) => {
   }
 
   return (
-    <motion.div ref={ref} className="w-full h-full overflow-hidden"
-      initial="normal"
-      animate={isZoomed ? "zoom" : "normal"}
-      transition={{ type: "spring", bounce: 0.05, duration: 0.3 }}
-      variants={getVariants()}
-      onUpdate={handleResize}
-    >
+    <div ref={ref} className="w-full h-full max-h-[500px] overflow-hidden" >
       {loading && <Spin />}
-      <div id='overall-g6' className={"w-full h-full overflow-hidden bg-gray-950 z-50" + (isZoomed ? '' : ' rounded-lg' )}>
+      <div id='overall-g6' className={"w-full h-full overflow-hidden bg-gray-950 z-50"}>
         <div className="absolute top-4 left-4">
           <SearchIcon onSearch={handleSearch}/>
         </div>
@@ -446,8 +439,8 @@ const OverallG6 = ({ messageApi, token }) => {
           <li style={{ cursor: 'unset'}}><p>{scale}</p></li>
           <li ><FaMinus onClick={zoomOut} /></li>
           <li className={`${isFull ? 'pointer-events-none opacity-70' : ''}`}>{
-            isZoomed ? <MdZoomInMap onClick={() => setIsZoomed(false)} />
-              : <MdZoomOutMap onClick={() => setIsZoomed(true)} />
+            isZoomed ? <MdZoomInMap onClick={exitFullScreen} />
+              : <MdZoomOutMap onClick={toFullScreen} />
           }</li>
         </ul>
         <ul className="tool-bar flex absolute top-4 text-xs justify-end right-4 rounded font-thin">
@@ -474,7 +467,7 @@ const OverallG6 = ({ messageApi, token }) => {
             ></Table>
         </ResetTable>
       </DragCloseDrawer>
-    </motion.div>
+    </div>
   );
 };
 
