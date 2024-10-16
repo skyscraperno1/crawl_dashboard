@@ -110,6 +110,7 @@ const OverallG6 = ({ messageApi, token }) => {
       setIsZoomed(true)
     } else {
       setIsZoomed(false)
+      setOpen(false)
     }
     if (ref.current && graph.current) {
       const newWidth = ref.current.offsetWidth;
@@ -456,7 +457,7 @@ const OverallG6 = ({ messageApi, token }) => {
           ))}
         </ul>
       </div>
-      <DragCloseDrawer open={open} setOpen={setOpen}>
+      <DragCloseDrawer open={open} setOpen={setOpen} boxHeight="50vh">
         <ResetTable>
             <Table
               columns={columns}

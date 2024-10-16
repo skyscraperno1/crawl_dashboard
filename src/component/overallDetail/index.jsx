@@ -17,6 +17,9 @@ export const ResetTable = styled.div`
     .ant-table-cell {
       font-size: 12px;
     }
+    .ant-table-body {
+      overflow-y: overlay!important;
+    }
     .ant-table-tbody {
       .ant-table-row:nth-child(even) {
         background-color: #303135;

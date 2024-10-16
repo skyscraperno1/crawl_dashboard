@@ -6,7 +6,7 @@ import {
   motion,
 } from "framer-motion";
 import { useEffect } from "react";
-const DragCloseDrawer = ({ open, setOpen, children }) => {
+const DragCloseDrawer = ({ open, setOpen, children, boxHeight = '85vh' }) => {
   const [scope, animate] = useAnimate();
   const [drawerRef, { height }] = useMeasure();
 
@@ -68,8 +68,8 @@ const DragCloseDrawer = ({ open, setOpen, children }) => {
             transition={{
               ease: "easeInOut",
             }}
-            className="absolute bottom-0 h-[85vh] w-full overflow-hidden rounded-t-3xl bg-neutral-900"
-            style={{ y }}
+            className="absolute bottom-0 w-full overflow-hidden rounded-t-3xl bg-neutral-900"
+            style={{ y, height: boxHeight }}
             drag="y"
             dragControls={controls}
             onDragEnd={() => {
