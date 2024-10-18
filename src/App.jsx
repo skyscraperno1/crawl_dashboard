@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./translation/i8n";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
@@ -14,6 +14,14 @@ import { ConfigProvider, theme, message } from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 import enUS from "antd/lib/locale/en_US";
 
+function FullPageG6(messageApi) {
+  const [token, setToken] = useState("0x55d398326f99059ff775485246999027b3197955")
+  return (
+    <>
+     <Route path="/track/:type/:add" element={<OverallG6 messageApi={messageApi} token={token} setToken={(token) => setToken(token)}/>}/>
+    </>
+  )
+}
 function EmptyPage() {
   return (
     <div className="h-full w-full mx-auto pt-20 text-center bg-bg">
@@ -78,7 +86,7 @@ function App() {
                  <BgCanvas index={0} />
                </>}
             />
-            <Route path="/track/:type/:add" element={<OverallG6 messageApi={messageApi} token='0x55d398326f99059ff775485246999027b3197955' />}/>
+            {FullPageG6(messageApi)}
             <Route path="*" element={<EmptyPage />}></Route>
           </Routes>
         </ConfigProvider>

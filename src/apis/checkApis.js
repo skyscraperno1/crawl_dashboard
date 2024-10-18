@@ -38,3 +38,13 @@ export function checkDetail(params, type) {
     params,
   });
 }
+
+export function getToken(address) {
+  return Ajax({
+    url: `/v1/api/bep20/findTokenByAddress`,
+    method: "POST",
+    params: {
+      address,
+    },
+  });
+}

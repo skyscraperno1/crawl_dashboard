@@ -306,7 +306,7 @@ const OverallCase = ({ t, messageApi }) => {
       );
     } else if (key === "isHold") {
       return (
-        <div className="flex justify-between px-4 text-base">
+        <div className="flex justify-between px-4 text-base transition">
           {text !== '2' &&
             (text === "1" ? (
               <div

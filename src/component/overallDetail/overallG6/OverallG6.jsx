@@ -4,7 +4,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import { MdZoomOutMap, MdZoomInMap } from "react-icons/md";
 import './toolbar.scss'
 import { debounce } from "../../../utils";
-import { getFromData, getToData, checkDetail } from '../../../apis/checkApis'
+import { getFromData, getToData, checkDetail, getToken } from '../../../apis/checkApis'
 import { handleData } from "./canvasUtils";
 import { defaultCfg, registerX, behaviors } from "./canvasConfig";
 import Spin from '../../common/Spin'
@@ -14,22 +14,41 @@ import { Modal } from "antd";
 import { useParams } from "react-router-dom";
 import SearchIcon from "../../core/SearchIcon";
 import DragCloseDrawer from "../DragCloseDrawer";
-import { Table } from 'antd'
+import { Table, Select } from 'antd'
 import { ResetTable } from '../index'
 const Tabs = ['bep20', 'bnb']
 const { confirm } = Modal;
-const OverallG6 = ({ messageApi, token }) => {
+const { Option } = Select;
+
+const OverallG6 = ({ messageApi, token, setToken }) => {
   const { type, add } = useParams()
   const [address, setAddress] = useState('')
   const [isFull, setIsFull] = useState(false)
+
   useEffect(() => {
     if (type === 'bep20' || type === 'bnb') {
       setActive(type)
       setIsFull(true)
       setAddress(add)
+      nodeDataCache = {
+        [add]: {
+          fromData: [],
+          toData: [],
+          fromLoaded: 1,
+          toLoaded: 1,
+        }
+      }
     } else {
       setIsFull(false)
       setAddress('0x0000000000000000000000000000000000000000')
+      nodeDataCache = {
+        '0x0000000000000000000000000000000000000000': {
+          fromData: [],
+          toData: [],
+          fromLoaded: 1,
+          toLoaded: 1,
+        }
+      }
     }
   }, [type, add])
   const { t } = useTranslation();
@@ -64,12 +83,12 @@ const OverallG6 = ({ messageApi, token }) => {
     const divElement = ref.current;
     if (!divElement) return;
     if (divElement.requestFullscreen) {
-      divElement.requestFullscreen(); 
+      divElement.requestFullscreen();
     } else if (divElement.mozRequestFullScreen) {
       divElement.mozRequestFullScreen();
-    } else if (divElement.webkitRequestFullscreen) { 
+    } else if (divElement.webkitRequestFullscreen) {
       divElement.webkitRequestFullscreen();
-    } else if (divElement.msRequestFullscreen) { 
+    } else if (divElement.msRequestFullscreen) {
       divElement.msRequestFullscreen();
     }
   }
@@ -77,11 +96,11 @@ const OverallG6 = ({ messageApi, token }) => {
   const exitFullScreen = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { 
+    } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { 
+    } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { 
+    } else if (document.msExitFullscreen) {
       document.msExitFullscreen();
     }
   }
@@ -202,6 +221,8 @@ const OverallG6 = ({ messageApi, token }) => {
     graph.current.render();
   }
   const fetchLocalTo = (nodeId, address, loadedCount, transactions) => {
+    console.log(nodeDataCache[nodeId], loadedCount);
+    alert(123123)
     nodeDataCache[nodeId].toLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
     const { nodes, edges } = handleData(nextPage, address, false, nodeId, 'to')
@@ -240,6 +261,7 @@ const OverallG6 = ({ messageApi, token }) => {
         if (direction === 'from') {
           fetchLocalFrom(nodeId, address, loadedCount, transactions)
         } else {
+          console.log(loadedCount, transactions);
           fetchLocalTo(nodeId, address, loadedCount, transactions)
         }
       } else {
@@ -255,17 +277,17 @@ const OverallG6 = ({ messageApi, token }) => {
     nodes: [], edges: []
   }
 
-  let nodeDataCache = {
-    [address]: {
-      fromData: [],
-      toData: [],
-      fromLoaded: 1,
-      toLoaded: 1,
-    }
-  };
-  const initData = (tab) => {
+  let nodeDataCache = null
+
+  const [options, setOptions] = useState([])
+  const initData = (tab, token) => {
     setLoading(true)
-    Promise.all([getToData(address, tab, token), getFromData(address, tab, token)]).then(([toData, fromData]) => {
+      if (!options.length) {
+        getToken(address).then(tokenData => {
+          setOptions(tokenData)
+        })
+      }
+      Promise.all([getToData(address, tab, token), getFromData(address, tab, token)]).then(([toData, fromData]) => {
       const fromEdges = fromData?.edges || []
       const toEdges = toData?.edges || []
       const _fromData = handleData(fromEdges.slice(0, PAGE_SIZE), address, true, undefined, 'from')
@@ -287,11 +309,11 @@ const OverallG6 = ({ messageApi, token }) => {
 
   const activeTabRef = useRef(activeTab);
   const isZoomedRef = useRef(isZoomed);
-  const tokenRef= useRef(token)
+  const tokenRef = useRef(token)
   useEffect(() => {
     activeTabRef.current = activeTab;
   }, [activeTab]);
-  
+
   useEffect(() => {
     isZoomedRef.current = isZoomed;
   }, [isZoomed]);
@@ -308,12 +330,12 @@ const OverallG6 = ({ messageApi, token }) => {
       key: "block_time",
     },
     {
-      title:  t('G6.amount'),
+      title: t('G6.amount'),
       dataIndex: "raw_amount",
       key: "raw_amount",
     },
     {
-      title:  t('G6.hash'),
+      title: t('G6.hash'),
       dataIndex: "trans_hash",
       key: "trans_hash",
     }
@@ -345,7 +367,7 @@ const OverallG6 = ({ messageApi, token }) => {
       showDetail(fromAddress, toAddress)
     }
   }
-  const [currentPage, setCurrentPage] = useState(1); 
+  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
   const paginatedData = useMemo(() => {
@@ -356,12 +378,12 @@ const OverallG6 = ({ messageApi, token }) => {
   }, [dataSource, currentPage]);
   const paginationConfig = {
     current: currentPage,
-    pageSize, 
-    total: dataSource.length, 
+    pageSize,
+    total: dataSource.length,
     onChange: (page) => {
-      setCurrentPage(page);  
+      setCurrentPage(page);
     },
-    showSizeChanger: false, 
+    showSizeChanger: false,
   };
 
   useEffect(() => {
@@ -381,14 +403,15 @@ const OverallG6 = ({ messageApi, token }) => {
       okText: t('OK'),
       cancelText: t('Cancel'),
       onOk() {
+        nodeDataCache = null
         setActive(tab)
       },
     });
   }
 
   useEffect(() => {
-    if (!address || !token) return;
-    data = {nodes: [], edges: []}
+    if (!address) return;
+    data = { nodes: [], edges: [] }
     nodeDataCache = {
       [address]: {
         fromData: [],
@@ -397,7 +420,7 @@ const OverallG6 = ({ messageApi, token }) => {
         toLoaded: 1,
       }
     };
-    initData(activeTab)
+    initData(activeTab, token)
   }, [activeTab, address, token])
 
   const handleSearch = (searchValue) => {
@@ -417,7 +440,7 @@ const OverallG6 = ({ messageApi, token }) => {
       const model = node.getModel();
       if (model.address === searchValue) {
         count++
-        graph.current.setItemState(node, 'highlight', true); 
+        graph.current.setItemState(node, 'highlight', true);
       }
     });
     if (count > 0) {
@@ -428,29 +451,88 @@ const OverallG6 = ({ messageApi, token }) => {
     }
   }
 
+  const handleTokenChange = (value) => {
+    confirm({
+      title: t('sureTitle'),
+      content: t('sureContent'),
+      icon: <QuestionCircleOutlined style={{ color: 'red' }} />,
+      okText: t('OK'),
+      cancelText: t('Cancel'),
+      onOk() {
+        nodeDataCache = null;
+        if (!value) {
+          setToken('0x55d398326f99059ff775485246999027b3197955')
+        } else {
+          setToken(value)
+        }
+      },
+    });
+  }
+
   return (
-    <div ref={ref} className="w-full h-full max-h-[500px] overflow-hidden" >
+    <div ref={ref} className="w-full h-full overflow-hidden"
+      style={{
+        maxHeight: type === 'bep20' || type === 'bnb' ? 'none' : '500px',
+      }}
+    >
       {loading && <Spin />}
       <div id='overall-g6' className={"w-full h-full overflow-hidden bg-gray-950 z-50"}>
-        <div className="absolute top-4 left-4">
-          <SearchIcon onSearch={handleSearch}/>
+        <div className="absolute top-4 left-4"
+          style={{
+            marginTop: type === 'bep20' || type === 'bnb' ? '80px' : '0px',
+          }}
+        >
+          <SearchIcon onSearch={handleSearch} />
         </div>
+        {
+          options.length && (
+            <div className="absolute top-4 left-[50%] flex gap-4" style={{
+              marginTop: type === 'bep20' || type === 'bnb' ? '80px' : '0px',
+              transform: 'translateX(-50%)',
+            }}>
+              <div className="leading-8">Token</div>
+              <Select
+                style={{ width: 200 }}
+                placeholder="Select an option"
+                virtual
+                showSearch
+                allowClear
+                value={token}
+                onChange={handleTokenChange}
+              >
+                {
+                  options.map(item => {
+                    return (
+                      <Option key={item.tokenAddress} value={item.tokenAddress}>
+                        {item.symbol}
+                      </Option>
+                    )
+                  })
+                }
+              </Select>
+            </div>
+          )
+        }
         <ul className="tool-bar flex absolute bottom-4 text-sm justify-end right-4 rounded font-thin">
           <li><FaPlus onClick={zoomIn} /></li>
-          <li style={{ cursor: 'unset'}}><p>{scale}</p></li>
+          <li style={{ cursor: 'unset' }}><p>{scale}</p></li>
           <li ><FaMinus onClick={zoomOut} /></li>
           <li className={`${isFull ? 'pointer-events-none opacity-70' : ''}`}>{
             isZoomed ? <MdZoomInMap onClick={exitFullScreen} />
               : <MdZoomOutMap onClick={toFullScreen} />
           }</li>
         </ul>
-        <ul className="tool-bar flex absolute top-4 text-xs justify-end right-4 rounded font-thin">
+        <ul className="tool-bar flex absolute top-4 text-xs justify-end right-4 rounded font-thin"
+          style={{
+            marginTop: type === 'bep20' || type === 'bnb' ? '80px' : '0px',
+          }}
+        >
           {Tabs.map((tab) => (
             <li
               key={tab}
               className={`uppercase hover:text-themeColor select-none cursor-pointer ${activeTab === tab ? 'hover:text-white text-white bg-themeColor hover:bg-[#a46c39] active:bg-[#b78c5d]' : ''}`}
               style={{ width: 'fit-content', padding: '2px 6px' }}
-              onClick={() => changeTab(tab)} 
+              onClick={() => changeTab(tab)}
             >
               {tab}
             </li>
@@ -459,13 +541,13 @@ const OverallG6 = ({ messageApi, token }) => {
       </div>
       <DragCloseDrawer open={open} setOpen={setOpen} boxHeight="50vh">
         <ResetTable>
-            <Table
-              columns={columns}
-              dataSource={paginatedData} 
-              rowKey={(record) => "tab_" + record.id} 
-              pagination={paginationConfig}
-              scroll={{ y: 'calc(85vh - 164px)' }} 
-            ></Table>
+          <Table
+            columns={columns}
+            dataSource={paginatedData}
+            rowKey={(record) => "tab_" + record.id}
+            pagination={paginationConfig}
+            scroll={{ y: 'calc(50vh - 164px)' }}
+          ></Table>
         </ResetTable>
       </DragCloseDrawer>
     </div>
