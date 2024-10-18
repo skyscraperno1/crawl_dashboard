@@ -24,13 +24,14 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
   const { type, add } = useParams()
   const [address, setAddress] = useState('')
   const [isFull, setIsFull] = useState(false)
+  let nodeDataCache = useRef(null)
 
   useEffect(() => {
     if (type === 'bep20' || type === 'bnb') {
       setActive(type)
       setIsFull(true)
       setAddress(add)
-      nodeDataCache = {
+      nodeDataCache.current = {
         [add]: {
           fromData: [],
           toData: [],
@@ -41,7 +42,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
     } else {
       setIsFull(false)
       setAddress('0x0000000000000000000000000000000000000000')
-      nodeDataCache = {
+      nodeDataCache.current = {
         '0x0000000000000000000000000000000000000000': {
           fromData: [],
           toData: [],
@@ -147,7 +148,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
           type: 'error',
           content: t("noMore"),
         });
-        nodeDataCache[nodeId].fromLoaded = 1
+        nodeDataCache.current[nodeId].fromLoaded = 1
       } else {
         const _edges = res.edges.filter(item => {
           const { from_address, to_address } = item;
@@ -160,8 +161,8 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
           );
         })
         const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId, 'from')
-        nodeDataCache[nodeId].fromData = _edges
-        nodeDataCache[nodeId].fromLoaded = 1
+        nodeDataCache.current[nodeId].fromData = _edges
+        nodeDataCache.current[nodeId].fromLoaded = 1
         data = {
           nodes: [...data.nodes, ...nodes],
           edges: [...data.edges, ...edges]
@@ -182,7 +183,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
           type: 'error',
           content: t("noMore"),
         });
-        nodeDataCache[nodeId].toLoaded = 1
+        nodeDataCache.current[nodeId].toLoaded = 1
       } else {
         const _edges = res.edges.filter(item => {
           const { from_address, to_address } = item;
@@ -195,8 +196,8 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
           );
         })
         const { nodes, edges } = handleData(_edges.slice(0, PAGE_SIZE), address, false, nodeId, 'to')
-        nodeDataCache[nodeId].toData = _edges
-        nodeDataCache[nodeId].toLoaded = 1
+        nodeDataCache.current[nodeId].toData = _edges
+        nodeDataCache.current[nodeId].toLoaded = 1
         data = {
           nodes: [...data.nodes, ...nodes],
           edges: [...data.edges, ...edges]
@@ -210,7 +211,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
   }
 
   const fetchLocalFrom = (nodeId, address, loadedCount, transactions) => {
-    nodeDataCache[nodeId].fromLoaded = loadedCount + 1;
+    nodeDataCache.current[nodeId].fromLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
     const { nodes, edges } = handleData(nextPage, address, false, nodeId, 'from')
     data = {
@@ -221,9 +222,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
     graph.current.render();
   }
   const fetchLocalTo = (nodeId, address, loadedCount, transactions) => {
-    console.log(nodeDataCache[nodeId], loadedCount);
-    alert(123123)
-    nodeDataCache[nodeId].toLoaded = loadedCount + 1;
+    nodeDataCache.current[nodeId].toLoaded = loadedCount + 1;
     const nextPage = transactions.slice(loadedCount * PAGE_SIZE, (loadedCount + 1) * PAGE_SIZE);
     const { nodes, edges } = handleData(nextPage, address, false, nodeId, 'to')
     data = {
@@ -234,9 +233,9 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
     graph.current.render();
   }
   function showNextPage(address, direction, nodeId) {
-    let nodeCache = nodeDataCache[nodeId];
+    let nodeCache = nodeDataCache.current[nodeId];
     if (!nodeCache) {
-      nodeDataCache[nodeId] = {
+      nodeDataCache.current[nodeId] = {
         fromData: [],
         toData: [],
         fromLoaded: 0,
@@ -277,8 +276,6 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
     nodes: [], edges: []
   }
 
-  let nodeDataCache = null
-
   const [options, setOptions] = useState([])
   const initData = (tab, token) => {
     setLoading(true)
@@ -296,8 +293,8 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
         nodes: [..._fromData.nodes, ..._toData.nodes],
         edges: [..._fromData.edges, ..._toData.edges]
       }
-      nodeDataCache[address].fromData = fromEdges
-      nodeDataCache[address].toData = toEdges
+      nodeDataCache.current[address].fromData = fromEdges
+      nodeDataCache.current[address].toData = toEdges
       graph.current.data(data)
       graph.current.render()
     }).finally(() => {
@@ -403,7 +400,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
       okText: t('OK'),
       cancelText: t('Cancel'),
       onOk() {
-        nodeDataCache = null
+        nodeDataCache.current = null
         setActive(tab)
       },
     });
@@ -412,7 +409,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
   useEffect(() => {
     if (!address) return;
     data = { nodes: [], edges: [] }
-    nodeDataCache = {
+    nodeDataCache.current = {
       [address]: {
         fromData: [],
         toData: [],
@@ -459,7 +456,7 @@ const OverallG6 = ({ messageApi, token, setToken }) => {
       okText: t('OK'),
       cancelText: t('Cancel'),
       onOk() {
-        nodeDataCache = null;
+        nodeDataCache.current = null;
         if (!value) {
           setToken('0x55d398326f99059ff775485246999027b3197955')
         } else {
